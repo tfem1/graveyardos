@@ -1,0 +1,1857 @@
+nlohmann-json	cmake git
+cppdap	cmake git nlohmann-json
+python-installer	python-build
+python-pyproject-hooks	python-build python-installer
+python-build	git python-installer python-pyproject-hooks
+python-fastjsonschema	python-build python-installer
+python-vcs-versioning	git python-build python-installer
+python-setuptools-scm	git python-build python-installer python-vcs-versioning
+python-typing_extensions	git python-build python-installer
+python-lark-parser	git python-build python-installer python-setuptools-scm python-typing_extensions
+python-poetry-core	python-build python-fastjsonschema python-installer python-lark-parser
+python-pkgconfig	git python-build python-installer python-poetry-core
+brotli	cmake git python-build python-installer python-pkgconfig
+gyp	git python-build python-installer
+python-docutils	python-build python-installer
+mercurial	python-build python-docutils python-installer python-setuptools-scm
+zip	
+nspr	git zip
+bash-completion	
+libgpg-error	
+libgcrypt	libgpg-error
+libxslt	git libgcrypt libxml2
+autoconf-archive	
+sgml-common	
+docbook-sgml	sgml-common
+docbook-dsssl	sgml-common
+docbook-sgml31	sgml-common
+xmlto	docbook-xsl libxslt
+opensp	docbook-sgml docbook-xsl sgml-common xmlto
+openjade	opensp sgml-common
+perl-sgmls	
+docbook-utils	docbook-dsssl docbook-sgml31 openjade perl-sgmls
+fontconfig	docbook-sgml docbook-utils freetype2 git perl-sgmls
+yasm	git xmlto
+aom	cmake doxygen yasm
+python-mako	git python-build python-installer
+python-markdown	git python-build python-installer
+python-pytz	
+python-babel	python-pytz
+python-imagesize	git python-build python-installer
+python-editables	git python-build python-installer
+python-pathspec	git python-build python-installer
+python-pluggy	git python-build python-installer python-setuptools-scm
+python-tomlkit	python-build python-installer python-poetry-core
+python-calver	git python-build python-installer
+python-trove-classifiers	git python-build python-calver python-installer
+python-hatchling	python-build python-editables python-installer python-pathspec python-pluggy python-tomlkit python-trove-classifiers
+python-wcag-contrast-ratio	python-build python-installer
+python-pygments	python-build python-hatchling python-installer python-sphinx python-wcag-contrast-ratio
+python-certifi	ca-certificates git python-build python-installer
+python-semantic-version	git python-build python-installer
+aarch64-linux-gnu-binutils	
+popt	
+python-sphinxcontrib-jquery	python-build python-installer python-sphinx
+python-sphinx_rtd_theme	git python-build python-installer python-setuptools-scm python-sphinx python-sphinxcontrib-jquery
+python-commonmark	python-build python-docutils python-installer python-sphinx python-sphinx_rtd_theme
+xxhash	git
+rsync	git popt python-commonmark xxhash
+aarch64-linux-gnu-linux-api-headers	rsync
+aarch64-linux-gnu-glibc	aarch64-linux-gnu-gcc aarch64-linux-gnu-linux-api-headers
+libisl	
+aarch64-linux-gnu-gcc	aarch64-linux-gnu-binutils aarch64-linux-gnu-glibc libisl
+glibc	gcc gd git
+gcc	doxygen git glibc libisl rust
+libssh2	git
+oniguruma	
+jq	git oniguruma
+gtest	cmake
+abseil-cpp	cmake gtest
+ada	cmake
+c-ares	cmake git
+icu	
+libnghttp2	git
+libnghttp3	git
+leancrypto	
+libunistring	
+libyaml	
+ruby-abbrev	ruby
+ruby-rake	git ruby ruby-rdoc
+ruby-bundler	ruby ruby-rake ruby-rdoc
+tree	
+ruby-erb	ruby ruby-rdoc tree
+ruby-minitest	ruby ruby-hoe ruby-rake ruby-rdoc
+ruby-hoe	git ruby ruby-minitest ruby-rake ruby-rdoc
+ruby-kpeg	ruby ruby-hoe ruby-rake ruby-rdoc
+ruby-rake-compiler	ruby ruby-rake ruby-rdoc
+rubygems	ruby ruby-rdoc
+ruby-racc	ruby ruby-bundler ruby-rake ruby-rake-compiler ruby-rdoc rubygems
+ruby-rdoc	ruby ruby-bundler ruby-erb ruby-kpeg ruby-racc ruby-rake
+ruby-base64	ruby ruby-rdoc
+ruby-bigdecimal	ruby ruby-rdoc
+ruby-csv	ruby ruby-rdoc
+ruby-irb	ruby ruby-bundler ruby-rdoc
+ruby-debug	git ruby ruby-irb ruby-rdoc
+ruby-drb	ruby ruby-rdoc
+ruby-getoptlong	ruby ruby-rdoc
+ruby-matrix	ruby ruby-rake
+ruby-mutex_m	ruby ruby-rdoc
+ruby-net-ftp	ruby
+ruby-net-imap	ruby ruby-rdoc
+ruby-net-pop	ruby
+ruby-net-smtp	git ruby ruby-rdoc
+ruby-nkf	ruby ruby-rdoc
+ruby-observer	ruby ruby-rdoc
+ruby-power_assert	ruby ruby-rake ruby-rdoc
+ruby-prime	ruby ruby-rdoc
+ruby-extconf_compile_commands_json	ruby ruby-rdoc
+ruby-rbs	git ruby ruby-extconf_compile_commands_json ruby-rdoc
+ruby-repl_type_completor	ruby ruby-rbs ruby-rdoc
+ruby-resolv-replace	ruby ruby-rdoc
+ruby-rexml	ruby ruby-rdoc
+ruby-rinda	ruby ruby-drb ruby-rdoc
+ruby-test-unit	ruby ruby-power_assert ruby-rdoc
+ruby-rss	git ruby-rake ruby-rexml ruby-test-unit
+ruby-syslog	ruby ruby-rdoc
+ruby-typeprof	ruby ruby-rdoc
+xorg-util-macros	
+xorgproto	xorg-util-macros
+libxau	xorgproto
+libxdmcp	xorg-util-macros xorgproto
+xcb-proto	libxml2
+libxcb	libxau libxdmcp libxslt xcb-proto xorg-util-macros xorgproto
+xtrans	
+libx11	git libxcb xorg-util-macros xorgproto xtrans
+libxrender	git libx11 xorg-util-macros xorgproto
+libxft	fontconfig freetype2 libx11 libxrender xorgproto
+libxext	libx11 xorg-util-macros xorgproto
+libxss	libx11 libxext xorg-util-macros xorgproto
+tk	libxft libxss
+ruby	doxygen graphviz libyaml ruby-abbrev ruby-base64 ruby-bigdecimal ruby-bundler ruby-csv ruby-debug ruby-drb ruby-erb ruby-getoptlong ruby-irb ruby-matrix ruby-minitest ruby-mutex_m ruby-net-ftp ruby-net-imap ruby-net-pop ruby-net-smtp ruby-nkf ruby-observer ruby-power_assert ruby-prime ruby-racc ruby-rake ruby-rbs ruby-rdoc ruby-repl_type_completor ruby-resolv-replace ruby-rexml ruby-rinda ruby-rss ruby-syslog ruby-test-unit ruby-typeprof rubygems rust tk
+ruby-kramdown	ruby ruby-rake ruby-rdoc ruby-rexml
+ruby-kramdown-parser-gfm	git ruby ruby-kramdown ruby-rake ruby-rdoc
+ruby-mustache	ruby ruby-rdoc
+ruby-mini_portile2	ruby ruby-rdoc
+ruby-nokogiri	libxslt ruby ruby-mini_portile2 ruby-racc ruby-rdoc
+ruby-rdiscount	git ruby ruby-rake ruby-rdoc
+ruby-ronn-ng	ruby ruby-erb ruby-kramdown ruby-kramdown-parser-gfm ruby-mustache ruby-nokogiri ruby-rdiscount ruby-rdoc
+libidn2	libunistring ruby-ronn-ng
+libtasn1	
+nettle	
+cmocka	cmake
+json-c	cmake git
+libtpms	git
+asciidoctor	git ruby ruby-rdoc
+pcre2	git
+swig	git pcre2
+libcap-ng	bash-completion swig
+perl-locale-gettext	
+perl-inc-latest	
+perl-module-build	perl-inc-latest
+perl-pod-parser	
+perl-term-readkey	
+perl-text-charwidth	
+perl-text-wrapi18n	perl-text-charwidth
+libdatrie	doxygen git
+libthai	autoconf-archive doxygen git libdatrie
+perl-mime-charset	
+perl-unicode-linebreak	libthai perl-mime-charset
+perl-yaml-tiny	
+po4a	docbook-xsl perl-locale-gettext perl-module-build perl-pod-parser perl-sgmls perl-term-readkey perl-text-wrapi18n perl-unicode-linebreak perl-yaml-tiny
+sqlite	
+util-linux	asciidoctor bash-completion git libcap-ng po4a sqlite
+tpm2-tss	autoconf-archive cmocka curl doxygen git json-c libtpms util-linux
+gnutls	brotli gtk-doc leancrypto libidn2 libtasn1 libunistring nettle p11-kit tpm2-tss
+libngtcp2	brotli git gnutls
+keyutils	git
+lmdb	git
+chrpath	git
+cccl	cmake
+cbindgen	git rust
+directx-headers	git
+libarchive	git libxml2
+libmicrohttpd	gnutls
+elfutils	curl git json-c libarchive libmicrohttpd sqlite
+spirv-headers	cmake git
+spirv-tools	cmake git spirv-headers
+glslang	cmake git spirv-headers spirv-tools
+hwdata	git
+libdisplay-info	hwdata
+libpciaccess	xorg-util-macros
+libdrm	libpciaccess python-docutils
+libpng	git
+libxfixes	libx11 xorg-util-macros xorgproto
+default-cursors	
+mdbook	rust
+wayland	default-cursors docbook-xsl doxygen graphviz libxml2 libxslt mdbook xmlto
+libva	git libdrm libglvnd libx11 libxcb libxext libxfixes mesa wayland
+libxrandr	libx11 libxext libxrender xorg-util-macros xorgproto
+libxshmfence	xorg-util-macros xorgproto
+libxxf86vm	libx11 libxext xorgproto
+libedit	
+python-mdurl	python-build python-installer
+python-markdown-it-py	python-build python-installer python-mdurl
+python-mdit_py_plugins	python-build python-installer python-markdown-it-py
+lapack	cmake doxygen gcc git
+patchelf	git
+python-pyproject-metadata	python-build python-installer
+meson-python	git patchelf python-build python-installer python-pyproject-metadata
+python-numpy	cmake cython gcc git lapack meson-python python-build python-installer
+cython	git python-build python-installer python-numpy python-pygments
+python-yaml	cython libyaml python-build python-installer
+python-myst-parser	python-build python-docutils python-installer python-markdown-it-py python-mdit_py_plugins python-pygments python-sphinx python-yaml
+python-psutil	python-build python-installer
+spirv-llvm-translator	cmake git llvm spirv-tools
+wasm-component-ld	git llvm rust
+wasm-pkg-tools	git rust
+wasm-tools	rust
+wit-bindgen	git rust
+wasi-libc	cmake git llvm wasm-component-ld wasm-pkg-tools wasm-tools wit-bindgen
+llvm	cmake curl gcc libedit libxml2 python-build python-installer python-myst-parser python-psutil python-sphinx spirv-llvm-translator swig wasi-libc wasm-component-ld
+lua51	
+help2man	perl-locale-gettext
+fribidi	git help2man
+python-magic	python-build python-installer
+python-smartypants	python-build python-installer
+python-typogrify	python-build python-hatchling python-installer python-smartypants
+gi-docgen	git graphviz python-build python-installer python-magic python-markdown python-pygments python-typogrify
+alsa-topology-conf	
+alsa-ucm-conf	
+alsa-lib	alsa-topology-conf alsa-ucm-conf
+amf-headers	git
+glu	libglvnd
+libxi	git libx11 libxext libxfixes xorg-util-macros xorgproto
+freeglut	cmake git glu libglvnd libx11 libxi libxrandr libxxf86vm mesa
+libjpeg-turbo	cmake nasm
+libice	xorg-util-macros xorgproto xtrans
+libsm	libice util-linux xorg-util-macros xorgproto xtrans
+libxt	libice libsm libx11 xorg-util-macros xorgproto
+libxmu	libx11 libxext libxt xorg-util-macros xorgproto
+jasper	cmake doxygen freeglut glu libglvnd libjpeg-turbo libxmu
+jbigkit	git
+libdeflate	cmake git
+hicolor-icon-theme	git
+djvulibre	git hicolor-icon-theme libjpeg-turbo libtiff
+fftw	cmake gcc openmpi
+add-determinism	rust
+libunwind	texlive-texmf
+gperftools	asciidoctor git libunwind
+highway	cmake gtest
+publicsuffix-list	git
+libpsl	gtk-doc libidn2 libunistring libxslt publicsuffix-list
+wget	autoconf-archive git gnutls libidn2 libpsl nettle pcre2 util-linux
+cpio	git rsync wget
+java-common	
+libnet	doxygen git graphviz help2man
+libxtst	git libx11 libxext libxi xorg-util-macros xorgproto
+alex	ghc
+uusi	ghc
+haskell-happy-lib	ghc uusi
+happy	ghc haskell-happy-lib
+haskell-base16-bytestring	ghc
+haskell-cryptohash-sha256	ghc haskell-base16-bytestring uusi
+haskell-clock	ghc
+haskell-extra	ghc haskell-clock
+haskell-erf	ghc
+haskell-splitmix	ghc
+haskell-random	ghc haskell-splitmix
+haskell-quickcheck	ghc haskell-erf haskell-random haskell-splitmix
+haskell-filepattern	ghc haskell-extra haskell-quickcheck uusi
+haskell-os-string	ghc
+haskell-hashable	ghc haskell-os-string uusi
+haskell-heaps	ghc uusi
+haskell-js-dgtable	ghc
+haskell-js-flot	ghc
+haskell-case-insensitive	ghc haskell-hashable
+haskell-colour	ghc
+haskell-ansi-terminal-types	ghc haskell-colour uusi
+haskell-ansi-terminal	ghc haskell-ansi-terminal-types haskell-colour
+haskell-call-stack	ghc
+haskell-hunit	ghc haskell-call-stack
+haskell-hspec-expectations	ghc haskell-call-stack haskell-hunit
+haskell-lexer	ghc
+haskell-quickcheck-io	ghc haskell-hunit haskell-quickcheck
+haskell-primitive	ghc uusi
+haskell-tf-random	ghc haskell-primitive haskell-random
+haskell-hspec-core	ghc haskell-ansi-terminal haskell-call-stack haskell-hspec-expectations haskell-hunit haskell-lexer haskell-quickcheck haskell-quickcheck-io haskell-random haskell-tf-random
+haskell-hspec-discover	ghc
+haskell-hspec	ghc haskell-hspec-core haskell-hspec-discover haskell-hspec-expectations haskell-quickcheck
+haskell-tagged	ghc
+haskell-distributive	ghc haskell-tagged
+haskell-indexed-traversable	ghc uusi
+haskell-comonad	ghc haskell-distributive haskell-indexed-traversable haskell-tagged
+haskell-statevar	ghc
+haskell-contravariant	ghc haskell-statevar
+haskell-code-page	ghc
+haskell-ghc-paths	ghc
+haskell-syb	ghc
+haskell-temporary	ghc haskell-random
+haskell-doctest	ghc haskell-code-page haskell-ghc-paths haskell-syb haskell-temporary
+haskell-base-orphans	ghc haskell-hspec haskell-hspec-discover haskell-quickcheck
+haskell-assoc	ghc haskell-tagged uusi
+haskell-th-abstraction	ghc
+haskell-bifunctors	ghc haskell-assoc haskell-comonad haskell-tagged haskell-th-abstraction
+haskell-profunctors	ghc haskell-base-orphans haskell-bifunctors haskell-comonad haskell-contravariant haskell-distributive haskell-tagged
+haskell-cabal-doctest	ghc
+haskell-transformers-compat	ghc
+haskell-unordered-containers	ghc haskell-hashable
+haskell-semigroupoids	ghc haskell-base-orphans haskell-bifunctors haskell-cabal-doctest haskell-comonad haskell-contravariant haskell-doctest haskell-hashable haskell-tagged haskell-transformers-compat haskell-unordered-containers
+haskell-prettyprinter	ghc
+haskell-prettyprinter-ansi-terminal	ghc haskell-ansi-terminal haskell-prettyprinter
+haskell-optparse-applicative	ghc haskell-prettyprinter haskell-prettyprinter-ansi-terminal haskell-transformers-compat uusi
+haskell-terminal-size	ghc
+haskell-tasty	ghc haskell-ansi-terminal haskell-optparse-applicative haskell-tagged haskell-terminal-size
+haskell-vector-stream	ghc
+haskell-vector	ghc haskell-primitive haskell-random haskell-tasty haskell-vector-stream uusi
+haskell-foldl	ghc haskell-comonad haskell-contravariant haskell-doctest haskell-primitive haskell-profunctors haskell-random haskell-semigroupoids haskell-unordered-containers haskell-vector
+haskell-split	ghc
+haskell-bitvec	ghc haskell-primitive haskell-vector uusi
+haskell-vector-algorithms	ghc haskell-bitvec haskell-primitive haskell-quickcheck haskell-vector
+haskell-mono-traversable	ghc haskell-foldl haskell-hashable haskell-hspec haskell-hspec-discover haskell-hunit haskell-quickcheck haskell-split haskell-unordered-containers haskell-vector haskell-vector-algorithms
+haskell-unliftio-core	ghc uusi
+haskell-resourcet	ghc haskell-primitive haskell-unliftio-core
+haskell-safe	ghc
+haskell-silently	ghc
+haskell-async	ghc haskell-hashable haskell-unordered-containers
+haskell-safe-exceptions	ghc
+haskell-unliftio	ghc haskell-async haskell-safe-exceptions haskell-unliftio-core
+haskell-conduit	ghc haskell-hspec haskell-mono-traversable haskell-primitive haskell-quickcheck haskell-resourcet haskell-safe haskell-silently haskell-split haskell-unliftio haskell-unliftio-core haskell-vector
+haskell-integer-logarithms	ghc
+haskell-scientific	ghc haskell-hashable haskell-integer-logarithms haskell-primitive
+haskell-attoparsec	ghc haskell-scientific uusi
+haskell-network	ghc
+haskell-zlib	ghc uusi
+haskell-streaming-commons	ghc haskell-async haskell-network haskell-random haskell-zlib
+haskell-transformers-base	ghc haskell-base-orphans haskell-transformers-compat
+haskell-typed-process	ghc haskell-async haskell-unliftio-core
+haskell-conduit-extra	ghc haskell-async haskell-attoparsec haskell-conduit haskell-hspec haskell-hspec-discover haskell-network haskell-primitive haskell-quickcheck haskell-resourcet haskell-streaming-commons haskell-transformers-base haskell-typed-process haskell-unliftio-core
+haskell-http-types	ghc haskell-case-insensitive
+haskell-network-bsd	ghc haskell-network
+haskell-th-compat	ghc
+haskell-network-uri	ghc haskell-th-compat
+haskell-httpd-shed	ghc haskell-network haskell-network-bsd haskell-network-uri uusi
+haskell-cereal	ghc
+haskell-entropy	ghc
+haskell-crypto-api	ghc haskell-cereal haskell-entropy haskell-tagged
+haskell-puremd5	ghc haskell-cereal haskell-crypto-api haskell-tagged
+haskell-prettyprinter-compat-ansi-wl-pprint	ghc haskell-prettyprinter haskell-prettyprinter-ansi-terminal
+haskell-ansi-wl-pprint	ghc haskell-prettyprinter-compat-ansi-wl-pprint
+haskell-hostname	ghc
+haskell-regex-base	ghc
+haskell-regex-posix	ghc haskell-regex-base uusi
+haskell-xml	ghc
+haskell-test-framework	ghc haskell-ansi-terminal haskell-ansi-wl-pprint haskell-hostname haskell-random haskell-regex-posix haskell-xml uusi
+haskell-test-framework-hunit	ghc haskell-hunit haskell-test-framework uusi
+haskell-vault	ghc haskell-hashable haskell-unordered-containers
+haskell-wai	ghc haskell-http-types haskell-network haskell-vault
+haskell-auto-update	ghc
+haskell-bsb-http-chunked	ghc uusi
+haskell-hourglass	ghc
+haskell-basement	ghc
+haskell-memory	ghc haskell-basement
+haskell-asn1-types	ghc haskell-hourglass haskell-memory
+haskell-asn1-encoding	ghc haskell-asn1-types haskell-hourglass
+haskell-asn1-parse	ghc haskell-asn1-encoding haskell-asn1-types
+haskell-crypton	ghc haskell-basement haskell-memory
+haskell-pem	ghc haskell-basement haskell-memory
+haskell-crypton-x509	ghc haskell-asn1-encoding haskell-asn1-parse haskell-asn1-types haskell-crypton haskell-hourglass haskell-memory haskell-pem
+haskell-base64-bytestring	ghc
+haskell-blaze-builder	ghc
+haskell-data-default-class	ghc
+haskell-cookie	ghc haskell-data-default-class uusi
+haskell-appar	ghc
+haskell-byteorder	ghc
+haskell-iproute	ghc haskell-appar haskell-byteorder haskell-network
+haskell-mime-types	ghc
+haskell-monad-control	ghc haskell-transformers-base haskell-transformers-compat uusi
+haskell-http-client	ghc haskell-async haskell-base64-bytestring haskell-blaze-builder haskell-case-insensitive haskell-cookie haskell-hspec haskell-hspec-discover haskell-http-types haskell-iproute haskell-mime-types haskell-monad-control haskell-network haskell-network-uri haskell-random haskell-streaming-commons haskell-zlib
+haskell-old-locale	ghc
+haskell-http-date	ghc haskell-attoparsec haskell-hspec haskell-hspec-discover haskell-old-locale
+haskell-network-byte-order	ghc
+haskell-time-manager	ghc haskell-auto-update uusi
+haskell-utf8-string	ghc
+haskell-http-semantics	ghc haskell-case-insensitive haskell-http-types haskell-network haskell-network-byte-order haskell-time-manager haskell-utf8-string uusi
+haskell-psqueues	ghc haskell-hashable
+haskell-old-time	ghc haskell-old-locale
+haskell-unix-time	ghc haskell-old-time
+haskell-network-control	ghc haskell-psqueues haskell-unix-time uusi
+haskell-http2	ghc haskell-async haskell-case-insensitive haskell-http-semantics haskell-http-types haskell-network haskell-network-byte-order haskell-network-control haskell-time-manager haskell-unix-time haskell-unliftio haskell-utf8-string
+haskell-recv	ghc haskell-network uusi
+haskell-simple-sendfile	ghc haskell-network
+haskell-word8	ghc haskell-hspec haskell-hspec-discover
+haskell-warp	ghc haskell-auto-update haskell-bsb-http-chunked haskell-case-insensitive haskell-crypton-x509 haskell-doctest haskell-hashable haskell-hspec haskell-hspec-discover haskell-http-client haskell-http-date haskell-http-types haskell-http2 haskell-iproute haskell-network haskell-quickcheck haskell-recv haskell-simple-sendfile haskell-streaming-commons haskell-time-manager haskell-unliftio haskell-vault haskell-wai haskell-word8 uusi
+haskell-http	ghc haskell-case-insensitive haskell-conduit haskell-conduit-extra haskell-http-types haskell-httpd-shed haskell-hunit haskell-network haskell-network-uri haskell-puremd5 haskell-split haskell-test-framework haskell-test-framework-hunit haskell-wai haskell-warp
+haskell-js-jquery	ghc haskell-http
+haskell-shake	ghc haskell-extra haskell-filepattern haskell-hashable haskell-heaps haskell-js-dgtable haskell-js-flot haskell-js-jquery haskell-primitive haskell-quickcheck haskell-random haskell-unordered-containers haskell-utf8-string
+haskell-hadrian	ghc haskell-base16-bytestring haskell-cryptohash-sha256 haskell-extra haskell-quickcheck haskell-shake haskell-unordered-containers uusi
+haskell-hscolour	ghc
+numactl	
+time	
+adwaita-fonts	git
+apr	util-linux
+db	
+liburing	git
+docbook5-xml	libxml2
+go	git
+gendesk	go
+groovy	gendesk java-openjdk
+which	
+gradle	asciidoc git groovy java-openjdk which xmlto
+java-hamcrest	git gradle java-openjdk
+junit	java-hamcrest java-openjdk
+ant	java-hamcrest java-openjdk junit which
+java-avalon-framework	java-openjdk
+java-commons-io	java-openjdk
+java-commons-logging	java-openjdk
+java-xmlgraphics-commons	java-openjdk
+maven	java-openjdk
+unzip	
+java-batik	ant java-commons-io java-commons-logging java-openjdk java-xmlgraphics-commons maven unzip
+lynx	brotli libidn2
+xdg-utils	docbook-xsl git lynx xmlto
+java8-openjdk	alsa-lib ca-certificates cpio cups fontconfig giflib git hicolor-icon-theme java-common java-openjdk libxrender libxt libxtst nss unzip xdg-utils zip
+fop	ant git java-avalon-framework java-batik java-commons-io java-commons-logging java-xmlgraphics-commons java8-openjdk maven
+pambase	
+gc	git
+gpm	git
+libid3tag	cmake
+cargo-c	curl libgit2 libssh2 rust sqlite
+bubblewrap	bash-completion docbook-xsl git libxslt
+libseccomp	cython git python-build python-installer
+glycin	bubblewrap cairo fontconfig gi-docgen git glib2 gobject-introspection gtk4 lcms2 libheif libjxl librsvg libseccomp llvm rust vala
+shared-mime-info	docbook-xsl glib2 libxml2 xmlto
+gdk-pixbuf2	gi-docgen git glib2 glycin gobject-introspection python-docutils shared-mime-info
+librsvg	cairo cargo-c dav1d fontconfig freetype2 gdk-pixbuf2 gi-docgen git glib2 gobject-introspection harfbuzz libxml2 llvm pango python-docutils rust vala
+libspectre	ghostscript
+openjpeg2	cmake doxygen graphviz lcms2 libpng libtiff
+imlib2	freetype2 giflib git highway libheif libid3tag libjpeg-turbo libjxl libpng librsvg libspectre libtiff libwebp libxext openjpeg2
+w3m	gc git gpm imlib2
+pam	audit docbook-xml docbook-xsl docbook5-xml fop git libnsl libtirpc libxslt pambase w3m
+perl-io-tty	
+perl-ipc-run	perl-io-tty
+postgresql	curl docbook-xml docbook-xsl icu krb5 liburing libxml2 libxslt llvm numactl openldap pam perl-ipc-run util-linux
+unixodbc	
+apr-util	apr db mariadb nss openldap postgresql sqlite unixodbc
+jansson	
+lua	
+apache	apr-util brotli curl db jansson libnghttp2 libxml2 lua pcre2
+python-legacy-cgi	python-build python-hatchling python-installer
+apparmor	apache audit autoconf-archive git pam python-legacy-cgi ruby swig
+audit	apparmor krb5 libcap-ng openldap swig
+dbus-broker	audit libcap-ng python-docutils
+gsettings-desktop-schemas	adwaita-fonts dconf git glib2 gobject-introspection
+xorg-xprop	libx11 xorg-util-macros
+at-spi2-core	dbus-broker gi-docgen git glib2 gobject-introspection gsettings-desktop-schemas libx11 libxi libxml2 libxtst python-sphinx xorg-xprop
+ftjam	
+libxinerama	libx11 libxext xorg-util-macros xorgproto
+argyllcms	ftjam libpng libtiff libxinerama libxrandr libxss libxxf86vm unzip zip
+ell	
+libical	cmake doxygen gi-docgen git glib2 gobject-introspection icu java-openjdk libxml2 vala
+bluez	alsa-lib cups ell git glib2 json-c libical python-docutils python-pygments
+libnl	git
+libpcap	bluez git libnl
+umockdev	gobject-introspection gtk-doc libgudev libpcap vala
+libgudev	git glib2 glibc gobject-introspection gtk-doc umockdev vala
+json-glib	docbook-xsl gi-docgen git glib2 gobject-introspection python-docutils
+libusb	git
+libgusb	gi-docgen git glib2 gobject-introspection gtk-doc json-glib libusb umockdev vala
+duktape	
+polkit	duktape git glib2 gobject-introspection gtk-doc pam
+libexif	
+libgphoto2	curl doxygen gd git graphviz libexif libjpeg-turbo libtiff libusb libxml2
+libieee1284	docbook-xml docbook-xsl xmlto
+pciutils	git hwdata
+net-snmp	git libnsl libpcap lm_sensors pciutils pcre2
+libxpm	git libx11 libxext libxt xorg-util-macros
+libsecret	bash-completion gi-docgen git glib2 gobject-introspection libgcrypt tpm2-tss vala
+libutf8proc	cmake git
+python-py3c	python-build python-installer
+scons	git python-build python-installer
+serf	apr-util db krb5 scons
+subversion	apache apr apr-util java-openjdk libsasl libsecret libutf8proc python-py3c ruby ruby-nkf serf sqlite swig
+netpbm	jbigkit libjpeg-turbo libpng libtiff libxml2 subversion
+fig2dev	ghostscript libpng libxpm netpbm
+libassuan	libgpg-error
+libksba	libgpg-error
+npth	
+pcsclite	git polkit
+hidapi	cmake libusb
+libcbor	cmake cmocka
+libfido2	cmake hidapi libcbor
+suitesparse	cmake gcc git lapack
+eigen	cmake fftw freeglut gcc git suitesparse
+python-iniconfig	git python-build python-installer python-setuptools-scm
+python-pytest	git python-build python-iniconfig python-installer python-pluggy python-pygments python-setuptools-scm
+python-hatch-vcs	git python-build python-hatchling python-installer python-setuptools-scm
+python-scikit-build-core	cmake python-build python-hatch-vcs python-hatchling python-installer python-pathspec
+pybind11	boost cmake eigen python-build python-installer python-pytest python-scikit-build-core
+python-contourpy	git meson-python pybind11 python-build python-installer python-numpy
+python-cycler	python-build python-installer
+python-six	git python-build python-installer
+python-dateutil	git python-build python-installer python-setuptools-scm python-six
+python-fonttools	cython python-build python-installer
+python-cppy	git python-build python-installer python-setuptools-scm
+python-kiwisolver	git python-build python-cppy python-installer python-setuptools-scm
+libimagequant	cargo-c rust
+libraqm	freetype2 fribidi git gtk-doc harfbuzz
+python-pillow	freetype2 git lcms2 libavif libimagequant libjpeg-turbo libraqm libtiff libwebp libxcb openjpeg2 pybind11 python-build python-installer tk
+python-pyparsing	git python-build python-installer
+qhull	cmake
+python-matplotlib	freetype2 git meson-python pybind11 python-build python-certifi python-contourpy python-cycler python-dateutil python-fonttools python-installer python-kiwisolver python-numpy python-pillow python-pyparsing python-setuptools-scm qhull
+pahole	cmake git python-matplotlib
+rust-bindgen	llvm rust
+linux	cpio graphviz imagemagick pahole python-sphinx python-yaml rust rust-bindgen texlive-texmf xxhash
+openssh	krb5 libedit libfido2 linux pam
+gcr	cairo dconf gdk-pixbuf2 gi-docgen git glib2 gobject-introspection gtk3 hicolor-icon-theme libgcrypt libsecret libxslt openssh p11-kit pango vala
+gtk2-compat	git gtk3
+gumbo-parser	
+litehtml	cmake gumbo-parser
+double-conversion	cmake git
+freetds	krb5 unixodbc
+pcre	
+slang	pcre
+aalib	gpm libx11 slang
+cdparanoia	
+chromaprint	cmake ffmpeg git gtest
+faac	git
+faad2	cmake
+libogg	cmake git
+flac	cmake doxygen git libogg nasm pandoc-cli
+db5.3	
+dbus-c++	glib2
+mm-common	doxygen git graphviz gtk-doc libsigc++
+libsigc++	git mm-common
+glibmm	git glib2 libsigc++ llvm mm-common
+libconfig	
+libraw1394	
+libiec61883	libraw1394
+libxml++	git glibmm libxml2 mm-common
+pyopengl	freeglut python-build python-installer
+sip	git python-build python-installer python-setuptools-scm
+pyqt-builder	git python-build python-installer python-setuptools-scm sip
+python-pyqt5-sip	python-build python-installer
+texi2html	
+ffcall	
+libsigsegv	
+clisp	ffcall git libsigsegv libunistring
+graphite	asciidoc cmake dblatex doxygen freetype2 graphviz texlive-texmf
+libpaper	
+libxaw	libx11 libxext libxmu libxpm libxt xorg-util-macros xorgproto
+pixman	libpng
+potrace	
+zziplib	cmake xmlto zip
+texlive-bin	cairo clisp ffcall fontconfig freetype2 gd git graphite harfbuzz icu libjpeg-turbo libpaper libpng libsigsegv libunistring libx11 libxaw libxmu libxpm libxt pixman potrace subversion zziplib
+check	cmake doxygen git texi2html texlive-bin
+guile	gc libunistring
+ctags	git jansson libseccomp libxml2 libyaml pcre2 python-docutils
+source-highlight	boost ctags
+gdb	boost guile source-highlight xxhash
+valgrind	docbook-sgml docbook-xml docbook-xsl elfutils gcc gdb glibc
+libevdev	check valgrind
+python-libevdev	libevdev python-build python-hatchling python-installer python-sphinx python-sphinx_rtd_theme
+python-pyudev	python-build python-installer python-sphinx
+libwacom	glib2 libevdev libgudev libxml2 python-libevdev python-pytest python-pyudev
+lua54	
+mtdev	
+wayland-protocols	wayland
+libinput	cairo check git glib2 gtk4 libevdev libwacom libx11 lua54 mtdev python-libevdev python-pyudev python-yaml wayland wayland-protocols
+libproxy	curl duktape gi-docgen git glib2 gobject-introspection gsettings-desktop-schemas vala
+libxkbfile	libx11 xorg-util-macros xorgproto
+xorg-xkbcomp	libx11 libxkbfile xorg-util-macros
+xkeyboard-config	git libxslt xorg-xkbcomp
+libxkbcommon	bash-completion doxygen git graphviz libxcb libxml2 wayland wayland-protocols xkeyboard-config xorgproto
+md4c	cmake git
+libasyncns	git lynx
+graphene	git glib2 gobject-introspection gtk-doc
+libdbusmenu	at-spi2-core gdk-pixbuf2 glib2 gobject-introspection gtk3 pango vala
+libnotify	docbook-xsl gdk-pixbuf2 gi-docgen git glib2 gobject-introspection xmlto
+unicode-character-database	
+unicode-cldr	
+unicode-emoji	unicode-character-database
+ibus	at-spi2-core cairo dconf gdk-pixbuf2 git glib2 gobject-introspection graphene gtk-doc gtk3 gtk4 hicolor-icon-theme libdbusmenu libnotify libx11 libxfixes libxi libxkbcommon pango pygobject qt5-base unicode-character-database unicode-cldr unicode-emoji vala wayland wayland-protocols
+libdecor	cmake gtk3 pango wayland wayland-protocols
+libxcursor	default-cursors libx11 libxfixes libxrender xorg-util-macros xorgproto
+libyuv	cmake git libjpeg-turbo
+python-ply	git python-build python-installer
+python-hatch-fancy-pypi-readme	git python-build python-hatchling python-installer
+python-accessible-pygments	git python-build python-hatch-fancy-pypi-readme python-hatch-vcs python-hatchling python-installer python-pygments
+python-soupsieve	git python-beautifulsoup4 python-build python-hatchling python-installer
+python-beautifulsoup4	python-build python-hatchling python-installer python-soupsieve python-typing_extensions
+python-nodeenv	git python-build python-installer python-setuptools-scm
+python-rich	git python-build python-installer python-markdown-it-py python-poetry-core python-pygments
+python-sphinx-theme-builder	python-build python-installer python-nodeenv python-pyproject-metadata python-rich
+python-pydata-sphinx-theme	git python-accessible-pygments python-babel python-beautifulsoup4 python-build python-docutils python-installer python-pygments python-requests python-sphinx python-sphinx-theme-builder python-typing_extensions
+python-sphinx-book-theme	python-build python-docutils python-installer python-pydata-sphinx-theme python-sphinx python-sphinx-theme-builder
+python-sphinxcontrib-doxylink	python-build python-dateutil python-docutils python-installer python-poetry-core python-pyparsing python-requests python-sphinx
+libcamera	cmake doxygen git glib2 gnutls graphviz gstreamer gtest libdrm libglvnd libjpeg-turbo libtiff libunwind libyaml libyuv pybind11 python-ply python-sphinx python-sphinx-book-theme python-sphinxcontrib-doxylink python-yaml qt6-base qt6-tools sdl2-compat texlive-texmf
+libvorbis	git libogg
+sound-theme-freedesktop	
+tdb	docbook-xsl libxslt
+libcanberra	alsa-lib git gtk-doc gtk3 libvorbis pulseaudio sound-theme-freedesktop tdb
+libebur128	cmake git
+libfdk-aac	git
+libfreeaptx	git
+liblc3	git
+libldac	cmake git
+cunit	
+libmysofa	cmake cunit git
+python-chardet	git python-build python-hatch-vcs python-hatchling python-installer
+codespell	git python-build python-chardet python-installer python-setuptools-scm
+python-click	python-build python-installer
+python-mypy_extensions	python-build python-installer
+python-platformdirs	git python-build python-hatch-fancy-pypi-readme python-hatch-vcs python-hatchling python-installer
+python-pytokens	git mypy python-build python-installer
+python-black	git python-build python-click python-hatch-fancy-pypi-readme python-hatch-vcs python-hatchling python-installer python-mypy_extensions python-pathspec python-platformdirs python-pytokens
+python-lxml	cython git libxml2 libxslt python-build python-installer python-pygments python-sphinx python-sphinx_rtd_theme
+python-astroid	python-build python-installer
+python-colorama	python-build python-hatchling python-installer
+python-dill	git python-build python-installer
+python-hatch-mypyc	mypy python-build python-hatchling python-installer
+python-isort	python-build python-colorama python-hatch-mypyc python-hatch-vcs python-hatchling python-installer python-mypy_extensions
+python-mccabe	python-build python-installer
+python-sphinx-reredirects	python-build python-installer python-sphinx
+python-pylint	python-astroid python-build python-colorama python-dill python-installer python-isort python-mccabe python-myst-parser python-platformdirs python-sphinx python-sphinx-reredirects python-tomlkit
+python-rdflib	git python-build python-installer python-poetry-core python-pyparsing
+mandoc	
+python-sphinxygen	python-build python-installer
+serd	doxygen mandoc python-sphinx python-sphinxygen
+python-sphinx-lv2-theme	python-build python-installer python-sphinx
+zix	doxygen python-sphinx python-sphinx-lv2-theme python-sphinxygen
+sord	doxygen pcre2 python-sphinx serd zix
+lv2	asciidoc codespell doxygen python-black python-lxml python-markdown python-pygments python-pylint python-rdflib serd sord
+sratom	doxygen lv2 python-sphinx python-sphinx-lv2-theme python-sphinxygen serd sord
+lilv	doxygen libsndfile lv2 python-sphinx python-sphinx-lv2-theme python-sphinxygen serd sord sratom swig zix
+opus	doxygen
+cpputest	cmake
+gengen	git
+gengetopt	gengen git help2man
+openfec	cmake
+colm	asciidoc python-pygments
+ragel	asciidoc colm dblatex fig2dev python-pygments texlive-bin
+gsm	
+libao	alsa-lib pulseaudio
+libmad	cmake git
+opencore-amr	
+opusfile	libogg opus
+speexdsp	git
+twolame	libsndfile
+wavpack	
+sox	alsa-lib ffmpeg fftw flac gcc git gsm lame libao libid3tag libmad libogg libpng libsndfile libvorbis opencore-amr opusfile pulseaudio speexdsp twolame wavpack
+roc-toolkit	alsa-lib cpputest gengetopt libunwind libuv openfec pulseaudio ragel scons sox speexdsp
+rtkit	git polkit
+sbc	git
+spandsp	docbook-xsl doxygen libtiff
+webrtc-audio-processing-1	abseil-cpp git
+ruff	git maturin python-installer rust
+python-breathe	python-build python-docutils python-installer python-pygments python-sphinx ruff
+wireplumber	doxygen git glib2 gobject-introspection graphviz lua pipewire python-breathe python-lxml python-sphinx python-sphinx_rtd_theme
+pipewire	alsa-lib avahi bluez dconf doxygen fftw git glib2 graphviz gstreamer jack2 libcamera libcanberra libebur128 libfdk-aac libffado libfreeaptx liblc3 libldac libmysofa libsndfile libusb libx11 libxfixes lilv opus pulseaudio python-docutils roc-toolkit rtkit sbc sdl2-compat spandsp valgrind webrtc-audio-processing-1 wireplumber
+libmd	
+libbsd	git libmd
+sndio	alsa-lib libbsd
+vulkan-headers	cmake git
+sdl3	alsa-lib cmake hidapi ibus jack2 libdecor libglvnd libusb libx11 libxcursor libxext libxinerama libxkbcommon libxrandr libxrender libxss mesa pipewire pulseaudio sndio vulkan-headers wayland wayland-protocols
+sdl2-compat	cmake sdl3
+mpg123	alsa-lib jack2 pulseaudio sdl2-compat
+lame	mpg123 nasm
+libsndfile	alsa-lib cmake flac lame libogg libvorbis mpg123 opus sqlite
+libsoxr	cmake gcc git
+confuse	git
+libftdi	boost cmake confuse libusb swig
+libusb-compat	libusb
+lirc	alsa-lib help2man libftdi libusb-compat libx11 libxslt python-yaml
+python-appdirs	python-build python-installer
+python-setuptools-git	git python-build python-installer
+python-dbus-deviation	git python-build python-installer python-lxml python-setuptools-git python-sphinx
+python-feedgen	python-build python-dateutil python-installer python-lxml python-sphinx
+python-versioneer	git python-build python-installer
+python-pandas	cython git meson-python python-build python-dateutil python-installer python-numpy python-pytz python-versioneer
+python-pooch	git python-build python-installer python-platformdirs python-requests python-setuptools-scm
+python-gast	python-build python-installer
+python-beniget	git python-build python-gast python-installer
+xsimd	cmake git gtest
+python-pythran	boost git python-beniget python-build python-gast python-installer python-numpy python-ply xsimd
+python-scipy	boost cython gcc git lapack meson-python pybind11 python-build python-installer python-numpy python-platformdirs python-pooch python-pythran
+python-networkx	git python-build python-installer python-matplotlib python-numpy python-pandas python-scipy
+python-schema	python-build python-installer
+python-toposort	python-build python-installer
+python-wheezy-template	cython python-build python-installer
+hotdoc	cmake git glib2 json-glib libxml2 meson-python npm python-appdirs python-build python-dbus-deviation python-feedgen python-installer python-lxml python-networkx python-pkgconfig python-schema python-toposort python-wheezy-template python-yaml
+orc	git hotdoc llvm valgrind
+xmltoman	
+pulseaudio	alsa-lib avahi bluez check dbus-python doxygen fftw git glib2 gstreamer gtk3 jack2 libasyncns libice libsm libsndfile libsoxr libx11 libxcb libxtst lirc orc pyqt5 rtkit sbc speexdsp tdb valgrind webrtc-audio-processing-1 xmltoman
+qt5-declarative	git qt5-base vulkan-headers
+qt5-tools	git hicolor-icon-theme llvm qt5-base qt5-declarative vulkan-headers
+qt5-translations	git qt5-tools
+tslib	git
+xcb-util	libxcb xorg-util-macros xorgproto
+xcb-util-image	libxcb xcb-util xorg-util-macros xorgproto
+xcb-util-keysyms	libxcb xorg-util-macros xorgproto
+xcb-util-renderutil	libxcb xorg-util-macros xorgproto
+xcb-util-wm	libxcb xorg-util-macros xorgproto
+qt5-base	alsa-lib cups double-conversion fontconfig freetds git gstreamer gtk3 harfbuzz libglvnd libinput libjpeg-turbo libproxy libxi libxkbcommon libxrender mariadb md4c mesa postgresql pulseaudio qt5-translations shared-mime-info sqlite tslib unixodbc vulkan-headers xcb-util-image xcb-util-keysyms xcb-util-renderutil xcb-util-wm xdg-utils
+portaudio	alsa-lib cmake jack2
+openal	alsa-lib cmake ffmpeg fluidsynth git jack2 libmysofa libsndfile pipewire portaudio pulseaudio qt6-base sdl3
+qt5-multimedia	git gstreamer openal pulseaudio qt5-base qt5-declarative
+qt5-serialport	git qt5-base
+flite	alsa-lib chrpath git
+dotconf	
+libsonic	
+pcaudiolib	alsa-lib pulseaudio
+espeak-ng	cmake git libsonic pcaudiolib ruby-ronn-ng
+pyxdg	git python-build python-installer
+speech-dispatcher	dotconf espeak-ng glib2 libao pipewire pulseaudio pyxdg
+qt5-speech	flite git qt5-multimedia speech-dispatcher
+qt5-svg	git qt5-base
+qt5-x11extras	git qt5-base
+qt5-xmlpatterns	git qt5-base qt5-declarative
+pyqt5	dbus-python pyopengl pyqt-builder python-pyqt5-sip qt5-base qt5-declarative qt5-multimedia qt5-serialport qt5-speech qt5-svg qt5-tools qt5-x11extras qt5-xmlpatterns sip
+libffado	alsa-lib dbus-c++ dbus-python glibmm hicolor-icon-theme jack2 libconfig libiec61883 libraw1394 libxml++ pyqt5 scons
+libsamplerate	alsa-lib cmake libsndfile opus
+waf	git unzip
+jack2	alsa-lib db5.3 doxygen git libffado libsamplerate opus waf
+ladspa	libsndfile
+fluidsynth	alsa-lib cmake doxygen gcc jack2 ladspa libsndfile pipewire portaudio pulseaudio sdl3
+imath	boost cmake git python-numpy
+iso-codes	git
+libunibreak	
+libass	fontconfig freetype2 fribidi git harfbuzz libunibreak nasm
+libavc1394	libraw1394
+libavtp	cmocka
+libbs2b	libsndfile
+libcaca	doxygen freeglut git glu imlib2 libglvnd libx11 pango slang
+libcdio	git help2man
+libxv	libx11 libxext xorgproto
+libdc1394	doxygen git libraw1394 libusb libxv
+libdca	git
+libde265	cmake git sdl2-compat
+libdv	popt
+libdvdread	git
+libdvdnav	git libdvdread
+libgme	cmake git sdl2-compat
+raptor	curl gtk-doc icu libxml2 libxslt
+liblrdf	ladspa raptor
+libltc	doxygen
+libmicrodns	
+libmodplug	
+libmpeg2	
+glib-networking	git glib2 gnutls gsettings-desktop-schemas libproxy
+python-h11	git python-build python-installer
+python-hpack	git python-build python-installer
+python-hyperframe	git python-build python-installer
+python-h2	git python-build python-hpack python-hyperframe python-installer
+python-tomli-w	git python-build python-installer
+python-pdm-backend	python-build python-installer python-pyproject-metadata python-tomli-w
+python-priority	python-build python-installer
+python-wsproto	git python-build python-h11 python-installer
+hypercorn	git python-build python-h11 python-h2 python-installer python-pdm-backend python-priority python-wsproto
+python-aiofiles	git python-build python-hatch-vcs python-hatchling python-installer
+python-blinker	python-build python-installer
+python-itsdangerous	python-build python-installer
+python-werkzeug	git python-build python-installer
+python-flask	python-blinker python-build python-click python-installer python-itsdangerous python-werkzeug
+python-lazy-importer	git python-build python-installer
+python-zipp	git python-build python-installer python-setuptools-scm
+python-importlib-metadata	git python-build python-installer python-lazy-importer python-setuptools-scm python-zipp
+python-quart	git hypercorn python-aiofiles python-blinker python-build python-click python-flask python-importlib-metadata python-installer python-itsdangerous python-werkzeug
+talloc	docbook-xsl libbsd
+cifs-utils	git keyutils krb5 libcap-ng pam python-docutils samba talloc
+dateutils	git
+libiconv	
+fuse3	libiconv liburing numactl
+libaio	
+liburcu	
+rpcbind	libtirpc
+rpcsvc-proto	
+glusterfs	fuse3 gperftools libaio liburcu liburing libxml2 rpcbind rpcsvc-proto
+perl-json	
+perl-parse-yapp	
+jemalloc	git
+uv	cmake git jemalloc maturin python-installer rust
+python-dnspython	python-build python-installer uv
+tevent	cmocka talloc
+samba	cifs-utils cups dateutils docbook-xsl glusterfs gnutls gpgme icu jansson krb5 libarchive libbsd libnsl libtirpc liburing lmdb openldap pam perl-json perl-parse-yapp popt python-dnspython python-markdown rpcsvc-proto talloc tdb tevent
+itstool	docbook-xml git libxml2
+mallard-ducktype	git python-build python-installer
+yelp-xsl	git itstool libxslt
+yelp-tools	docbook-xsl git itstool libxml2 mallard-ducktype python-lxml yelp-xsl
+sysprof	git glib2 yelp-tools
+libsoup3	brotli gi-docgen git glib-networking glib2 gobject-introspection krb5 libnghttp2 libpsl python-quart samba sqlite sysprof vala
+gssdp	gi-docgen git glib2 gobject-introspection gtk4 libsoup3 pandoc-cli vala
+gupnp	gi-docgen git glib2 gobject-introspection gssdp libsoup3 libxml2 vala
+gupnp-igd	git glib2 gobject-introspection gssdp gtk-doc gupnp
+libnice	git glib2 gnutls gobject-introspection graphviz gstreamer gtk-doc gupnp-igd
+libopenmpt	autoconf-archive doxygen flac help2man libogg libsndfile libvorbis mpg123 portaudio pulseaudio
+libtheora	doxygen git libogg libpng libvorbis
+speex	git libogg speexdsp
+libshout	git libtheora libvorbis speex
+libsrtp	doxygen git libpcap nspr nss
+libvpl	cmake
+libvpx	git nasm
+libxdamage	libx11 libxfixes xorgproto
+mjpegtools	libdv libjpeg-turbo libpng
+musepack	
+neon	ca-certificates docbook-xsl git krb5 xmlto
+cudnn	cuda
+doctest	cmake
+fast_float	cmake doctest git
+python-mergedeep	git python-build python-installer
+mkdocs-get-deps	git python-build python-hatchling python-installer python-mergedeep python-platformdirs python-yaml
+python-ghp-import	python-build python-installer
+python-pyyaml-env-tag	git python-build python-installer python-yaml
+python-watchdog	git python-build python-installer
+mkdocs	git mkdocs-get-deps python-babel python-build python-click python-ghp-import python-hatchling python-importlib-metadata python-installer python-markdown python-mergedeep python-pathspec python-pyyaml-env-tag python-typing_extensions python-watchdog python-yaml
+python-backrefs	python-build python-hatchling python-installer
+python-hatch-nodejs-version	python-build python-hatchling python-installer
+python-hatch-requirements-txt	git python-build python-hatchling python-installer
+mkdocs-material	mkdocs python-babel python-backrefs python-build python-colorama python-hatch-nodejs-version python-hatch-requirements-txt python-hatchling python-installer python-markdown python-requests python-yaml
+mkdocs-autorefs	mkdocs python-build python-installer python-markdown python-pdm-backend
+python-pymdown-extensions	python-build python-hatchling python-installer python-markdown python-yaml
+mkdocstrings	mkdocs mkdocs-autorefs python-build python-installer python-markdown python-pdm-backend python-pymdown-extensions python-yaml
+python-regex	python-build python-installer
+fmt	cmake doxygen git mkdocs mkdocs-material mkdocstrings npm python-pymdown-extensions python-regex
+glew	glu libglvnd libx11
+libaec	cmake
+hdf5	cmake gcc git java-openjdk libaec openmpi time
+hwloc	cairo libpciaccess libx11 libxml2
+python-attrs	git python-build python-hatch-fancy-pypi-readme python-hatch-vcs python-hatchling python-installer
+python-pycparser	git python-build python-installer
+python-cffi	git python-build python-installer python-pycparser
+python-cryptography	git llvm maturin python-build python-cffi python-installer
+python-filelock	git python-build python-hatch-vcs python-hatchling python-installer
+python-sphinx-copybutton	git python-build python-installer python-sphinx
+python-sphinx-inline-tabs	git python-build python-installer python-sphinx
+python-sphinx-issues	python-build python-installer python-sphinx
+python-pip	python-attrs python-build python-cryptography python-filelock python-installer python-myst-parser python-sphinx python-sphinx-copybutton python-sphinx-inline-tabs python-sphinx-issues
+onetbb	cmake hwloc python-pip swig
+openjph	cmake doxygen git libtiff
+openexr	cmake git imath libdeflate openjph pybind11
+bazelisk	git go
+ruby-rspec-support	git ruby ruby-rdoc
+ruby-rspec-core	git ruby-erb ruby-rdoc ruby-rspec-support
+ruby-diff-lcs	ruby ruby-rdoc
+ruby-rspec-expectations	git ruby ruby-diff-lcs ruby-rdoc ruby-rspec-support
+ruby-rspec-mocks	git ruby ruby-diff-lcs ruby-ffi ruby-rdoc ruby-rspec-support
+ruby-rspec	git ruby ruby-rdoc ruby-rspec-core ruby-rspec-expectations ruby-rspec-mocks
+ruby-ffi	git ruby ruby-bundler ruby-rake ruby-rake-compiler ruby-rdoc ruby-rspec
+ruby-samus	ruby ruby-rake ruby-rdoc
+ruby-webrick	ruby ruby-erb ruby-rdoc
+ruby-yard	ruby ruby-irb ruby-rake ruby-rdoc ruby-samus ruby-webrick
+ruby-rubygems-tasks	git ruby-irb ruby-rake ruby-yard
+ruby-ffi-compiler	git ruby-ffi ruby-rake ruby-rdoc ruby-rspec ruby-rubygems-tasks
+protobuf	abseil-cpp bazelisk cmake git gtest python-build python-installer ruby ruby-erb ruby-ffi-compiler ruby-rake ruby-rake-compiler
+pugixml	cmake
+qt6-languageserver	cmake git qt6-base
+qt6-shadertools	cmake git qt6-base
+qt6-svg	cmake git qt6-base
+qt6-declarative	cmake git qt6-base qt6-languageserver qt6-shadertools qt6-svg vulkan-headers
+qt6-5compat	cmake git icu qt6-base qt6-declarative qt6-shadertools
+verdict	cmake git
+zfp	cmake cython gcc python-numpy
+zlib-ng	cmake git
+blosc2	cmake git zfp zlib-ng
+conduit-llnl	cmake gcc openmpi python-build python-installer python-numpy
+libfabric	numactl
+libsodium	git
+catch2	cmake git
+mgard	abseil-cpp catch2 cmake gcc protobuf
+robin-map	cmake
+nanobind	cmake eigen git python-build python-installer python-scikit-build-core robin-map
+rdma-core	cmake cython git libdrm libnl pandoc-cli python-docutils valgrind
+python-wcwidth	git python-build python-installer
+python-prettytable	git python-build python-hatch-vcs python-hatchling python-installer python-wcwidth
+python-pyaml	git python-build python-installer python-yaml
+python-pyelftools	python-build python-installer
+rocm-core	cmake python-prettytable python-pyaml python-pyelftools
+rocm-cmake	cmake rocm-core
+rocm-llvm	cmake git libedit libxml2 patchelf rocm-cmake rocm-core
+gflags	cmake
+google-glog	cmake gflags git
+rocprofiler-register	cmake fmt google-glog rocm-cmake rocm-core
+hsa-rocr	cmake libdrm numactl pciutils rocm-core rocm-llvm rocprofiler-register
+rocm-hip-sdk	hsa-rocr rocm-core rocm-llvm
+openucx	cuda gcc rdma-core rocm-hip-sdk
+paraview-catalyst	cmake conduit-llnl gcc gtest openmpi python-numpy
+python-mpi4py	cython openmpi python-build python-installer
+gsl	lapack
+sz	cmake gcc gsl gtest hdf5
+yaml-cpp	cmake git
+libpgm	git
+zeromq	asciidoc cmake git gnutls libpgm libsodium xmlto
+adios2	blosc2 cmake conduit-llnl cuda curl gcc gtest hdf5 libfabric libpng libsodium mgard nanobind nlohmann-json openmpi openucx paraview-catalyst pugixml python-mpi4py python-numpy sqlite sz yaml-cpp zeromq zfp
+alembic	cmake hdf5 imath
+anari-sdk	cmake git
+cgns	cmake gcc glu hdf5 libglvnd libx11 libxmu tk
+cli11	cmake
+snappy	cmake git gtest llvm
+apache-orc	abseil-cpp cmake git protobuf snappy
+aws-c-common	cmake
+aws-c-cal	aws-c-common cmake
+aws-c-compression	aws-c-common cmake
+s2n-tls	cmake
+aws-c-io	aws-c-cal aws-c-common cmake s2n-tls
+aws-c-http	aws-c-cal aws-c-common aws-c-compression aws-c-io cmake
+aws-c-sdkutils	aws-c-common cmake
+aws-c-auth	aws-c-cal aws-c-common aws-c-http aws-c-io aws-c-sdkutils cmake
+aws-checksums	aws-c-common cmake
+aws-c-event-stream	aws-c-common aws-c-io aws-checksums cmake
+aws-c-mqtt	aws-c-common aws-c-http aws-c-io cmake
+aws-c-s3	aws-c-auth aws-c-cal aws-c-common aws-c-http aws-c-io aws-checksums cmake
+aws-crt-cpp	aws-c-auth aws-c-cal aws-c-common aws-c-event-stream aws-c-http aws-c-io aws-c-mqtt aws-c-s3 aws-c-sdkutils aws-checksums cmake
+aws-sdk-cpp	aws-c-auth aws-c-common aws-c-event-stream aws-c-http aws-c-io aws-c-s3 aws-crt-cpp cmake curl pulseaudio
+flatbuffers	cmake git python-build python-installer python-numpy
+benchmark	cmake
+argon2	
+aspell	git
+hunspell	
+jsoncpp	doxygen graphviz
+libepoxy	doxygen git graphviz libglvnd libx11 mesa
+libxcomposite	libx11 libxfixes xorg-util-macros xorgproto
+libpfm	git
+libtraceevent	asciidoc xmlto
+sysfsutils	git
+linux-tools	asciidoc audit elfutils git glib2 libnl libpfm libtraceevent libunwind llvm numactl pciutils python-docutils slang sysfsutils xmlto
+noto-fonts	git
+openh264	nasm
+python-webencodings	
+python-html5lib	python-build python-installer python-six python-webencodings
+qt6-serialport	cmake git qt6-base
+qt6-positioning	cmake git qt6-base qt6-declarative qt6-serialport
+qt6-webchannel	cmake git qt6-base qt6-declarative
+qt6-websockets	cmake git qt6-base qt6-declarative
+re2	abseil-cpp cmake git
+zlib	
+qt6-webengine	alsa-lib cmake ffmpeg fontconfig freetype2 git glib2 harfbuzz icu jsoncpp lcms2 libepoxy libglvnd libjpeg-turbo libpng libtiff libva libwebp libx11 libxcb libxcomposite libxcursor libxdamage libxext libxfixes libxkbcommon libxkbfile libxml2 libxrandr libxslt libxtst linux-tools mesa nodejs noto-fonts nspr nss openh264 openjpeg2 opus pipewire pulseaudio python-html5lib qt6-base qt6-declarative qt6-positioning qt6-tools qt6-webchannel qt6-websockets re2 snappy zlib
+hspell	hunspell qt6-webengine
+libvoikko	
+nuspell	cmake doxygen icu pandoc-cli
+enchant	aspell git glib2 hspell hunspell libvoikko nuspell vala
+libzip	cmake gnutls
+libtlsrpt	asciidoctor
+mongo-c-driver	cmake libsasl snappy
+tinycdb	
+postfix	icu libnsl libsasl libtlsrpt lmdb mariadb mongo-c-driver openldap pcre2 postgresql sqlite tinycdb
+tidy	cmake git libxslt
+php	apache argon2 curl enchant freetds gd icu libsodium libtiff libxml2 libxslt libzip net-snmp oniguruma pcre2 postfix postgresql sqlite tidy unixodbc
+php-legacy	apache argon2 aspell curl enchant freetds gd icu libsodium libxml2 libxslt libzip net-snmp oniguruma patchelf pcre2 postfix postgresql sqlite tidy unixodbc
+re2c	cmake
+grpc	abseil-cpp benchmark c-ares chrpath cmake cython git php php-legacy protobuf python-build python-installer python-typing_extensions re2 re2c
+rapidjson	cmake
+simdjson	cmake
+libotf	freetype2 libxaw
+tree-sitter	cmake git llvm rust
+emacs	fontconfig freetype2 gcc gdk-pixbuf2 giflib glib2 gnutls gtk3 harfbuzz hicolor-icon-theme lcms2 libotf libpng libxml2 tree-sitter
+libevent	cmake doxygen
+thrift	boost cmake emacs git glib2 libevent python-build python-installer qt5-base
+uriparser	cmake
+arrow	abseil-cpp apache-orc aws-crt-cpp aws-sdk-cpp boost brotli cmake flatbuffers git google-glog grpc gtest libutf8proc protobuf rapidjson re2 simdjson snappy thrift uriparser xsimd
+blosc	cmake git snappy
+cfitsio	cmake curl git
+crypto++	git unzip
+geos	cmake
+libfreexl	zlib
+proj	cmake curl git gtest libtiff sqlite
+libgeotiff	libjpeg-turbo libtiff proj
+librttopo	geos
+libspatialite	geos libfreexl librttopo libxml2 proj sqlite zlib
+muparser	cmake gcc
+netcdf	blosc cmake curl git hdf5 libaec libxml2 libzip
+opencl-headers	cmake
+ocl-icd	asciidoc mesa opencl-headers ruby xmlto
+libidn	
+podofo	cmake fontconfig freetype2 libidn libjpeg-turbo libpng libtiff libxml2 lua
+xerces-c	curl icu libnsl
+gdal	arrow blosc cfitsio cmake crypto++ curl gcc geos giflib hdf5 json-c libaec libarchive libdeflate libfreexl libgeotiff libheif libjpeg-turbo libjxl libpng libspatialite libtiff libwebp libxml2 mariadb muparser netcdf ocl-icd opencl-headers openexr openjpeg2 pcre2 podofo poppler postgresql proj python-numpy qhull sqlite swig unixodbc xerces-c
+gl2ps	cmake git libglvnd libpng texlive-texmf
+libharu	cmake libpng
+laszip2	
+liblas	boost cmake gdal git laszip2 libgeotiff proj
+opencascade	cmake eigen fast_float fontconfig freetype2 git libglvnd libx11 libxcursor nlohmann-json rapidjson tk vtk
+python-cppheaderparser	python-build python-installer python-ply
+rocminfo	cmake hsa-rocr pciutils rocm-cmake rocm-core
+hip-runtime	cmake cuda git mesa numactl python-cppheaderparser rocm-core rocm-llvm rocminfo rocprofiler-register
+level-zero	cmake git opencl-headers
+vc-intrinsics	cmake git llvm
+ispc	cmake git glibc level-zero llvm onetbb spirv-llvm-translator vc-intrinsics
+openimagedenoise	cmake cuda hip-runtime ispc onetbb
+cppunit	doxygen
+vulkan-icd-loader	cmake git libx11 libxrandr python-lxml vulkan-headers wayland
+glfw	cmake doxygen extra-cmake-modules libglvnd libxcursor libxi libxinerama libxkbcommon libxrandr mesa vulkan-headers vulkan-icd-loader wayland-protocols
+log4cplus	gcc
+openvdb	blosc boost cmake cppunit doxygen glfw glu imath jemalloc log4cplus mesa nanobind onetbb python-numpy robin-map
+openvr	cmake jsoncpp libglvnd
+openxr	cmake jsoncpp libglvnd libx11 libxrandr libxxf86vm mesa vulkan-headers vulkan-icd-loader wayland
+embree	cmake freeglut ispc libxmu onetbb
+rkcommon	cmake git onetbb
+openvkl	boost cmake embree ispc onetbb openvdb rkcommon
+ospray	benchmark cmake embree git glu gtest ispc level-zero onetbb openimagedenoise openmpi openvkl rkcommon snappy
+pdal	cmake gdal jsoncpp libgeotiff postgresql python-numpy
+utf8cpp	cmake
+viskores	cmake gcc onetbb openmpi
+vtk	adios2 alembic anari-sdk boost cgns cli11 cmake eigen fast_float ffmpeg fmt fontconfig freetype2 gcc gdal git gl2ps hdf5 imath java-openjdk jsoncpp libarchive libharu libjpeg-turbo liblas libogg libpng libtheora libtiff libx11 libxcursor libxml2 mariadb netcdf nlohmann-json onetbb opencascade openimagedenoise openmpi openvdb openvr openxr ospray paraview-catalyst pdal postgresql proj pugixml python-matplotlib python-mpi4py qt6-base qt6-declarative qt6-tools sqlite tk unixodbc utf8cpp verdict viskores
+opencv	abseil-cpp ant cmake cuda cudnn eigen fast_float ffmpeg fmt freetype2 git glew glib2 gstreamer harfbuzz hdf5 java-openjdk lapack libdc1394 libglvnd libjpeg-turbo libjxl libpng libtiff libwebp mesa nlohmann-json onetbb openexr openjpeg2 openmpi protobuf pugixml python-numpy qt6-5compat verdict vtk
+python-aaf2	python-build python-installer
+opentimelineio	cmake git imath pybind11 python-aaf2 python-build python-installer
+python-cairo	cairo python-sphinx python-sphinx_rtd_theme
+qrencode	git libpng sdl2-compat
+qt5-wayland	git libxcomposite qt5-declarative vulkan-headers
+rtmpdump	git gnutls
+shaderc	asciidoctor cmake glslang spirv-headers spirv-tools
+soundtouch	cmake git
+srt	cmake git
+svt-av1	cmake git nasm
+svt-hevc	cmake git nasm
+taglib	cmake git utf8cpp
+libbpf	git
+v4l-utils	alsa-lib doxygen hicolor-icon-theme json-c libbpf libjpeg-turbo llvm qt6-5compat qt6-base
+vmaf	nasm
+vulkan-utility-libraries	cmake git vulkan-headers vulkan-icd-loader
+vulkan-validation-layers	cmake git libxrandr python-lxml spirv-headers spirv-tools vulkan-headers vulkan-icd-loader vulkan-utility-libraries wayland
+wildmidi	alsa-lib cmake git
+hyphen	
+unifdef	
+woff2	brotli cmake git
+xdg-dbus-proxy	docbook-xsl git glib2
+wpewebkit	at-spi2-core bubblewrap cairo cmake enchant fontconfig freetype2 gcc gi-docgen glib2 gobject-introspection gstreamer harfbuzz hyphen icu lcms2 libavif libdrm libepoxy libgcrypt libinput libjpeg-turbo libjxl libpng libseccomp libsoup3 libtasn1 libwebp libxkbcommon libxml2 libxslt llvm mesa noto-fonts openjpeg2 ruby sqlite unifdef wayland wayland-protocols woff2 xdg-dbus-proxy
+x264	git nasm
+x265	cmake git nasm
+libwmf	freetype2 gdk-pixbuf2 git libjpeg-turbo libpng libx11
+graphicsmagick	freetype2 jasper lcms2 libheif libjxl libpng libtiff libwebp libwmf libxext libxml2
+zbar	cmake docbook-xsl glib2 gobject-introspection graphicsmagick gtk3 libxv qt5-x11extras v4l-utils xmlto
+zvbi	git libpng libx11
+assimp	cmake
+qt6-quicktimeline	cmake git qt6-base qt6-declarative
+qt6-quick3d	assimp cmake git libglvnd openxr qt6-base qt6-declarative qt6-quicktimeline qt6-shadertools vulkan-headers
+qt6-multimedia	cmake ffmpeg git gstreamer libxrandr pipewire pulseaudio qt6-base qt6-declarative qt6-quick3d qt6-shadertools vulkan-headers
+stb	git
+zint	cmake git libpng qt6-svg qt6-tools
+zxing-cpp	cmake git libpng opencv qt6-base qt6-declarative qt6-multimedia stb zint
+gstreamer	a52dec aalib alsa-lib aom bash-completion bluez cairo cdparanoia chromaprint curl faac faad2 ffmpeg flac fluidsynth gdk-pixbuf2 git glib2 gobject-introspection graphene gsm gtk3 hicolor-icon-theme imath iso-codes jack2 json-glib ladspa lame lcms2 libass libavc1394 libavtp libbs2b libcaca libcdio libdc1394 libdca libde265 libdrm libdv libdvdnav libdvdread libfdk-aac libfreeaptx libglvnd libgme libgudev libiec61883 libjpeg-turbo liblc3 libldac liblrdf libltc libmicrodns libmodplug libmpeg2 libnice libogg libopenmpt libpng libraw1394 librsvg libshout libsndfile libsoup3 libsrtp libtheora libunwind libusb libva libvorbis libvpl libvpx libwebp libx11 libxcb libxdamage libxext libxfixes libxi libxkbcommon libxml2 libxrandr libxtst libxv lilv lv2 mesa mjpegtools mpg123 musepack nasm neon nettle openal opencore-amr opencv openexr openh264 openjpeg2 opentimelineio opus orc pango pulseaudio pygobject python-cairo python-commonmark python-lxml python-typing_extensions qrencode qt5-base qt5-declarative qt5-tools qt5-wayland qt5-x11extras qt6-base qt6-declarative qt6-shadertools qt6-tools rtmpdump rust sbc sdl2-compat shaderc soundtouch spandsp speex srt svt-av1 svt-hevc taglib twolame v4l-utils valgrind vmaf vulkan-headers vulkan-icd-loader vulkan-validation-layers wavpack wayland wayland-protocols webrtc-audio-processing-1 wildmidi wpewebkit x264 x265 zbar zvbi zxing-cpp
+libb2	git
+editline	git
+libtommath	git
+libtomcrypt	libtommath
+libfbclient	cmake editline git libtomcrypt libtommath unzip
+qt6-translations	cmake git qt6-tools
+renderdoc	cmake git harfbuzz hicolor-icon-theme libglvnd libx11 libxcb mesa pcre qt5-base qt5-svg qt5-x11extras xcb-util-keysyms
+xcb-util-cursor	libxcb xcb-util-image xcb-util-renderutil xorgproto
+xmlstarlet	fop ghostscript libxslt
+qt6-base	alsa-lib brotli cmake cups double-conversion fontconfig freetds freetype2 git glib2 gstreamer gtk3 harfbuzz icu jemalloc krb5 libb2 libdrm libfbclient libglvnd libice libinput libjpeg-turbo libpng libproxy libsm liburing libx11 libxcb libxkbcommon mariadb md4c mesa mtdev pcre2 postgresql pulseaudio qt6-translations renderdoc shared-mime-info sqlite tslib unixodbc vulkan-headers wayland xcb-util-cursor xcb-util-image xcb-util-keysyms xcb-util-renderutil xcb-util-wm xdg-utils xmlstarlet
+qt6-tools	cmake git litehtml llvm qt6-base qt6-declarative vulkan-headers
+extra-cmake-modules	cmake python-requests python-sphinx qt6-tools
+plasma-wayland-protocols	extra-cmake-modules qt6-base
+qt6-3d	assimp cmake git qt6-base qt6-declarative qt6-shadertools shaderc vulkan-headers vulkan-icd-loader
+qt6-canvaspainter	cmake git qt6-base qt6-declarative qt6-shadertools
+qt6-charts	cmake git qt6-base qt6-declarative
+qt6-connectivity	bluez cmake git pcsclite qt6-base
+qt6-datavis3d	cmake git qt6-base qt6-declarative
+qt6-graphs	cmake git qt6-base qt6-declarative qt6-quick3d qt6-shadertools
+qt6-httpserver	cmake git qt6-base qt6-websockets
+qt6-location	cmake git qt6-base qt6-declarative qt6-positioning
+qt6-networkauth	cmake git qt6-base
+qt6-remoteobjects	cmake git qt6-base qt6-declarative
+qt6-scxml	cmake git qt6-base qt6-declarative
+qt6-sensors	cmake git qt6-base qt6-declarative
+qt6-serialbus	cmake git qt6-base qt6-serialport
+qt6-speech	cmake flite git qt6-base qt6-declarative qt6-multimedia speech-dispatcher
+qt6-webview	cmake git qt6-base qt6-declarative qt6-webengine
+pyside6	cmake git libxml2 libxslt llvm python-numpy qt6-3d qt6-base qt6-canvaspainter qt6-charts qt6-connectivity qt6-datavis3d qt6-declarative qt6-graphs qt6-httpserver qt6-location qt6-multimedia qt6-networkauth qt6-positioning qt6-quick3d qt6-remoteobjects qt6-scxml qt6-sensors qt6-serialbus qt6-serialport qt6-shadertools qt6-speech qt6-svg qt6-tools qt6-webchannel qt6-webengine qt6-websockets qt6-webview
+kguiaddons	doxygen extra-cmake-modules libx11 plasma-wayland-protocols pyside6 python-build qt6-base qt6-declarative qt6-tools wayland wayland-protocols
+kwindowsystem	doxygen extra-cmake-modules libx11 libxcb libxfixes plasma-wayland-protocols qt6-base qt6-declarative qt6-tools wayland wayland-protocols xcb-util-keysyms
+pinentry	gcr glib2 gtk2-compat kguiaddons kwindowsystem libassuan libsecret qt6-base
+gnupg	fig2dev git gnutls imagemagick libassuan libgcrypt libgpg-error libksba librsvg libusb npth openldap pcsclite pinentry sqlite tpm2-tss
+gpgme	git gnupg libassuan libgpg-error
+gpgmepp	cmake git gpgme libgpg-error
+poppler-data	
+poppler	boost cairo cmake curl fontconfig freetype2 git glib2 gobject-introspection gpgmepp gtk-doc gtk3 harfbuzz icu lcms2 libjpeg-turbo libpng libtiff nspr nss openjpeg2 poppler-data qt5-base qt6-base
+sane	autoconf-archive avahi cairo curl glib2 libgphoto2 libieee1284 libjpeg-turbo libpng libtiff libusb libxml2 net-snmp poppler texlive-texmf v4l-utils
+colord	argyllcms bash-completion dconf docbook-xsl git glib2 gobject-introspection gtk-doc lcms2 libgudev libgusb polkit sane shared-mime-info sqlite vala
+desktop-file-utils	git glib2
+libcloudproviders	gi-docgen git glib2 gobject-introspection vala
+libsass	
+sassc	libsass
+python-more-itertools	git python-build python-installer
+python-tappy	python-babel python-build python-hatchling python-installer python-more-itertools python-pyaml
+snowball	git
+tinysparql	asciidoc avahi bash-completion dbus-python gi-docgen git glib2 gobject-introspection icu json-glib libsoup3 libxml2 pygobject python-tappy snowball sqlite vala
+b3sum	cmake git onetbb rust
+libfyaml	cmake git libyaml
+libcgif	
+libmatio	git hdf5
+libraw	gcc git lcms2 libjpeg-turbo
+uthash	
+libdicom	git uthash
+openslide	cairo doxygen git glib2 libdicom libjpeg-turbo libpng libtiff libxml2 openjpeg2 sqlite
+libvips	cairo cfitsio doxygen fftw fontconfig gi-docgen glib2 gobject-introspection graphviz highway imagemagick lcms2 libarchive libcgif libexif libheif libimagequant libjpeg-turbo libjxl libmatio libpng libraw librsvg libtiff libwebp openexr openjpeg2 openslide pango poppler vala
+libxmlb	git glib2 gobject-introspection gtk-doc snowball
+appstream	b3sum bash-completion cairo curl fontconfig freetype2 gi-docgen git glib2 gobject-introspection itstool libfyaml libvips libxml2 libxmlb pango qt6-base qt6-tools snowball vala xmlto
+accountsservice	docbook-xsl git glib2 gobject-introspection gtk-doc json-c polkit vala xmlto
+gnome-desktop	bubblewrap cairo gdk-pixbuf2 git glib2 gobject-introspection gsettings-desktop-schemas gtk-doc gtk3 gtk4 iso-codes libseccomp libxkbcommon xkeyboard-config yelp-tools
+libglib-testing	git glib2 gtk-doc
+malcontent	accountsservice gi-docgen git glib2 gnome-desktop gobject-introspection libglib-testing yelp-tools
+go-md2man	go
+composefs	fuse3 go-md2man
+mkinitcpio-busybox	
+mkinitcpio	asciidoctor git libarchive mkinitcpio-busybox
+ostree	avahi composefs curl fuse3 git glib2 gobject-introspection gpgme gtk-doc libarchive libgpg-error libsodium libsoup3 libxslt mkinitcpio which
+flatpak	appstream bubblewrap curl dconf docbook-xsl fuse3 gdk-pixbuf2 git glib2 gobject-introspection gpgme gtk-doc json-glib libarchive libseccomp libxau libxml2 malcontent ostree polkit pygobject python-pyparsing wayland wayland-protocols xdg-dbus-proxy xdg-desktop-portal xdg-utils xmlto
+libinih	git
+gamemode	git libinih polkit
+libmbim	bash-completion git glib2 gobject-introspection gtk-doc help2man
+libqrtr-glib	gi-docgen git glib2 gobject-introspection
+libqmi	bash-completion gi-docgen git glib2 gobject-introspection help2man libgudev libmbim libqrtr-glib
+mobile-broadband-provider-info	git libxslt
+ppp	git libpcap
+modemmanager	bash-completion git glib2 gobject-introspection gtk-doc hicolor-icon-theme libgudev libmbim libqmi libqrtr-glib mobile-broadband-provider-info polkit ppp vala
+geoclue	avahi git glib2 gobject-introspection gtk-doc json-glib libnotify libsoup3 modemmanager vala
+js140	cbindgen llvm rust zip
+gjs	cairo dconf git glib2 gobject-introspection js140 libx11 sysprof
+libportal	gi-docgen git gjs glib2 gobject-introspection gtk3 gtk4 qt5-base qt5-tools qt5-x11extras qt6-base qt6-tools vala
+python-dbusmock	dbus-python git glib2 pygobject python-build python-installer python-setuptools-scm
+libmakepkg-dropins	git
+pacman-mirrorlist	
+pacman	asciidoc curl doxygen git gnupg gpgme libarchive libmakepkg-dropins pacman-mirrorlist
+expac	git pacman
+nodejs-lts-krypton	ada brotli c-ares git icu libnghttp2 libnghttp3 libngtcp2 libuv simdjson
+python-sphinx-basic-ng	git python-build python-installer python-sphinx
+python-sphinx-furo	expac git nodejs-lts-krypton npm python-accessible-pygments python-beautifulsoup4 python-build python-installer python-pygments python-sphinx-basic-ng python-sphinx-theme-builder
+python-sphinxext-opengraph	git python-build python-docutils python-installer python-matplotlib python-sphinx
+xdg-desktop-portal	dbus-python docbook-xsl flatpak fuse3 gamemode gdk-pixbuf2 geoclue git glib2 gstreamer json-glib libgudev libportal pipewire pygobject python-dbusmock python-docutils python-pytest python-sphinx python-sphinx-copybutton python-sphinx-furo python-sphinxext-opengraph rtkit umockdev xmlto
+xdg-desktop-portal-gtk	fontconfig gdk-pixbuf2 git glib2 gsettings-desktop-schemas gtk3 xdg-desktop-portal
+gtk4	adwaita-fonts adwaita-icon-theme at-spi2-core cairo colord cups dconf desktop-file-utils docbook-xsl fontconfig fribidi gdk-pixbuf2 gi-docgen git glib2 gobject-introspection graphene gstreamer harfbuzz hicolor-icon-theme iso-codes libcloudproviders libepoxy libglvnd libjpeg-turbo libpng librsvg libtiff libx11 libxcursor libxdamage libxext libxfixes libxi libxinerama libxkbcommon libxrandr libxrender pango pygobject python-docutils sassc shaderc shared-mime-info sysprof tinysparql vulkan-headers vulkan-icd-loader wayland wayland-protocols xdg-desktop-portal-gtk
+adwaita-icon-theme-legacy	git gtk4 hicolor-icon-theme
+adwaita-icon-theme	adwaita-icon-theme-legacy git gtk4 hicolor-icon-theme
+gtk3	adwaita-fonts adwaita-icon-theme at-spi2-core cairo colord cups dconf desktop-file-utils fontconfig fribidi gdk-pixbuf2 git glib2 gobject-introspection gtk-doc gtk4 harfbuzz hicolor-icon-theme iso-codes libcloudproviders libepoxy libglvnd librsvg libx11 libxcomposite libxcursor libxdamage libxext libxfixes libxi libxinerama libxkbcommon libxrandr libxrender pango sassc shared-mime-info tinysparql wayland wayland-protocols
+atkmm	at-spi2-core git glib2 glibmm libsigc++ mm-common
+cairomm	cairo git libsigc++ mm-common
+pangomm	cairomm git glib2 glibmm libsigc++ mm-common pango
+gtkmm3	atkmm cairomm gdk-pixbuf2 git glib2 glibmm gtk3 libsigc++ mm-common pangomm
+libspiro	git
+libuninameslist	
+fontforge	cmake giflib git gtk3 gtkmm3 libspiro libtiff libuninameslist libxml2 pango potrace python-sphinx woff2
+perl-io-string	
+perl-font-ttf	perl-io-string
+ttf-dejavu	fontforge git perl-font-ttf
+ghc	alex docbook-xsl happy haskell-hadrian haskell-hscolour libxslt numactl python-sphinx python-sphinx_rtd_theme texlive-texmf time ttf-dejavu
+haskell-base-compat	ghc
+haskell-character-ps	ghc uusi
+haskell-data-fix	ghc haskell-hashable
+haskell-diff	ghc
+haskell-dlist	ghc uusi
+haskell-generic-deriving	ghc haskell-th-abstraction
+haskell-generically	ghc haskell-base-orphans uusi
+haskell-integer-conversion	ghc haskell-primitive uusi
+haskell-wherefrom-compat	ghc uusi
+haskell-nothunks	ghc haskell-vector haskell-wherefrom-compat uusi
+haskell-onetuple	ghc
+haskell-these	ghc haskell-assoc haskell-hashable uusi
+haskell-strict	ghc haskell-assoc haskell-hashable haskell-these
+haskell-text-short	ghc haskell-hashable uusi
+haskell-time-compat	ghc haskell-base-orphans haskell-hashable uusi
+haskell-uuid-types	ghc haskell-hashable haskell-random
+haskell-quickcheck-instances	ghc haskell-case-insensitive haskell-data-fix haskell-hashable haskell-integer-logarithms haskell-old-time haskell-onetuple haskell-primitive haskell-quickcheck haskell-scientific haskell-splitmix haskell-strict haskell-tagged haskell-text-short haskell-these haskell-time-compat haskell-unordered-containers haskell-uuid-types haskell-vector
+haskell-indexed-traversable-instances	ghc haskell-indexed-traversable haskell-onetuple haskell-tagged haskell-unordered-containers haskell-vector uusi
+haskell-semialign	ghc haskell-hashable haskell-indexed-traversable haskell-indexed-traversable-instances haskell-semigroupoids haskell-tagged haskell-these haskell-unordered-containers haskell-vector uusi
+haskell-tasty-golden	ghc haskell-optparse-applicative haskell-tasty haskell-temporary haskell-typed-process
+haskell-tasty-hunit	ghc haskell-call-stack haskell-tasty
+haskell-tasty-quickcheck	ghc haskell-optparse-applicative haskell-quickcheck haskell-random haskell-tagged haskell-tasty
+haskell-text-iso8601	ghc haskell-integer-conversion haskell-time-compat uusi
+haskell-witherable	ghc haskell-base-orphans haskell-hashable haskell-indexed-traversable haskell-indexed-traversable-instances haskell-quickcheck haskell-quickcheck-instances haskell-tasty haskell-tasty-quickcheck haskell-unordered-containers haskell-vector
+haskell-aeson	ghc haskell-base-compat haskell-base-orphans haskell-base16-bytestring haskell-character-ps haskell-data-fix haskell-diff haskell-dlist haskell-generic-deriving haskell-generically haskell-hashable haskell-indexed-traversable haskell-integer-conversion haskell-integer-logarithms haskell-network-uri haskell-nothunks haskell-onetuple haskell-primitive haskell-quickcheck haskell-quickcheck-instances haskell-scientific haskell-semialign haskell-strict haskell-tagged haskell-tasty haskell-tasty-golden haskell-tasty-hunit haskell-tasty-quickcheck haskell-text-iso8601 haskell-text-short haskell-th-abstraction haskell-these haskell-time-compat haskell-unordered-containers haskell-uuid-types haskell-vector haskell-witherable
+haskell-attoparsec-aeson	ghc haskell-aeson haskell-attoparsec haskell-character-ps haskell-integer-conversion haskell-primitive haskell-scientific haskell-vector uusi
+haskell-cmdargs	ghc
+haskell-aeson-pretty	ghc haskell-aeson haskell-attoparsec haskell-attoparsec-aeson haskell-base-compat haskell-cmdargs haskell-scientific haskell-unordered-containers haskell-vector
+haskell-pretty-show	ghc happy haskell-lexer
+haskell-tagsoup	ghc haskell-quickcheck
+haskell-asciidoc	ghc haskell-aeson haskell-optparse-applicative haskell-pretty-show haskell-tagsoup haskell-tasty haskell-tasty-golden haskell-tasty-hunit uusi
+haskell-blaze-markup	ghc haskell-blaze-builder haskell-hunit haskell-quickcheck haskell-tasty haskell-tasty-hunit haskell-tasty-quickcheck uusi
+haskell-test-framework-quickcheck2	ghc haskell-quickcheck haskell-random haskell-test-framework uusi
+haskell-blaze-html	ghc haskell-blaze-builder haskell-blaze-markup haskell-hunit haskell-quickcheck haskell-test-framework haskell-test-framework-hunit haskell-test-framework-quickcheck2 uusi
+haskell-data-default-instances-containers	ghc haskell-data-default-class
+haskell-data-default-instances-dlist	ghc haskell-data-default-class haskell-dlist
+haskell-data-default-instances-old-locale	ghc haskell-data-default-class haskell-old-locale
+haskell-data-default	ghc haskell-data-default-class haskell-data-default-instances-containers haskell-data-default-instances-dlist haskell-data-default-instances-old-locale haskell-old-locale
+haskell-file-embed	ghc
+haskell-pandoc-types	ghc haskell-aeson haskell-hunit haskell-quickcheck haskell-syb haskell-test-framework haskell-test-framework-hunit haskell-test-framework-quickcheck2
+haskell-text-icu	ghc haskell-hunit haskell-quickcheck haskell-random haskell-test-framework haskell-test-framework-hunit haskell-test-framework-quickcheck2 icu
+haskell-timeit	ghc
+haskell-th-lift	ghc haskell-th-abstraction
+haskell-th-lift-instances	ghc haskell-th-lift haskell-vector
+haskell-unicode-data	ghc haskell-hspec uusi
+haskell-unicode-transforms	ghc haskell-hspec haskell-quickcheck haskell-split haskell-text-icu haskell-unicode-data uusi
+haskell-unicode-collation	ghc haskell-tasty haskell-tasty-hunit haskell-tasty-quickcheck haskell-th-lift-instances haskell-unicode-transforms uusi
+haskell-uniplate	ghc haskell-hashable haskell-syb haskell-unordered-containers
+haskell-xml-types	ghc
+haskell-xml-conduit	ghc haskell-attoparsec haskell-blaze-html haskell-blaze-markup haskell-cabal-doctest haskell-conduit haskell-conduit-extra haskell-data-default haskell-doctest haskell-hspec haskell-hunit haskell-resourcet haskell-xml-types
+haskell-citeproc	ghc haskell-aeson haskell-aeson-pretty haskell-attoparsec haskell-case-insensitive haskell-data-default haskell-diff haskell-file-embed haskell-pandoc-types haskell-safe haskell-scientific haskell-text-icu haskell-timeit haskell-unicode-collation haskell-uniplate haskell-vector haskell-xml-conduit uusi
+haskell-commonmark	ghc haskell-tasty haskell-tasty-hunit haskell-tasty-quickcheck haskell-unicode-data haskell-unicode-transforms
+haskell-emojis	ghc haskell-hunit uusi
+haskell-commonmark-extensions	ghc haskell-commonmark haskell-emojis haskell-network-uri haskell-tasty haskell-tasty-hunit uusi
+haskell-commonmark-pandoc	ghc haskell-commonmark haskell-commonmark-extensions haskell-pandoc-types
+haskell-crypton-socks	ghc haskell-cereal haskell-network haskell-network-bsd
+haskell-crypton-x509-store	ghc haskell-asn1-encoding haskell-asn1-types haskell-crypton haskell-crypton-x509 haskell-pem haskell-tasty haskell-tasty-hunit
+haskell-crypton-x509-system	ghc haskell-crypton-x509 haskell-crypton-x509-store haskell-pem
+haskell-crypton-x509-validation	ghc haskell-asn1-encoding haskell-asn1-types haskell-crypton haskell-crypton-x509 haskell-crypton-x509-store haskell-data-default haskell-hourglass haskell-iproute haskell-memory haskell-pem haskell-tasty haskell-tasty-hunit
+haskell-half	ghc haskell-quickcheck haskell-tasty haskell-tasty-quickcheck uusi
+haskell-cborg	ghc haskell-aeson haskell-base-orphans haskell-base16-bytestring haskell-base64-bytestring haskell-half haskell-primitive haskell-quickcheck haskell-scientific haskell-tasty haskell-tasty-hunit haskell-tasty-quickcheck haskell-vector uusi
+haskell-serialise	ghc haskell-cborg haskell-half haskell-hashable haskell-primitive haskell-quickcheck haskell-quickcheck-instances haskell-strict haskell-tasty haskell-tasty-hunit haskell-tasty-quickcheck haskell-these haskell-unordered-containers haskell-vector uusi
+haskell-tls	ghc haskell-asn1-encoding haskell-asn1-types haskell-async haskell-base16-bytestring haskell-cereal haskell-crypton haskell-crypton-x509 haskell-crypton-x509-store haskell-crypton-x509-validation haskell-data-default-class haskell-hourglass haskell-hspec haskell-hspec-discover haskell-memory haskell-network haskell-quickcheck haskell-serialise haskell-unix-time
+haskell-crypton-connection	ghc haskell-crypton-socks haskell-crypton-x509-store haskell-crypton-x509-system haskell-data-default haskell-network haskell-tls
+haskell-doclayout	ghc haskell-emojis haskell-safe haskell-tasty haskell-tasty-golden haskell-tasty-hunit haskell-tasty-quickcheck
+haskell-djot	ghc haskell-doclayout haskell-tasty haskell-tasty-hunit haskell-tasty-quickcheck uusi
+haskell-glob	ghc haskell-dlist haskell-transformers-compat uusi
+haskell-text-conversions	ghc haskell-base16-bytestring haskell-base64-bytestring haskell-hspec haskell-hspec-discover
+haskell-doctemplates	ghc haskell-aeson haskell-doclayout haskell-glob haskell-safe haskell-scientific haskell-tasty haskell-tasty-golden haskell-tasty-hunit haskell-temporary haskell-text-conversions haskell-vector
+haskell-gridtables	ghc haskell-doclayout haskell-tasty haskell-tasty-hunit uusi
+haskell-charset	ghc haskell-unordered-containers
+haskell-parsers	ghc haskell-attoparsec haskell-charset haskell-quickcheck haskell-quickcheck-instances haskell-scientific haskell-unordered-containers
+haskell-fingertree	ghc haskell-hunit haskell-quickcheck haskell-test-framework haskell-test-framework-hunit haskell-test-framework-quickcheck2
+haskell-free	ghc haskell-comonad haskell-distributive haskell-indexed-traversable haskell-profunctors haskell-semigroupoids haskell-th-abstraction haskell-transformers-base uusi
+haskell-void	ghc haskell-hashable uusi
+haskell-adjunctions	ghc haskell-comonad haskell-distributive haskell-free haskell-hspec haskell-hspec-discover haskell-profunctors haskell-semigroupoids haskell-tagged haskell-void
+haskell-invariant	ghc haskell-bifunctors haskell-comonad haskell-contravariant haskell-hspec haskell-profunctors haskell-quickcheck haskell-statevar haskell-tagged haskell-th-abstraction haskell-unordered-containers
+haskell-kan-extensions	ghc haskell-adjunctions haskell-comonad haskell-contravariant haskell-distributive haskell-free haskell-invariant haskell-profunctors haskell-semigroupoids
+haskell-parallel	ghc
+haskell-reflection	ghc haskell-hspec haskell-quickcheck
+haskell-simple-reflect	ghc
+haskell-lens	ghc haskell-assoc haskell-base-orphans haskell-bifunctors haskell-call-stack haskell-comonad haskell-contravariant haskell-distributive haskell-free haskell-hashable haskell-indexed-traversable haskell-indexed-traversable-instances haskell-kan-extensions haskell-parallel haskell-profunctors haskell-quickcheck haskell-reflection haskell-semigroupoids haskell-simple-reflect haskell-strict haskell-tagged haskell-tasty haskell-tasty-hunit haskell-tasty-quickcheck haskell-th-abstraction haskell-these haskell-unordered-containers haskell-vector
+haskell-reducers	ghc haskell-fingertree haskell-hashable haskell-semigroupoids haskell-unordered-containers
+haskell-trifecta	ghc haskell-ansi-terminal haskell-blaze-builder haskell-blaze-html haskell-blaze-markup haskell-charset haskell-comonad haskell-fingertree haskell-hashable haskell-indexed-traversable haskell-lens haskell-parsers haskell-prettyprinter haskell-prettyprinter-ansi-terminal haskell-profunctors haskell-quickcheck haskell-reducers haskell-unordered-containers haskell-utf8-string
+haskell-tree-diff	ghc haskell-aeson haskell-ansi-terminal haskell-ansi-wl-pprint haskell-hashable haskell-parsers haskell-primitive haskell-quickcheck haskell-scientific haskell-semialign haskell-strict haskell-tagged haskell-tasty haskell-tasty-golden haskell-tasty-quickcheck haskell-these haskell-trifecta haskell-unordered-containers haskell-uuid-types haskell-vector uusi
+haskell-haddock-library	ghc haskell-base-compat haskell-hspec haskell-hspec-discover haskell-optparse-applicative haskell-quickcheck haskell-tree-diff uusi
+haskell-http-client-tls	ghc haskell-case-insensitive haskell-crypton haskell-crypton-connection haskell-data-default haskell-hspec haskell-http-client haskell-http-types haskell-memory haskell-network haskell-network-uri haskell-tls uusi
+haskell-microlens	ghc
+haskell-microlens-aeson	ghc haskell-aeson haskell-attoparsec haskell-hashable haskell-microlens haskell-scientific haskell-tasty haskell-tasty-hunit haskell-vector uusi
+haskell-ipynb	ghc haskell-aeson haskell-base64-bytestring haskell-microlens haskell-microlens-aeson haskell-tasty haskell-tasty-hunit haskell-unordered-containers
+haskell-jira-wiki-markup	ghc haskell-tasty haskell-tasty-hunit uusi
+haskell-juicypixels	ghc haskell-primitive haskell-vector haskell-zlib
+haskell-libyaml	ghc haskell-conduit haskell-resourcet libyaml
+haskell-skylighting-core	ghc haskell-aeson haskell-attoparsec haskell-base64-bytestring haskell-case-insensitive haskell-colour haskell-diff haskell-pretty-show haskell-quickcheck haskell-safe haskell-tasty haskell-tasty-golden haskell-tasty-hunit haskell-tasty-quickcheck haskell-utf8-string haskell-xml-conduit
+haskell-skylighting-format-ansi	ghc haskell-ansi-terminal haskell-colour haskell-skylighting-core uusi
+haskell-skylighting-format-blaze-html	ghc haskell-blaze-html haskell-skylighting-core uusi
+haskell-skylighting-format-context	ghc haskell-skylighting-core uusi
+haskell-skylighting-format-latex	ghc haskell-skylighting-core uusi
+haskell-skylighting-format-typst	ghc haskell-skylighting-core uusi
+haskell-skylighting	ghc haskell-skylighting-core haskell-skylighting-format-ansi haskell-skylighting-format-blaze-html haskell-skylighting-format-context haskell-skylighting-format-latex haskell-skylighting-format-typst
+haskell-typst-symbols	ghc uusi
+haskell-texmath	ghc haskell-pandoc-types haskell-pretty-show haskell-split haskell-syb haskell-tagged haskell-tasty haskell-tasty-golden haskell-typst-symbols haskell-xml
+haskell-only	ghc
+haskell-cassava	ghc git haskell-attoparsec haskell-hashable haskell-hunit haskell-only haskell-quickcheck haskell-quickcheck-instances haskell-scientific haskell-test-framework haskell-test-framework-hunit haskell-test-framework-quickcheck2 haskell-text-short haskell-unordered-containers haskell-vector
+haskell-ordered-containers	ghc haskell-hashable
+haskell-regex-tdfa	ghc haskell-regex-base uusi
+haskell-stringbuilder	ghc
+haskell-markdown-unlit	ghc haskell-base-compat haskell-hspec haskell-hspec-discover haskell-silently haskell-stringbuilder haskell-temporary
+haskell-toml-parser	alex ghc happy haskell-hspec haskell-hspec-discover haskell-markdown-unlit haskell-prettyprinter uusi
+haskell-logging-facade	ghc haskell-call-stack
+haskell-mockery	ghc haskell-base-compat haskell-logging-facade haskell-temporary
+haskell-raw-strings-qq	ghc haskell-hunit
+haskell-yaml	ghc haskell-aeson haskell-attoparsec haskell-base-compat haskell-conduit haskell-hspec haskell-hunit haskell-libyaml haskell-mockery haskell-optparse-applicative haskell-raw-strings-qq haskell-resourcet haskell-scientific haskell-temporary haskell-unordered-containers haskell-vector
+haskell-typst	ghc haskell-aeson haskell-cassava haskell-erf haskell-ordered-containers haskell-pretty-show haskell-regex-tdfa haskell-scientific haskell-tasty haskell-tasty-golden haskell-toml-parser haskell-typst-symbols haskell-vector haskell-xml-conduit haskell-yaml uusi
+haskell-digest	ghc
+haskell-zip-archive	ghc haskell-digest haskell-hunit haskell-old-time haskell-temporary haskell-zlib unzip
+haskell-pandoc	ghc haskell-aeson haskell-aeson-pretty haskell-asciidoc haskell-attoparsec haskell-base64-bytestring haskell-blaze-html haskell-blaze-markup haskell-case-insensitive haskell-citeproc haskell-commonmark haskell-commonmark-extensions haskell-commonmark-pandoc haskell-crypton haskell-crypton-connection haskell-crypton-x509-system haskell-data-default haskell-diff haskell-djot haskell-doclayout haskell-doctemplates haskell-emojis haskell-file-embed haskell-glob haskell-gridtables haskell-haddock-library haskell-http-client haskell-http-client-tls haskell-http-types haskell-ipynb haskell-jira-wiki-markup haskell-juicypixels haskell-libyaml haskell-mime-types haskell-network haskell-network-uri haskell-pandoc-types haskell-pretty-show haskell-random haskell-safe haskell-scientific haskell-skylighting haskell-skylighting-core haskell-split haskell-syb haskell-tagsoup haskell-tasty haskell-tasty-golden haskell-tasty-hunit haskell-tasty-quickcheck haskell-temporary haskell-texmath haskell-text-conversions haskell-tls haskell-typst haskell-unicode-collation haskell-unicode-data haskell-unicode-transforms haskell-vector haskell-xml haskell-xml-conduit haskell-xml-types haskell-yaml haskell-zip-archive haskell-zlib uusi
+haskell-lua	ghc haskell-tasty haskell-tasty-hunit lua54 uusi
+haskell-lua-arbitrary	ghc haskell-lua haskell-quickcheck uusi
+haskell-hslua-core	ghc haskell-lua haskell-lua-arbitrary haskell-quickcheck haskell-tasty haskell-tasty-hunit haskell-tasty-quickcheck uusi
+haskell-tasty-hslua	ghc haskell-hslua-core haskell-tasty haskell-tasty-hunit uusi
+haskell-hslua-marshalling	ghc haskell-hslua-core haskell-lua-arbitrary haskell-quickcheck haskell-quickcheck-instances haskell-tasty haskell-tasty-hslua haskell-tasty-hunit haskell-tasty-quickcheck uusi
+haskell-hslua-aeson	ghc haskell-aeson haskell-hslua-core haskell-hslua-marshalling haskell-quickcheck haskell-quickcheck-instances haskell-scientific haskell-tasty haskell-tasty-hunit haskell-tasty-quickcheck haskell-vector uusi
+haskell-hslua-classes	ghc haskell-hslua-core haskell-hslua-marshalling haskell-lua-arbitrary haskell-quickcheck haskell-quickcheck-instances haskell-tasty haskell-tasty-hslua haskell-tasty-hunit haskell-tasty-quickcheck uusi
+haskell-hslua-typing	ghc haskell-hslua-core haskell-hslua-marshalling haskell-lua-arbitrary haskell-quickcheck haskell-quickcheck-instances haskell-tasty haskell-tasty-hunit haskell-tasty-quickcheck uusi
+haskell-hslua-objectorientation	ghc haskell-hslua-core haskell-hslua-marshalling haskell-hslua-typing haskell-tasty haskell-tasty-hslua uusi
+haskell-hslua-packaging	ghc haskell-hslua-core haskell-hslua-marshalling haskell-hslua-objectorientation haskell-hslua-typing haskell-tasty haskell-tasty-hslua haskell-tasty-hunit uusi
+haskell-hslua	ghc haskell-hslua-aeson haskell-hslua-classes haskell-hslua-core haskell-hslua-marshalling haskell-hslua-objectorientation haskell-hslua-packaging haskell-hslua-typing haskell-tasty haskell-tasty-hslua haskell-tasty-hunit uusi
+haskell-tasty-lua	ghc haskell-file-embed haskell-hslua-core haskell-hslua-marshalling haskell-lua-arbitrary haskell-quickcheck haskell-tasty haskell-tasty-hunit
+haskell-hslua-module-doclayout	ghc haskell-doclayout haskell-hslua haskell-tasty haskell-tasty-hunit haskell-tasty-lua uusi
+haskell-hslua-module-path	ghc haskell-hslua-core haskell-hslua-marshalling haskell-hslua-packaging haskell-tasty haskell-tasty-hunit haskell-tasty-lua uusi
+haskell-hslua-list	ghc haskell-hslua-core haskell-tasty haskell-tasty-lua uusi
+haskell-hslua-module-system	ghc haskell-hslua-core haskell-hslua-list haskell-hslua-marshalling haskell-hslua-packaging haskell-tasty-hunit haskell-tasty-lua haskell-temporary uusi
+haskell-hslua-module-text	ghc haskell-hslua-core haskell-hslua-marshalling haskell-hslua-packaging haskell-tasty haskell-tasty-hunit haskell-tasty-lua
+haskell-hslua-module-version	ghc haskell-hslua-core haskell-hslua-marshalling haskell-hslua-packaging haskell-tasty haskell-tasty-hunit haskell-tasty-lua uusi
+haskell-hslua-module-zip	ghc haskell-hslua-core haskell-hslua-list haskell-hslua-marshalling haskell-hslua-module-system haskell-hslua-packaging haskell-tasty haskell-tasty-hunit haskell-tasty-lua haskell-zip-archive uusi
+haskell-isocline	ghc uusi
+haskell-hslua-repl	ghc haskell-hslua-core haskell-isocline haskell-lua uusi
+lua52	
+lua53	
+luarocks	curl lua unzip zip
+lpeg	lua lua51 lua52 lua53 lua54 luarocks
+haskell-lpeg	ghc haskell-lua haskell-tasty haskell-tasty-hunit lpeg uusi
+haskell-pandoc-lua-marshal	ghc haskell-aeson haskell-hslua haskell-hslua-list haskell-hslua-marshalling haskell-pandoc-types haskell-quickcheck haskell-safe haskell-tasty haskell-tasty-hunit haskell-tasty-lua haskell-tasty-quickcheck uusi
+haskell-pandoc-lua-engine	ghc haskell-aeson haskell-citeproc haskell-crypton haskell-data-default haskell-doclayout haskell-doctemplates haskell-hslua haskell-hslua-module-doclayout haskell-hslua-module-path haskell-hslua-module-system haskell-hslua-module-text haskell-hslua-module-version haskell-hslua-module-zip haskell-hslua-repl haskell-lpeg haskell-pandoc haskell-pandoc-lua-marshal haskell-pandoc-types haskell-tasty haskell-tasty-golden haskell-tasty-hunit haskell-tasty-lua uusi
+haskell-boring	ghc haskell-tagged uusi
+haskell-constraints	ghc haskell-boring haskell-hashable
+haskell-easy-file	ghc
+haskell-monad-parallel	ghc haskell-parallel haskell-transformers-compat
+haskell-unix-compat	ghc haskell-hspec haskell-hunit haskell-monad-parallel haskell-temporary
+haskell-fast-logger	ghc haskell-async haskell-auto-update haskell-easy-file haskell-hspec haskell-hspec-discover haskell-unix-compat haskell-unix-time
+haskell-wai-logger	ghc haskell-byteorder haskell-fast-logger haskell-hspec haskell-hspec-discover haskell-http-types haskell-network haskell-wai
+haskell-wai-extra	ghc haskell-aeson haskell-ansi-terminal haskell-base64-bytestring haskell-call-stack haskell-case-insensitive haskell-cookie haskell-data-default haskell-fast-logger haskell-hspec haskell-hspec-discover haskell-http-types haskell-hunit haskell-iproute haskell-network haskell-resourcet haskell-streaming-commons haskell-temporary haskell-vault haskell-wai haskell-wai-logger haskell-warp haskell-word8 haskell-zlib
+haskell-hspec-wai	ghc haskell-base-compat haskell-case-insensitive haskell-hspec haskell-hspec-core haskell-hspec-discover haskell-hspec-expectations haskell-http-types haskell-hunit haskell-quickcheck haskell-wai haskell-wai-extra
+haskell-http-api-data	ghc haskell-cookie haskell-hashable haskell-hspec haskell-http-types haskell-quickcheck haskell-quickcheck-instances haskell-tagged haskell-text-iso8601 haskell-time-compat haskell-unordered-containers haskell-uuid-types
+haskell-http-media	ghc haskell-case-insensitive haskell-quickcheck haskell-tasty haskell-tasty-quickcheck haskell-utf8-string uusi
+haskell-sop-core	ghc uusi
+haskell-generics-sop	ghc haskell-sop-core haskell-th-abstraction uusi
+haskell-mmorph	ghc haskell-transformers-compat
+haskell-dec	ghc haskell-boring uusi
+haskell-some	ghc haskell-base-orphans uusi
+haskell-singleton-bool	ghc haskell-boring haskell-dec haskell-some
+haskell-servant	ghc haskell-aeson haskell-attoparsec haskell-bifunctors haskell-case-insensitive haskell-constraints haskell-generics-sop haskell-hspec haskell-hspec-discover haskell-http-api-data haskell-http-media haskell-http-types haskell-mmorph haskell-network-uri haskell-quickcheck haskell-quickcheck-instances haskell-singleton-bool haskell-sop-core haskell-vault
+haskell-should-not-typecheck	ghc haskell-hspec haskell-hspec-expectations haskell-hunit
+haskell-cryptohash-md5	ghc haskell-base16-bytestring haskell-puremd5 haskell-tasty haskell-tasty-hunit haskell-tasty-quickcheck uusi
+haskell-wai-app-static	ghc haskell-base64-bytestring haskell-blaze-html haskell-blaze-markup haskell-cryptohash-md5 haskell-file-embed haskell-hspec haskell-http-date haskell-http-types haskell-mime-types haskell-mockery haskell-old-locale haskell-optparse-applicative haskell-temporary haskell-unix-compat haskell-unordered-containers haskell-wai haskell-wai-extra haskell-warp haskell-zlib
+haskell-servant-server	ghc haskell-aeson haskell-base-compat haskell-base64-bytestring haskell-constraints haskell-hspec haskell-hspec-wai haskell-http-api-data haskell-http-media haskell-http-types haskell-monad-control haskell-network haskell-resourcet haskell-safe haskell-servant haskell-should-not-typecheck haskell-sop-core haskell-tagged haskell-temporary haskell-transformers-base haskell-wai haskell-wai-app-static haskell-wai-extra haskell-warp haskell-word8 uusi
+haskell-base-unicode-symbols	ghc
+haskell-wai-cors	ghc haskell-attoparsec haskell-base-unicode-symbols haskell-case-insensitive haskell-http-types haskell-wai
+haskell-pandoc-server	ghc haskell-aeson haskell-base64-bytestring haskell-data-default haskell-doctemplates haskell-pandoc haskell-pandoc-types haskell-servant-server haskell-skylighting haskell-unicode-collation haskell-wai haskell-wai-cors uusi
+hslua-cli	ghc haskell-hslua-core haskell-hslua-marshalling haskell-hslua-repl haskell-lua uusi
+pandoc-cli	ghc haskell-pandoc haskell-pandoc-lua-engine haskell-pandoc-server haskell-safe haskell-temporary haskell-wai-extra haskell-warp hslua-cli uusi
+java-openjdk	alsa-lib ca-certificates cpio cups freetype2 giflib graphviz harfbuzz hicolor-icon-theme java-common lcms2 libjpeg-turbo libnet libpng libx11 libxext libxrandr libxrender libxt libxtst nss pandoc-cli unzip zip
+libjxl	add-determinism asciidoc brotli cmake doxygen giflib git gperftools graphviz gtest highway java-openjdk libjpeg-turbo libpng xdg-utils
+liblqr	git glib2
+libultrahdr	cmake git gtest libjpeg-turbo
+imagemagick	cairo chrpath djvulibre fftw fontconfig freetype2 gcc ghostscript git glib2 glu jbigkit lcms2 libheif libjpeg-turbo libjxl liblqr libpng libraqm libraw librsvg libultrahdr libwebp libwmf libxext libxml2 libzip ocl-icd opencl-headers openexr openjpeg2
+giflib	docbook-xml docbook-xsl git imagemagick xmlto
+libwebp	cmake giflib libjpeg-turbo libpng libtiff
+libtiff	cmake freeglut git glu jbigkit libdeflate libjpeg-turbo libwebp mesa
+lcms2	libjpeg-turbo libtiff
+devil	cmake jasper lcms2 libjpeg-turbo libpng libtiff
+patchutils	pcre2 xmlto
+avisynthplus	cmake devil hicolor-icon-theme patchutils soundtouch
+ffnvcodec-headers	git
+gavl	doxygen git gnutls libdrm libglvnd libpng libva nettle
+frei0r-plugins	cairo cmake gavl git libglvnd opencv
+libbluray	ant fontconfig freetype2 git java-openjdk libxml2
+glad	python-build python-installer python-lxml
+libdovi	cargo-c git rust
+nuklear	
+libplacebo	glad glslang lcms2 libdovi libglvnd libunwind nuklear python-mako shaderc vulkan-headers vulkan-icd-loader xxhash
+libssh	cmake cmocka doxygen openssh
+libvdpau	git libx11 libxext xorgproto
+rav1e	cargo-c git nasm rust
+vamp-plugin-sdk	libsndfile
+rubberband	boost fftw java-openjdk ladspa libsamplerate libsndfile lv2 vamp-plugin-sdk
+zimg	git
+vapoursynth	cython git meson-python python-build python-installer zimg
+vid.stab	cmake gcc git
+xvidcore	nasm
+ffmpeg	alsa-lib amf-headers aom avisynthplus cairo dav1d ffnvcodec-headers fontconfig freetype2 frei0r-plugins fribidi git glib2 gnutls gsm harfbuzz jack2 ladspa lame lcms2 libass libavc1394 libbluray libbs2b libdrm libdvdnav libdvdread libglvnd libiec61883 libjxl libmodplug libopenmpt libplacebo libraw1394 librsvg libsoxr libssh libtheora libva libvdpau libvorbis libvpl libvpx libwebp libx11 libxcb libxext libxml2 libxv llvm mesa nasm ocl-icd opencl-headers opencore-amr openjpeg2 opus pulseaudio rav1e rubberband sdl2-compat snappy sndio speex spirv-headers srt svt-av1 v4l-utils vapoursynth vid.stab vmaf vulkan-headers vulkan-icd-loader x264 x265 xvidcore zeromq zimg
+libheif	aom cmake dav1d ffmpeg git libde265 libjpeg-turbo libpng libtiff libwebp openh264 openjpeg2 rav1e svt-av1 x264 x265
+chafa	git gtk-doc libavif libheif libjxl librsvg libwebp libxslt
+harfbuzz	cairo chafa freetype2 git glew glfw glib2 gobject-introspection graphite gtk-doc help2man icu libglvnd libpng ragel
+pango	cairo fontconfig freetype2 fribidi gi-docgen git glib2 gobject-introspection harfbuzz help2man libthai libx11 libxft libxrender python-docutils sysprof
+rrdtool	git libxml2 lua51 pango python-installer ruby ttf-dejavu
+lm_sensors	rrdtool
+python-sphinx-hawkmoth	git llvm python-build python-docutils python-hatchling python-installer python-sphinx
+mesa	cbindgen cmake directx-headers elfutils glslang libdisplay-info libdrm libglvnd libpng libva libx11 libxcb libxext libxml2 libxrandr libxshmfence libxxf86vm llvm lm_sensors python-mako python-ply python-pycparser python-sphinx python-sphinx-hawkmoth python-yaml rust rust-bindgen spirv-llvm-translator spirv-tools valgrind vulkan-icd-loader wayland wayland-protocols xcb-util-keysyms xorgproto
+libglvnd	libx11 libxext mesa xorgproto
+eglexternalplatform	git libglvnd
+egl-gbm	eglexternalplatform libdrm mesa
+egl-wayland	eglexternalplatform git libdrm libglvnd wayland wayland-protocols
+egl-wayland2	eglexternalplatform git libdrm libglvnd mesa wayland wayland-protocols
+egl-x11	eglexternalplatform git libdrm libx11 libxcb mesa
+nvidia-utils	egl-gbm egl-wayland egl-wayland2 egl-x11 libglvnd
+cuda	cccl nvidia-utils
+openpmix	hwloc libevent
+nccl	cuda git
+hipify-clang	cmake cuda rocm-llvm
+rocm-smi-lib	cmake hsa-rocr rocm-core
+rccl	cmake git hip-runtime hipify-clang rocm-cmake rocm-core rocm-llvm rocm-smi-lib
+openucc	cuda hip-runtime nccl openucx rccl rdma-core rocm-llvm
+prrte	hwloc libevent openpmix
+openmpi	cuda gcc hip-runtime hwloc libevent libfabric nvidia-utils openpmix openucc openucx prrte valgrind
+boost	icu openmpi python-numpy
+cracklib	
+judy	
+mariadb	boost cmake cracklib curl git jemalloc judy krb5 liburing libxml2 pcre2
+libsasl	git krb5 mariadb openldap postgresql sqlite
+openldap	chrpath libsasl libsodium unixodbc
+krb5	keyutils lmdb openldap
+libtirpc	krb5
+libnsl	libtirpc
+libuv	git libnsl python-sphinx python-sphinx-copybutton
+nodejs	abseil-cpp ada brotli c-ares git icu libnghttp2 libnghttp3 libngtcp2 libuv rust simdjson
+nodejs-nopt	nodejs npm
+semver	git jq nodejs npm
+node-gyp	git jq nodejs nodejs-nopt npm semver
+npm	git jq node-gyp nodejs nodejs-nopt semver
+typescript	git nodejs npm rsync
+ts-node	nodejs npm typescript
+llhttp	cmake git npm ts-node
+libgit2	cmake libssh2 llhttp pcre2
+setconf	
+riscv64-linux-gnu-binutils	setconf
+riscv64-linux-gnu-linux-api-headers	rsync
+riscv64-linux-gnu-glibc	riscv64-linux-gnu-gcc riscv64-linux-gnu-linux-api-headers
+riscv64-linux-gnu-gcc	git libisl riscv64-linux-gnu-binutils riscv64-linux-gnu-glibc
+musl	aarch64-linux-gnu-gcc riscv64-linux-gnu-gcc
+rust	aarch64-linux-gnu-gcc aarch64-linux-gnu-glibc cmake curl gcc glibc libgit2 libssh2 llvm musl sqlite wasi-libc wasm-component-ld
+python-setuptools-rust	git python-build python-installer python-semantic-version python-setuptools-scm rust
+maturin	git python-build python-installer python-setuptools-rust rust
+python-ast-serialize	git maturin python-build python-installer rust
+python-librt	python-build python-installer
+python-orjson	maturin python-installer rust
+mypy	python-ast-serialize python-build python-installer python-librt python-mypy_extensions python-orjson python-pathspec python-typing_extensions
+python-charset-normalizer	git mypy python-build python-installer
+python-idna	git python-build python-installer
+python-urllib3	python-build python-hatch-vcs python-hatchling python-installer
+python-requests	ca-certificates git python-build python-certifi python-charset-normalizer python-idna python-installer python-urllib3
+python-roman-numerals-py	git python-build python-installer
+python-snowballstemmer	python-build python-installer
+python-sphinx-alabaster-theme	git python-build python-installer
+python-sphinxcontrib-applehelp	git python-build python-installer
+python-sphinxcontrib-devhelp	git python-build python-installer
+python-sphinxcontrib-htmlhelp	git python-build python-installer
+python-sphinxcontrib-jsmath	python-build python-installer
+python-sphinxcontrib-qthelp	git python-build python-installer
+python-sphinxcontrib-serializinghtml	git python-build python-installer
+python-sphinx	git python-babel python-build python-docutils python-imagesize python-installer python-pygments python-requests python-roman-numerals-py python-snowballstemmer python-sphinx-alabaster-theme python-sphinxcontrib-applehelp python-sphinxcontrib-devhelp python-sphinxcontrib-htmlhelp python-sphinxcontrib-jsmath python-sphinxcontrib-qthelp python-sphinxcontrib-serializinghtml
+gobject-introspection	cairo git glib2 gtk-doc python-mako python-markdown python-sphinx
+pygobject	git glib2 gobject-introspection python-cairo python-pydata-sphinx-theme python-sphinx python-sphinx-copybutton
+python-tomli	python-build python-installer
+dbus-python	git glib2 pygobject python-pyproject-metadata python-sphinx python-sphinx_rtd_theme python-sphinxcontrib-jquery python-tomli
+libdaemon	git
+python-automat	python-build python-hatch-vcs python-installer python-setuptools-scm
+python-constantly	python-build python-installer python-versioneer
+python-hyperlink	python-build python-idna python-installer
+python-incremental	git python-build python-hatchling python-installer
+python-zope-interface	git python-build python-installer
+python-twisted	git python-attrs python-automat python-build python-constantly python-hatch-fancy-pypi-readme python-hatchling python-hyperlink python-incremental python-installer python-typing_extensions python-zope-interface
+avahi	dbus-python doxygen git glib2 gobject-introspection graphviz gtk3 libdaemon pygobject python-twisted xmltoman
+pdfio	libpng
+libcupsfilters	cups fontconfig ghostscript git lcms2 libexif libjpeg-turbo libjxl libpng libtiff pdfio poppler
+libppd	cups ghostscript libcupsfilters
+cmark-gfm	cmake
+jbig2dec	git libpng
+leptonica	giflib libjpeg-turbo libpng libtiff libwebp openjpeg2
+tesseract-data	
+tesseract	asciidoc curl gcc icu leptonica libarchive pango tesseract-data
+mupdf	brotli cmark-gfm curl desktop-file-utils freeglut freetype2 git glu gumbo-parser harfbuzz jbig2dec leptonica libjpeg-turbo libx11 libxext llvm mesa openjpeg2 swig tesseract unzip zint zxing-cpp
+cups-filters	cups ghostscript libcupsfilters libppd mupdf
+cups	avahi colord cups-filters gnutls hicolor-icon-theme libpaper libusb pam
+ijs	docbook-utils ghostscript
+ghostscript	cairo cups fontconfig freeglut gdk-pixbuf2 glib2 glu gnutls gtk3 ijs jbig2dec lcms2 libidn libjpeg-turbo libpaper libpng libtiff libx11 libxt openjpeg2 poppler-data
+perl-sort-versions	
+ttf-roboto	
+ttf-roboto-mono	
+nasm	asciidoc fontconfig ghostscript perl-font-ttf perl-sort-versions ttf-roboto ttf-roboto-mono xmlto
+dav1d	doxygen graphviz nasm xxhash
+libavif	aom cmake dav1d git libjpeg-turbo libpng libwebp libxml2 libyuv nasm pandoc-cli rav1e svt-av1
+gd	fontconfig git libavif libheif libwebp libxpm
+gsfonts	
+gts	glib2 netpbm
+libgdiplus	cairo fontconfig giflib glib2 harfbuzz libexif libjpeg-turbo libpng libtiff libx11 pango
+mono	ca-certificates cmake git libgdiplus
+r	cairo curl gcc glib2 icu java-openjdk lapack libdeflate libjpeg-turbo libpng libtiff libtirpc libx11 libxmu libxt pango pcre2 texlive-texmf tk unzip which zip
+graphviz	gd ghostscript gsfonts gts guile librsvg lua mono pango qt6-base r swig tk
+vala	autoconf-archive git glib2 graphviz gtk-doc help2man libxslt noto-fonts
+dconf	bash-completion git glib2 gtk-doc vala
+glib2	dconf gi-docgen git gobject-introspection pcre2 python-docutils shared-mime-info sysprof util-linux
+lzo	
+cairo	fontconfig freetype2 git glib2 gtk-doc libpng libx11 libxcb libxext libxrender lzo pixman valgrind
+freetype2	brotli cairo glib2 harfbuzz libpng librsvg libx11 qt6-base
+dvisvgm	autoconf-archive brotli freetype2 ghostscript git potrace texlive-bin texlive-texmf woff2 xxhash
+texlive-texmf	dvisvgm subversion texlive-bin
+dblatex	docbook-xml docbook-xsl libxslt python-build python-installer texlive-texmf
+gtk-doc	dblatex docbook-xml docbook-xsl git glib2 python-lxml python-pygments yelp-tools
+p11-kit	bash-completion git gtk-doc libtasn1
+nss	ca-certificates gyp mercurial nspr p11-kit sqlite
+ca-certificates	asciidoc nss p11-kit
+curl	brotli ca-certificates git gnutls krb5 libidn2 libnghttp2 libnghttp3 libngtcp2 libpsl libssh2 nettle patchelf
+rhash	
+cmake	cppdap curl emacs git hicolor-icon-theme jsoncpp libarchive libuv nlohmann-json python-sphinx qt6-base rhash
+spdlog	catch2 cmake fmt
+doxygen	cmake fmt ghostscript graphviz llvm qt6-base qt6-svg spdlog sqlite texlive-texmf
+libxml2	docbook-xsl doxygen git icu
+docbook-xml	libxml2
+docbook-xsl	docbook-xml libxml2 libxslt
+asciidoc	docbook-xsl libxslt python-build python-installer
+perl-error	
+perl-timedate	
+perl-mailtools	perl-timedate
+git	asciidoc curl pcre2 perl-error perl-mailtools rust xmlto zlib-ng
+a52dec	git
+buf	git go
+gn	git llvm
+dart	git gn
+dart-sass	buf dart git
+adw-gtk-theme	dart-sass git
+aha	git
+hyprutils	cmake pixman
+hyprwayland-scanner	cmake git pugixml
+scdoc	
+seatd	scdoc
+aquamarine	cmake hyprutils hyprwayland-scanner libdisplay-info libdrm libglvnd libinput mesa pixman seatd wayland wayland-protocols
+archlinux-appstream-data	
+breeze-icons	extra-cmake-modules python-lxml qt6-base
+kconfig	doxygen extra-cmake-modules qt6-base qt6-declarative qt6-tools
+ki18n	doxygen extra-cmake-modules iso-codes qt6-base qt6-declarative qt6-tools
+kcolorscheme	doxygen extra-cmake-modules kconfig kguiaddons ki18n qt6-base qt6-tools
+kcodecs	doxygen extra-cmake-modules qt6-base qt6-tools
+kwidgetsaddons	doxygen extra-cmake-modules pyside6 python-build qt6-base qt6-tools
+kcompletion	doxygen extra-cmake-modules kcodecs kconfig kwidgetsaddons qt6-base qt6-tools
+kcoreaddons	doxygen extra-cmake-modules pyside6 python-build qt6-base qt6-declarative qt6-tools util-linux
+kconfigwidgets	doxygen extra-cmake-modules kcodecs kcolorscheme kconfig kcoreaddons ki18n kwidgetsaddons qt6-base qt6-tools
+kcrash	doxygen extra-cmake-modules kcoreaddons libx11 qt6-base qt6-tools
+kdbusaddons	doxygen extra-cmake-modules qt6-base qt6-tools
+karchive	doxygen extra-cmake-modules qt6-base qt6-tools
+perl-mime-base32	
+perl-uri	perl-mime-base32
+kdoctools	docbook-xsl doxygen extra-cmake-modules karchive ki18n libxml2 libxslt perl-uri qt6-base qt6-tools
+catdoc	
+convertlit	libtommath
+ebook-tools	cmake convertlit libxml2 libzip
+exiv2	brotli cmake curl git gtest libinih
+kdegraphics-mobipocket	extra-cmake-modules qt6-base
+squashfuse	git
+xdg-utils-cxx	cmake git
+libappimage	boost cairo cmake desktop-file-utils git glib2 libarchive librsvg squashfuse wget xdg-utils-cxx
+kfilemetadata	catdoc doxygen ebook-tools exiv2 extra-cmake-modules ffmpeg karchive kcodecs kconfig kcoreaddons kdegraphics-mobipocket ki18n libappimage poppler qt6-base qt6-tools taglib
+kbookmarks	doxygen extra-cmake-modules kconfig kcoreaddons kwidgetsaddons qt6-base qt6-tools
+kiconthemes	breeze-icons doxygen extra-cmake-modules karchive kcolorscheme kconfig ki18n kwidgetsaddons qt6-base qt6-svg qt6-tools
+kitemviews	doxygen extra-cmake-modules qt6-base qt6-tools
+knotifications	doxygen extra-cmake-modules kconfig libcanberra pyside6 python-build qt6-base qt6-declarative
+kjobwidgets	doxygen extra-cmake-modules kcoreaddons knotifications kwidgetsaddons pyside6 python-build qt6-base qt6-tools
+kservice	doxygen extra-cmake-modules kconfig kcoreaddons kdoctools ki18n qt6-base qt6-tools
+botan	boost sqlite
+pkcs11-helper	git gnutls nss
+qca	botan ca-certificates cmake doxygen libgcrypt libsasl nss pkcs11-helper qt5-base qt6-5compat qt6-base
+kwallet	doxygen extra-cmake-modules glib2 gpgmepp kcolorscheme kconfig kcoreaddons kcrash kdbusaddons kdoctools ki18n knotifications kservice kwidgetsaddons kwindowsystem libgcrypt libsecret qca qt6-base qt6-tools
+libplist	cython git
+libimobiledevice-glue	git libplist
+libtatsu	curl git libplist
+libusbmuxd	git libimobiledevice-glue libplist
+libimobiledevice	cython doxygen git libimobiledevice-glue libplist libtatsu libusbmuxd
+media-player-info	appstream git
+btrfs-progs	asciidoc git libgcrypt lzo python-sphinx python-sphinx_rtd_theme util-linux xmlto
+thin-provisioning-tools	git llvm lvm2 rust
+lvm2	git libaio thin-provisioning-tools util-linux
+cryptsetup	asciidoctor json-c lvm2 popt util-linux
+exfatprogs	
+libatasmart	
+libbytesize	pcre2
+libnvme	asciidoc json-c keyutils liburing swig
+mdadm	git
+iniparser	cmake doxygen
+libtracefs	asciidoc libtraceevent xmlto
+ndctl	asciidoctor bash-completion cmake git iniparser json-c keyutils libtraceevent libtracefs util-linux xmlto
+parted	lvm2 util-linux
+volume_key	cryptsetup glib2 gpgme nspr nss swig util-linux
+libblockdev	autoconf-archive btrfs-progs cryptsetup exfatprogs git glib2 gobject-introspection gtk-doc json-glib keyutils libatasmart libbytesize libnvme libyaml lvm2 mdadm ndctl nss parted util-linux volume_key
+udisks2	autoconf-archive git glib2 gobject-introspection gtk-doc libblockdev libgudev lvm2 polkit util-linux
+usbmuxd	git libimobiledevice libplist libusb
+upower	docbook-xsl git glib2 gobject-introspection gtk-doc libgudev libimobiledevice libplist polkit usbmuxd
+solid	doxygen extra-cmake-modules libimobiledevice libplist media-player-info qt6-base qt6-declarative qt6-tools udisks2 upower util-linux
+kio	doxygen extra-cmake-modules karchive kbookmarks kcolorscheme kcompletion kconfig kcoreaddons kcrash kdbusaddons kdoctools kguiaddons ki18n kiconthemes kitemviews kjobwidgets kservice kwallet kwidgetsaddons kwindowsystem libxml2 libxslt qt6-base qt6-tools solid util-linux
+kglobalaccel	doxygen extra-cmake-modules qt6-base qt6-tools
+kxmlgui	doxygen extra-cmake-modules kconfig kconfigwidgets kcoreaddons kglobalaccel kguiaddons ki18n kiconthemes kitemviews kwidgetsaddons pyside6 python-build qt6-base qt6-tools
+kparts	doxygen extra-cmake-modules kconfig kcoreaddons ki18n kio kwidgetsaddons kxmlgui qt6-base qt6-tools
+libutempter	git
+kpty	doxygen extra-cmake-modules kcoreaddons ki18n libutempter qt6-base qt6-tools
+ark	breeze-icons extra-cmake-modules kcolorscheme kcompletion kconfig kconfigwidgets kcoreaddons kcrash kdbusaddons kdoctools kfilemetadata ki18n kio kjobwidgets kparts kpty kservice kwidgetsaddons kwindowsystem kxmlgui libarchive libzip qt6-base
+attica	doxygen extra-cmake-modules qt6-base qt6-tools
+kirigami	doxygen extra-cmake-modules gcc qt6-base qt6-declarative qt6-shadertools qt6-svg qt6-tools
+kcmutils	doxygen extra-cmake-modules kconfig kconfigwidgets kcoreaddons kguiaddons ki18n kio kirigami kitemviews kservice kwidgetsaddons kxmlgui qt6-base qt6-declarative qt6-tools
+kdecoration	extra-cmake-modules ki18n qt6-base
+kpackage	doxygen extra-cmake-modules karchive kcoreaddons kdoctools ki18n qt6-base qt6-tools
+syndication	doxygen extra-cmake-modules kcodecs qt6-base qt6-tools
+knewstuff	attica doxygen extra-cmake-modules karchive kcmutils kconfig kcoreaddons ki18n kirigami kpackage kwidgetsaddons qt6-base qt6-declarative qt6-tools syndication
+ksvg	doxygen extra-cmake-modules karchive kcolorscheme kconfig kcoreaddons kguiaddons kirigami qt6-base qt6-declarative qt6-svg qt6-tools
+aurorae	extra-cmake-modules kcmutils kcolorscheme kconfig kcoreaddons kdecoration ki18n kirigami knewstuff kpackage ksvg qt6-base qt6-declarative qt6-tools
+kidletime	doxygen extra-cmake-modules libxss plasma-wayland-protocols qt6-base qt6-tools wayland-protocols
+baloo	doxygen extra-cmake-modules kconfig kcoreaddons kcrash kdbusaddons kdoctools kfilemetadata ki18n kidletime kio lmdb qt6-base qt6-tools solid
+baloo-widgets	baloo extra-cmake-modules kconfig kcoreaddons kdoctools kfilemetadata ki18n kio kservice kwidgetsaddons qt6-base
+bluez-qt	bluez doxygen extra-cmake-modules qt6-base qt6-declarative qt6-tools
+kdeclarative	doxygen extra-cmake-modules kconfig kglobalaccel kguiaddons ki18n kwidgetsaddons qt6-base qt6-declarative qt6-shadertools qt6-tools
+plasma-activities	extra-cmake-modules kconfig kcoreaddons qt6-base qt6-declarative qt6-tools
+libplasma	extra-cmake-modules kcolorscheme kconfig kcoreaddons kdoctools kglobalaccel kguiaddons ki18n kiconthemes kio kirigami knotifications kpackage ksvg kwidgetsaddons kwindowsystem plasma-activities plasma-wayland-protocols qt6-5compat qt6-base qt6-declarative wayland wayland-protocols
+bluedevil	bluez-qt extra-cmake-modules kcmutils kconfig kcoreaddons kdbusaddons kdeclarative kdoctools ki18n kio kirigami kjobwidgets knotifications kservice ksvg kwidgetsaddons kwindowsystem libplasma qt6-base qt6-declarative
+bolt	asciidoc glib2 polkit
+packagekit	bash-completion git glib2 gobject-introspection pacman polkit sqlite vala
+packagekit-qt	cmake git packagekit qt6-base
+frameworkintegration	appstream extra-cmake-modules kcolorscheme kconfig ki18n kiconthemes knewstuff knotifications kwidgetsaddons packagekit-qt qt6-base qt6-tools
+kconfig5	extra-cmake-modules qt5-base qt5-declarative qt5-tools
+kcoreaddons5	extra-cmake-modules qt5-base qt5-tools
+polkit-qt	cmake glib2 polkit qt5-base qt6-base
+kauth5	extra-cmake-modules kcoreaddons5 polkit-qt qt5-tools
+kcodecs5	extra-cmake-modules qt5-base qt5-tools
+kguiaddons5	extra-cmake-modules plasma-wayland-protocols qt5-wayland qt5-x11extras
+ki18n5	extra-cmake-modules iso-codes qt5-declarative
+kwidgetsaddons5	extra-cmake-modules qt5-base qt5-tools
+kconfigwidgets5	extra-cmake-modules kauth5 kcodecs5 kconfig5 kguiaddons5 ki18n5 kwidgetsaddons5 qt5-tools
+karchive5	extra-cmake-modules qt5-base qt5-tools
+kiconthemes5	extra-cmake-modules karchive5 kconfigwidgets5 qt5-svg qt5-tools
+kwindowsystem5	extra-cmake-modules qt5-tools qt5-x11extras
+libdbusmenu-qt	cmake qt5-base
+knotifications5	extra-cmake-modules kconfig5 kcoreaddons5 kwindowsystem5 libcanberra libdbusmenu-qt libxtst qt5-declarative qt5-speech qt5-tools
+frameworkintegration5	extra-cmake-modules kconfig5 kconfigwidgets5 kiconthemes5 knotifications5 kwidgetsaddons5 qt5-base
+breeze	breeze-icons extra-cmake-modules frameworkintegration frameworkintegration5 kcmutils kcolorscheme kconfig kconfigwidgets5 kcoreaddons kdecoration kguiaddons ki18n kiconthemes kiconthemes5 kirigami kwidgetsaddons kwindowsystem kwindowsystem5 qt6-base qt6-declarative qt6-svg
+plymouth	adwaita-fonts cairo docbook-xsl fontconfig freetype2 git glib2 gtk3 libdrm libevdev libpng libx11 libxkbcommon pango xkeyboard-config
+breeze-plymouth	extra-cmake-modules plymouth
+brightnessctl	
+cava	alsa-lib fftw iniparser jack2 libglvnd pipewire portaudio pulseaudio sdl2-compat sndio
+clinfo	ocl-icd opencl-headers
+wl-clipboard	wayland wayland-protocols
+cliphist	go wl-clipboard
+corrosion	cmake git rust
+libdwarf	elfutils git
+cpptrace	cmake git libdwarf libunwind
+cxx-rust-cssparser	corrosion extra-cmake-modules qt6-base
+i2c-tools	python-build python-installer
+ddcutil	git glib2 i2c-tools jansson libdrm libusb libx11 libxext libxrandr
+dhcpcd	
+discount	
+gnu-efi	
+python-pefile	python-build python-installer
+fwupd-efi	git gnu-efi python-pefile
+libmnl	
+noto-fonts-cjk	git
+passim	avahi cmake git glib2 gnutls gobject-introspection hicolor-icon-theme libsoup3
+fwupd	bash-completion curl dbus-python fwupd-efi gi-docgen git glib2 gnu-efi gnutls gobject-introspection hicolor-icon-theme libdrm libmbim libmnl libqmi libusb libxmlb modemmanager noto-fonts noto-fonts-cjk pandoc-cli passim polkit pygobject python-cairo python-dbusmock shared-mime-info sqlite tpm2-tss udisks2 umockdev vala valgrind
+kitemmodels	doxygen extra-cmake-modules qt6-base qt6-declarative qt6-tools
+sonnet	aspell doxygen extra-cmake-modules hspell hunspell libvoikko qt6-base qt6-declarative qt6-tools
+kirigami-addons	extra-cmake-modules kcolorscheme kconfig kcoreaddons kcrash kglobalaccel kguiaddons ki18n kiconthemes kirigami kitemmodels ksvg qt6-base qt6-declarative qt6-multimedia sonnet
+kstatusnotifieritem	doxygen extra-cmake-modules kwindowsystem pyside6 python-build qt6-base qt6-tools
+kuserfeedback	extra-cmake-modules llvm qt6-base qt6-charts qt6-declarative qt6-svg qt6-tools
+libaccounts-glib	check glib2 gobject-introspection libxml2 pygobject sqlite vala
+libaccounts-qt	doxygen git glib2 libaccounts-glib qt6-base
+qcoro	cmake git qt6-base qt6-declarative qt6-websockets
+signond	doxygen git graphviz noto-fonts qt6-base qt6-tools
+signon-kwallet-extension	extra-cmake-modules kwallet qt6-base signond
+signon-plugin-oauth2	git qt6-base signond
+signon-ui	git glib2 libaccounts-qt libnotify libproxy qt6-base qt6-declarative qt6-webengine signond
+kaccounts-integration	extra-cmake-modules kcmutils kconfig kcoreaddons kdbusaddons kdoctools ki18n kio kirigami kwallet libaccounts-qt qcoro qt6-base signon-kwallet-extension signon-plugin-oauth2 signon-ui signond
+libdmtx	git
+prison	doxygen extra-cmake-modules libdmtx qrencode qt6-base qt6-declarative qt6-multimedia qt6-tools zxing-cpp
+purpose	extra-cmake-modules hicolor-icon-theme kaccounts-integration kcmutils kconfig kcoreaddons ki18n kio kirigami kitemmodels knotifications kservice libaccounts-qt prison qt6-base qt6-declarative qt6-tools
+discover	appstream archlinux-appstream-data attica discount extra-cmake-modules flatpak fwupd glib2 kcmutils kconfig kcoreaddons kcrash kdbusaddons ki18n kiconthemes kidletime kio kirigami kirigami-addons kjobwidgets knewstuff knotifications kservice kstatusnotifieritem kuserfeedback kwidgetsaddons kwindowsystem packagekit-qt purpose qcoro qt6-base qt6-declarative qt6-webview
+dmidecode	
+libnfnetlink	
+libnetfilter_conntrack	libmnl libnfnetlink
+libnftnl	git libmnl
+nftables	asciidoc git jansson libmnl libnftnl python-build python-installer
+dnsmasq	libidn2 libnetfilter_conntrack nettle nftables
+kdnssd	doxygen extra-cmake-modules qt6-base qt6-tools
+kdsoap	cmake qt6-base
+kdsoap-ws-discovery-client	doxygen extra-cmake-modules kdsoap qt6-base qt6-tools
+libkexiv2	exiv2 extra-cmake-modules qt6-base
+libmtp	doxygen libgcrypt libusb
+plasma-activities-stats	extra-cmake-modules kconfig plasma-activities qt6-base qt6-tools
+ripgrep	pcre2 rust
+ripgrep-all	ripgrep rust sqlite
+syntax-highlighting	doxygen extra-cmake-modules qt6-base qt6-declarative qt6-tools
+kio-extras	extra-cmake-modules karchive kcmutils kconfig kcoreaddons kdbusaddons kdnssd kdoctools kdsoap kdsoap-ws-discovery-client ki18n kio knotifications kservice kwidgetsaddons libappimage libimobiledevice libkexiv2 libmtp libplist libproxy libssh libtirpc libxcursor openexr plasma-activities plasma-activities-stats qcoro qt6-base qt6-svg ripgrep-all samba solid syntax-highlighting taglib
+ktextwidgets	doxygen extra-cmake-modules kcompletion kconfig ki18n kwidgetsaddons qt6-base qt6-speech qt6-tools sonnet
+dolphin	baloo baloo-widgets extra-cmake-modules kbookmarks kcmutils kcodecs kcolorscheme kcompletion kconfig kconfigwidgets kcoreaddons kcrash kdbusaddons kdoctools kfilemetadata kguiaddons ki18n kiconthemes kio kio-extras kjobwidgets knewstuff knotifications kparts kservice ktextwidgets kuserfeedback kwidgetsaddons kwindowsystem kxmlgui qt6-base qt6-multimedia solid
+python-pygdbmi	gdb python-build python-installer
+python-sentry_sdk	python-build python-certifi python-installer python-urllib3
+drkonqi	elfutils extra-cmake-modules gdb kconfig kcoreaddons kcrash kdbusaddons kguiaddons ki18n kidletime kio kirigami kitemmodels knotifications kservice kstatusnotifieritem kwallet kwidgetsaddons kwindowsystem polkit-qt python-psutil python-pygdbmi python-sentry_sdk qt6-base qt6-declarative syntax-highlighting
+editorconfig-core-c	cmake doxygen git pcre2
+libxpresent	libx11 libxext libxfixes libxrandr xorg-util-macros xorgproto
+mailcap	git
+scim	gtk3
+efl	curl doxygen fontconfig freetype2 fribidi giflib glib2 gstreamer harfbuzz hicolor-icon-theme libavif libglvnd libheif libinput libjpeg-turbo libjxl libpng libraw librsvg libsndfile libspectre libtiff libunwind libwebp libx11 libxcb libxcomposite libxcursor libxdamage libxext libxfixes libxi libxinerama libxkbcommon libxpresent libxrandr libxrender libxss libxtst lua52 mailcap mesa noto-fonts openjpeg2 pipewire poppler pulseaudio scim shared-mime-info texlive-texmf util-linux wayland wayland-protocols
+xfce4-dev-tools	git glib2 gtk-doc
+libxfce4util	git glib2 gobject-introspection vala xfce4-dev-tools
+xfconf	git glib2 gobject-introspection libxfce4util vala xfce4-dev-tools
+yyjson	cmake
+fastfetch	chafa cmake dconf efl imagemagick libglvnd libva libvdpau libxcb libxrandr lua ocl-icd opencl-headers sqlite vulkan-headers vulkan-icd-loader wayland xfconf yyjson
+fish	cmake git jq pcre2 python-sphinx rust
+flatpak-kcm	extra-cmake-modules flatpak glib2 kcmutils kconfig kcoreaddons ki18n kirigami kitemmodels kservice qt6-base qt6-declarative
+libp11	
+sdl3_ttf	cmake freetype2 harfbuzz sdl3
+freerdp	alsa-lib cmake cups ffmpeg fuse3 git icu jansson krb5 libcbor libfido2 libjpeg-turbo libp11 libpng libusb libwebp libx11 libxcursor libxdamage libxext libxfixes libxi libxinerama libxkbcommon libxkbfile libxrandr libxrender libxtst pam pkcs11-helper pulseaudio sdl3 sdl3_ttf sndio wayland xorgproto
+glaze	cmake
+glm	cmake
+gocryptfs	fuse3 go pandoc-cli
+pps-tools	
+python-pyserial	python-build python-installer
+gpsd	bluez docbook-xsl gtk3 libusb pps-tools pygobject python-cairo python-pyserial qt5-base scons
+grim	bash-completion cairo fish git libjpeg-turbo pango scdoc wayland wayland-protocols
+kcolorpicker	cmake git qt6-base
+kimageannotator	cmake git kcolorpicker libx11 qt6-base qt6-svg qt6-tools
+libkdcraw	extra-cmake-modules libraw qt6-base
+gwenview	baloo cfitsio exiv2 extra-cmake-modules kcolorscheme kcompletion kconfig kconfigwidgets kcoreaddons kcrash kdoctools kfilemetadata kguiaddons ki18n kiconthemes kimageannotator kio kitemmodels kitemviews kjobwidgets kparts kservice kwidgetsaddons kxmlgui lcms2 libjpeg-turbo libkdcraw libpng libtiff libx11 plasma-activities purpose qt6-base qt6-multimedia qt6-svg solid wayland wayland-protocols
+hyprlang	cmake hyprutils
+tomlplusplus	cmake
+hyprcursor	cairo cmake hyprlang librsvg libzip tomlplusplus
+hyprgraphics	cairo cmake hyprutils libglvnd libjpeg-turbo libjxl libpng librsvg libwebp pango pixman
+hyprland-protocols	cmake
+sdbus-cpp	cmake doxygen
+hypridle	cmake hyprland-protocols hyprlang hyprwayland-scanner sdbus-cpp wayland wayland-protocols
+hyprtoolkit	abseil-cpp aquamarine cairo cmake glib2 hyprgraphics hyprlang hyprutils hyprwayland-scanner iniparser libdrm libglvnd libxkbcommon mesa pango pixman wayland
+hyprland-guiutils	cmake hyprlang hyprtoolkit hyprutils libdrm pixman
+hyprwire	cmake hyprutils pugixml
+python-structlog	git openssh python-build python-hatch-fancy-pypi-readme python-hatch-vcs python-hatchling python-installer
+libei	doxygen git libevdev libxkbcommon python-attrs python-dbusmock python-pytest python-structlog python-yaml
+xcb-util-errors	libxcb xorgproto
+libxcvt	
+xorg-font-util	xorg-util-macros
+xorg-mkfontscale	freetype2 libfontenc xorg-util-macros xorgproto
+xorg-fonts-encodings	xorg-font-util xorg-mkfontscale xorg-util-macros
+libfontenc	xorg-fonts-encodings xorg-util-macros xorgproto
+libxfont2	freetype2 git libfontenc xorg-util-macros xorgproto xtrans
+libxres	libx11 libxext xorg-util-macros xorgproto
+xf86-input-libinput	libinput libx11 libxi xorg-server xorgproto
+xorg-setxkbmap	libx11 libxkbfile libxrandr xorg-util-macros
+xorg-server	git libdrm libepoxy libglvnd libpciaccess libtirpc libunwind libx11 libxau libxaw libxcvt libxdmcp libxfont2 libxi libxkbfile libxmu libxrender libxres libxshmfence libxtst libxv mesa nettle pixman xcb-util xcb-util-image xcb-util-keysyms xcb-util-renderutil xcb-util-wm xf86-input-libinput xkeyboard-config xorg-font-util xorg-setxkbmap xorg-util-macros xorg-xkbcomp xorgproto xtrans
+xorg-xwayland	libdecor libdrm libei libepoxy libglvnd libtirpc libxau libxcvt libxfont2 libxkbfile libxshmfence mesa nettle pixman wayland wayland-protocols xorg-font-util xorg-server xorgproto xtrans
+hyprland	aquamarine cairo cmake glaze glib2 glslang hyprcursor hyprgraphics hyprland-guiutils hyprland-protocols hyprlang hyprutils hyprwayland-scanner hyprwire lcms2 libcanberra libdrm libei libglvnd libinput libx11 libxcb libxcomposite libxcursor libxfixes libxkbcommon libxrender lua mesa muparser pango pixman re2 sdbus-cpp tomlplusplus util-linux wayland wayland-protocols xcb-proto xcb-util xcb-util-errors xcb-util-image xcb-util-keysyms xcb-util-renderutil xcb-util-wm xorg-xwayland xorgproto
+hyprlock	cairo cmake hyprgraphics hyprlang hyprutils hyprwayland-scanner libdrm libglvnd libxkbcommon mesa pam sdbus-cpp wayland wayland-protocols
+hyprsunset	cmake hyprland-protocols hyprlang hyprutils hyprwayland-scanner wayland wayland-protocols
+protobuf-c	protobuf
+libssc	git glib2 libqmi libqrtr-glib protobuf-c
+iio-sensor-proxy	git glib2 libgudev libssc polkit
+inter-font	
+iptables	git libmnl libnetfilter_conntrack libnfnetlink libnftnl libpcap nftables
+iwd	ell python-docutils
+jxrlib	cmake git
+kactivitymanagerd	boost extra-cmake-modules kconfig kcoreaddons kcrash kglobalaccel ki18n kio kservice kxmlgui qt6-base
+kauth	doxygen extra-cmake-modules kcoreaddons kwindowsystem polkit-qt qt6-base qt6-tools
+ktexteditor	doxygen editorconfig-core-c extra-cmake-modules karchive kauth kcodecs kcolorscheme kcompletion kconfig kconfigwidgets kcoreaddons kguiaddons ki18n kio kitemviews kparts kwidgetsaddons kxmlgui qt6-base qt6-declarative qt6-speech qt6-tools sonnet syntax-highlighting
+qtkeychain	cmake git glib2 kwallet qt6-base qt6-declarative qt6-tools
+kate	extra-cmake-modules gpgmepp karchive kbookmarks kcolorscheme kcompletion kconfig kconfigwidgets kcoreaddons kcrash kdbusaddons kdoctools kguiaddons ki18n kiconthemes kio knewstuff kparts kservice ktexteditor kuserfeedback kwidgetsaddons kwindowsystem kxmlgui qt6-base qtkeychain syntax-highlighting
+kcrash5	extra-cmake-modules kcoreaddons5 kwindowsystem5
+kdbusaddons5	extra-cmake-modules qt5-tools qt5-x11extras
+kglobalaccel5	extra-cmake-modules kconfig5 kcoreaddons5 kcrash5 kdbusaddons5 kwindowsystem5 qt5-tools
+kitemviews5	extra-cmake-modules qt5-base qt5-tools
+kxmlgui5	extra-cmake-modules kglobalaccel5 kiconthemes5 kitemviews5 qt5-tools
+kbookmarks5	extra-cmake-modules kxmlgui5 qt5-tools
+kcompletion5	extra-cmake-modules kconfig5 kwidgetsaddons5 qt5-tools
+kcontacts	doxygen extra-cmake-modules kcodecs kconfig ki18n qt6-base qt6-declarative qt6-tools
+kdesu	doxygen extra-cmake-modules kconfig kcoreaddons ki18n kpty libx11 qt6-base qt6-tools
+kde-cli-tools	extra-cmake-modules kcmutils kcompletion kconfig kcoreaddons kdesu kdoctools ki18n kiconthemes kio kparts kservice kwidgetsaddons kwindowsystem qt6-base qt6-svg
+xsettingsd	cmake git libx11 libxfixes
+kde-gtk-config	extra-cmake-modules glib2 gtk3 kcolorscheme kconfig kcoreaddons kdbusaddons kdecoration kguiaddons kwindowsystem qt6-base qt6-svg sassc xdg-desktop-portal-gtk xsettingsd
+kpeople	doxygen extra-cmake-modules kcontacts kcoreaddons ki18n kitemviews kwidgetsaddons qt6-base qt6-declarative qt6-tools
+libfakekey	libxtst
+modemmanager-qt	doxygen extra-cmake-modules modemmanager qt6-base qt6-tools
+pulseaudio-qt	extra-cmake-modules pulseaudio qt6-base
+qqc2-desktop-style	extra-cmake-modules kcolorscheme kconfig kiconthemes kirigami qt6-base qt6-declarative qt6-tools sonnet
+kdeconnect	extra-cmake-modules glib2 kconfig kcoreaddons kcrash kdbusaddons kdeclarative kguiaddons ki18n kio kirigami kirigami-addons kitemmodels kjobwidgets knotifications kpackage kpeople kservice kstatusnotifieritem kwindowsystem libei libevdev libfakekey libx11 libxkbcommon libxtst modemmanager-qt pulseaudio-qt qqc2-desktop-style qt6-base qt6-connectivity qt6-declarative qt6-multimedia solid wayland wayland-protocols
+kded	extra-cmake-modules kconfig kcoreaddons kcrash kdbusaddons kdoctools kservice qt6-base
+kservice5	extra-cmake-modules kconfig5 kcoreaddons5 kdbusaddons5 ki18n5
+kded5	extra-cmake-modules kcrash5 kservice5
+kholidays	doxygen extra-cmake-modules qt6-base qt6-declarative qt6-tools
+krunner	doxygen extra-cmake-modules kconfig kcoreaddons kdoctools ki18n kitemmodels kwindowsystem qt6-base qt6-tools
+kunitconversion	doxygen extra-cmake-modules ki18n pyside6 python-build qt6-base qt6-tools
+kglobalacceld	extra-cmake-modules kconfig kcoreaddons kglobalaccel kio kjobwidgets kservice qt6-base
+knighttime	extra-cmake-modules kconfig kcoreaddons kdbusaddons kholidays ki18n qt6-base qt6-positioning qt6-tools
+kquickcharts	extra-cmake-modules kirigami qt6-base qt6-declarative qt6-shadertools qt6-tools
+layer-shell-qt	extra-cmake-modules qt6-base qt6-declarative wayland wayland-protocols
+libkscreen	extra-cmake-modules libxcb plasma-wayland-protocols qt6-base qt6-tools wayland
+kscreenlocker	extra-cmake-modules kcmutils kconfig kcoreaddons kcrash kdeclarative kdoctools kglobalaccel ki18n kidletime kio kirigami knotifications kpackage ksvg kwindowsystem kxmlgui layer-shell-qt libkscreen libplasma pam qt6-base qt6-declarative
+kwayland	extra-cmake-modules plasma-wayland-protocols qt6-base wayland wayland-protocols
+libqaccessibilityclient	at-spi2-core extra-cmake-modules qt6-base
+milou	extra-cmake-modules kconfig kcoreaddons kdoctools kirigami krunner ksvg libplasma qt6-base qt6-declarative
+kwin	aurorae breeze extra-cmake-modules iio-sensor-proxy kauth kcmutils kcolorscheme kconfig kcoreaddons kcrash kdbusaddons kdeclarative kdecoration kdoctools kglobalaccel kglobalacceld kguiaddons ki18n kidletime kirigami kitemmodels knewstuff knighttime knotifications kpackage kquickcharts krunner kscreenlocker kservice ksvg kwayland kwidgetsaddons kwindowsystem kxmlgui lcms2 libcanberra libdisplay-info libdrm libei libepoxy libevdev libinput libplasma libqaccessibilityclient libxcb libxcvt libxkbcommon mesa milou pipewire plasma-activities plasma-wayland-protocols qt6-5compat qt6-base qt6-declarative qt6-svg qt6-tools vulkan-headers vulkan-icd-loader wayland wayland-protocols xcb-util-keysyms xcb-util-wm xorg-xwayland
+libndp	git
+libnewt	gpm popt slang
+libteam	doxygen git graphviz jansson libdaemon libnl zeromq
+openresolv	git
+pacrunner	curl duktape git glib2
+perl-yaml	
+wpa_supplicant	docbook-sgml docbook-utils git libnl pcsclite perl-sgmls
+networkmanager	audit curl dhcpcd dnsmasq git glib2 gobject-introspection gtk-doc iptables iwd jansson libbpf libndp libnewt libnvme libpsl libteam linux-tools llvm mobile-broadband-provider-info modemmanager nftables nspr nss openresolv pacrunner perl-yaml polkit ppp pygobject slang util-linux vala wpa_supplicant
+networkmanager-qt	doxygen extra-cmake-modules networkmanager qt6-base qt6-declarative qt6-tools
+kio-fuse	extra-cmake-modules fuse3 kcoreaddons kio qt6-base
+kpipewire	extra-cmake-modules ffmpeg kcoreaddons ki18n libdrm libepoxy libva mesa pipewire qt6-base qt6-declarative
+libksysguard	extra-cmake-modules kauth kconfig kcoreaddons kdeclarative ki18n kirigami kitemmodels knewstuff kpackage kquickcharts kservice libdrm libnl libpcap lm_sensors qt6-5compat qt6-base qt6-declarative qt6-tools solid
+ksystemstats	extra-cmake-modules kcoreaddons kcrash ki18n kio libksysguard libnl lm_sensors networkmanager-qt qt6-base solid
+libqalculate	curl doxygen git icu libxml2
+ocean-sound-theme	extra-cmake-modules qt6-base
+kjobwidgets5	extra-cmake-modules kcoreaddons5 kwidgetsaddons5 qt5-tools qt5-x11extras
+sonnet5	aspell extra-cmake-modules hspell hunspell libvoikko qt5-base qt5-declarative qt5-tools
+ktextwidgets5	extra-cmake-modules kcompletion5 kconfigwidgets5 qt5-speech qt5-tools sonnet5
+kwallet5	extra-cmake-modules kconfig5 kcoreaddons5 ki18n5 kwindowsystem5 qt5-base
+solid5	extra-cmake-modules media-player-info qt5-base qt5-declarative qt5-tools udisks2 upower
+kio5	extra-cmake-modules kbookmarks5 kded5 kjobwidgets5 knotifications5 ktextwidgets5 kwallet5 qt5-tools solid5
+kwayland5	extra-cmake-modules plasma-wayland-protocols qt5-wayland wayland-protocols
+qqc2-breeze-style	extra-cmake-modules kcolorscheme kconfig kguiaddons kiconthemes kirigami qt6-base qt6-declarative
+qt5-quickcontrols2	git qt5-declarative
+ttf-hack	
+xdg-desktop-portal-kde	extra-cmake-modules kcmutils kconfig kcoreaddons kcrash kdeclarative kglobalaccel ki18n kiconthemes kio kio-fuse kirigami kirigami-addons kitemviews knotifications kpipewire kservice kstatusnotifieritem kwayland kwindowsystem libxkbcommon plasma-wayland-protocols plasma-workspace qt6-base qt6-declarative wayland wayland-protocols xdg-desktop-portal
+plasma-integration	extra-cmake-modules kcolorscheme kconfig kconfig5 kcoreaddons kguiaddons ki18n ki18n5 kiconthemes kiconthemes5 kio kio5 kjobwidgets knotifications knotifications5 kservice kstatusnotifieritem kwayland5 kwidgetsaddons kwindowsystem kwindowsystem5 libxcb libxcursor noto-fonts plasma-wayland-protocols qqc2-breeze-style qqc2-desktop-style qt5-base qt5-declarative qt5-quickcontrols2 qt5-wayland qt5-x11extras qt6-base qt6-declarative ttf-hack wayland xdg-desktop-portal-kde
+qt6-virtualkeyboard	cmake git hunspell qt6-base qt6-declarative qt6-multimedia qt6-svg
+union	cxx-rust-cssparser extra-cmake-modules git kcolorscheme kconfig kcoreaddons kguiaddons kiconthemes kirigami qt6-base qt6-declarative qt6-shadertools
+xorg-xmessage	libx11 libxaw libxt xorg-util-macros
+xorg-xrdb	libx11 libxmu xorg-util-macros
+plasma-workspace	accountsservice appstream baloo extra-cmake-modules fontconfig freetype2 icu kactivitymanagerd karchive kauth kbookmarks kcmutils kcolorscheme kcompletion kconfig kconfigwidgets kcoreaddons kcrash kdbusaddons kde-cli-tools kdeclarative kded kdoctools kglobalaccel kguiaddons kholidays ki18n kiconthemes kidletime kio kio-extras kio-fuse kirigami kirigami-addons kitemmodels kjobwidgets knewstuff knighttime knotifications kpackage kparts kpipewire kquickcharts krunner kscreenlocker kservice kstatusnotifieritem ksvg ksystemstats ktexteditor ktextwidgets kuserfeedback kwallet kwayland kwidgetsaddons kwin kwindowsystem kxmlgui layer-shell-qt libcanberra libice libkexiv2 libksysguard libplasma libqalculate libsm libx11 libxau libxcb libxft libxtst milou networkmanager-qt ocean-sound-theme plasma-activities plasma-activities-stats plasma-integration plasma-wayland-protocols prison qcoro qt6-5compat qt6-base qt6-declarative qt6-location qt6-positioning qt6-svg qt6-tools qt6-virtualkeyboard solid union wayland xcb-util xcb-util-cursor xcb-util-image xcb-util-wm xorg-xmessage xorg-xrdb xorg-xwayland
+kdeplasma-addons	corrosion extra-cmake-modules icu kauth kcmutils kconfig kcoreaddons kdbusaddons kdeclarative kglobalaccel kguiaddons kholidays ki18n kiconthemes kio kirigami kirigami-addons kitemmodels kjobwidgets knewstuff knotifications kpackage krunner kservice ksvg kunitconversion kwidgetsaddons kwin kwindowsystem kxmlgui libplasma networkmanager-qt plasma-workspace qt6-5compat qt6-base qt6-declarative qt6-quick3d qt6-webengine sonnet
+kimageformats	extra-cmake-modules jxrlib karchive libavif libheif libjxl libraw openexr openjpeg2 qt6-base
+libva-utils	libva mesa
+mesa-demos	freeglut glslang glu libdecor libdrm libglvnd libx11 libxcb libxkbcommon mesa vulkan-headers vulkan-icd-loader wayland wayland-protocols
+systemsettings	extra-cmake-modules kauth kcmutils kcolorscheme kconfig kconfigwidgets kcoreaddons kcrash kdbusaddons kdoctools ki18n kio kirigami kitemmodels kitemviews kjobwidgets krunner kservice kwidgetsaddons kwindowsystem kxmlgui plasma-activities qt6-base qt6-declarative
+volk	cmake git vulkan-headers
+vulkan-tools	cmake git glslang libx11 libxcb libxrandr spirv-tools volk vulkan-headers vulkan-icd-loader wayland wayland-protocols
+wayland-utils	git libdrm wayland wayland-protocols
+xorg-xdpyinfo	libx11 libxcb libxcomposite libxext libxi libxinerama libxrender libxtst libxxf86vm xorg-util-macros xorgproto
+kinfocenter	aha clinfo dmidecode extra-cmake-modules fwupd glu kauth kcmutils kconfig kcoreaddons kdeclarative kdoctools ki18n kio kirigami kservice libdisplay-info libdrm libglvnd libusb libva-utils lm_sensors mesa-demos pulseaudio qt6-base qt6-declarative qt6-graphs solid systemsettings vulkan-headers vulkan-tools wayland-utils xorg-xdpyinfo
+librsync	cmake popt
+miniz	cmake git
+unordered_dense	cmake git
+shader-slang	cmake fast_float git glm glslang libx11 llvm miniz spirv-headers spirv-tools stb unordered_dense vulkan-headers vulkan-icd-loader
+simde	
+ttf-nerd-fonts-symbols	
+kitty	cairo fontconfig freetype2 go harfbuzz hicolor-icon-theme lcms2 libglvnd libpng librsync libx11 libxcursor libxi libxinerama libxkbcommon libxrandr shader-slang simde ttf-nerd-fonts-symbols wayland wayland-protocols xxhash
+kmenuedit	extra-cmake-modules kcompletion kconfig kconfigwidgets kcoreaddons kcrash kdbusaddons kdoctools kglobalaccel ki18n kiconthemes kio kitemviews kservice kwidgetsaddons kwindowsystem kxmlgui qt6-base sonnet
+knotifyconfig	doxygen extra-cmake-modules kconfig ki18n kio libcanberra qt6-base qt6-tools
+kquickimageeditor	extra-cmake-modules highway kconfig kirigami qt6-base qt6-declarative qt6-shadertools
+krdp	extra-cmake-modules freerdp kcmutils kconfig kcoreaddons kcrash kguiaddons ki18n kirigami kirigami-addons kpipewire kstatusnotifieritem libei libxkbcommon pam plasma-wayland-protocols qt6-base qt6-declarative qtkeychain wayland
+plasma5support	extra-cmake-modules gpsd kconfig kcoreaddons kguiaddons kholidays ki18n kidletime kio kjobwidgets knotifications kservice kunitconversion libksysguard networkmanager-qt plasma-activities qt6-base qt6-declarative solid
+kscreen	extra-cmake-modules kcmutils kconfig kcoreaddons kcrash ki18n kimageformats kirigami kitemmodels ksvg kwindowsystem layer-shell-qt libkscreen libplasma plasma5support qt6-base qt6-declarative wayland wayland-protocols
+ksshaskpass	extra-cmake-modules kconfig kcoreaddons kdoctools ki18n kwidgetsaddons qt6-base qtkeychain
+kup	extra-cmake-modules git kcmutils kcompletion kconfig kconfigwidgets kcoreaddons kcrash kdbusaddons ki18n kidletime kio kirigami kjobwidgets knotifications kwidgetsaddons kwindowsystem kxmlgui libgit2 libplasma qt6-base qt6-declarative solid
+socat	
+kwallet-pam	extra-cmake-modules kwallet libgcrypt pam socat
+kwrited	extra-cmake-modules kcoreaddons kdbusaddons kdoctools knotifications kpty qt6-base
+libcec	cmake libxrandr swig
+libmng	lcms2 libjpeg-turbo
+nerd-fonts	
+xmlsec	gnutls libxml2 libxslt nspr nss
+oath-toolkit	pam xmlsec
+phonon	extra-cmake-modules pulseaudio qt6-5compat qt6-base qt6-tools
+threadweaver	doxygen extra-cmake-modules qt6-base qt6-tools
+okular	discount djvulibre ebook-tools extra-cmake-modules freetype2 karchive kbookmarks kcolorscheme kcompletion kconfig kconfigwidgets kcoreaddons kcrash kdegraphics-mobipocket kdoctools ki18n kiconthemes kio kparts ktextwidgets kwallet kwidgetsaddons kwindowsystem kxmlgui libkexiv2 libspectre libtiff phonon poppler purpose qt6-base qt6-declarative qt6-speech qt6-svg threadweaver
+stoken	gtk3 libxml2 nettle
+vpnc	git libgcrypt which
+openconnect	gnutls krb5 libproxy libtasn1 libxml2 nettle oath-toolkit p11-kit pcsclite stoken tpm2-tss vpnc xdg-utils
+oxygen-icons	extra-cmake-modules qt6-base
+oxygen	extra-cmake-modules frameworkintegration frameworkintegration5 kcmutils kcolorscheme kcompletion kcompletion5 kconfig kconfigwidgets kconfigwidgets5 kcoreaddons kdecoration kguiaddons ki18n kiconthemes5 kservice5 kwidgetsaddons kwindowsystem kwindowsystem5 libplasma libxcb oxygen-icons qt6-base qt6-declarative
+papirus-icon-theme	gtk4
+plasma-nano	cmake extra-cmake-modules kdeclarative kirigami kitemmodels knewstuff kservice ksvg kwayland kwindowsystem libplasma plasma-workspace qt6-5compat qt6-base qt6-declarative
+plasma-nm	extra-cmake-modules glib2 kcmutils kcolorscheme kcompletion kconfig kcoreaddons kdbusaddons kdeclarative ki18n kio kirigami kirigami-addons kjobwidgets knotifications kquickcharts kservice kwidgetsaddons kwindowsystem libplasma modemmanager-qt networkmanager networkmanager-qt openconnect plasma-workspace prison qcoro qt6-base qt6-declarative qt6-webengine qtkeychain solid
+plasma-pa	extra-cmake-modules glib2 kcmutils kconfig kcoreaddons kdbusaddons kdeclarative kdoctools kglobalaccel ki18n kirigami kirigami-addons kitemmodels kstatusnotifieritem ksvg libcanberra libplasma pipewire plasma-workspace pulseaudio pulseaudio-qt qt6-base qt6-declarative
+powerdevil	ddcutil extra-cmake-modules kauth kcmutils kconfig kcoreaddons kcrash kdbusaddons kdoctools kglobalaccel ki18n kidletime kirigami kitemmodels knotifications kpackage kservice kxmlgui libkscreen libplasma plasma-activities plasma-wayland-protocols plasma-workspace qcoro qt6-base qt6-declarative solid wayland
+plasma-bigscreen	bluez-qt extra-cmake-modules kcmutils kcolorscheme kconfig kcoreaddons kdbusaddons kdeclarative kdeconnect kglobalaccel ki18n kiconthemes kio kirigami kirigami-addons kitemmodels kjobwidgets knotifications kservice ksvg kwindowsystem layer-shell-qt libcec libkscreen libplasma milou plasma-activities plasma-nano plasma-nm plasma-pa plasma-wayland-protocols plasma-workspace plasma5support powerdevil qcoro qt6-5compat qt6-base qt6-declarative qt6-multimedia qt6-webengine sdl3 solid
+plasma-browser-integration	extra-cmake-modules kconfig kcoreaddons kcrash kdbusaddons kfilemetadata ki18n kio kjobwidgets kservice kstatusnotifieritem plasma-activities plasma-workspace purpose qt6-base
+polkit-kde-agent	extra-cmake-modules kcoreaddons kcrash kdbusaddons kdoctools ki18n kirigami knotifications kwindowsystem polkit-qt qt6-base qt6-declarative
+xdg-user-dirs	docbook-xsl git
+plasma-desktop	attica baloo extra-cmake-modules ibus kaccounts-integration kbookmarks kcmutils kcodecs kcompletion kconfig kconfigwidgets kcoreaddons kcrash kdbusaddons kdeclarative kdoctools kglobalaccel kguiaddons ki18n kiconthemes kio kirigami kirigami-addons kitemmodels kjobwidgets kmenuedit knewstuff knotifications knotifyconfig kpackage kpipewire krunner kscreenlocker kservice ksvg kwidgetsaddons kwindowsystem kxmlgui libcanberra libksysguard libplasma libwacom libx11 libxcb libxkbcommon libxkbfile packagekit-qt plasma-activities plasma-activities-stats plasma-workspace plasma5support polkit-kde-agent powerdevil qt6-5compat qt6-base qt6-declarative scim sdl2-compat solid sonnet systemsettings wayland wayland-protocols xcb-util-keysyms xdg-user-dirs
+smartmontools	libcap-ng
+plasma-disks	extra-cmake-modules kauth kcmutils kconfig kcoreaddons kdbusaddons kdeclarative ki18n kinfocenter kio kirigami knotifications kservice qt6-base qt6-declarative smartmontools solid
+plasma-firewall	extra-cmake-modules kauth kcmutils kconfig kcoreaddons ki18n kirigami qt6-base qt6-declarative
+qt6-wayland	cmake git libglvnd libxkbcommon qt6-base qt6-declarative qt6-svg vulkan-headers wayland
+plasma-keyboard	extra-cmake-modules kcmutils kconfig kcoreaddons kcrash ki18n kirigami kirigami-addons kitemmodels libplasma libxkbcommon qt6-base qt6-declarative qt6-virtualkeyboard qt6-wayland wayland wayland-protocols
+plasma-login-manager	extra-cmake-modules kauth kcmutils kconfig kcoreaddons kdbusaddons ki18n kio kirigami kpackage kservice layer-shell-qt libkscreen libplasma libxau pam plasma-workspace qt6-5compat qt6-base qt6-declarative qt6-tools
+plasma-sdk	extra-cmake-modules karchive kcmutils kcolorscheme kcompletion kconfig kcoreaddons kcrash kdbusaddons kdeclarative kdoctools ki18n kiconthemes kio kirigami kitemmodels knewstuff kpackage ksvg ktexteditor kwidgetsaddons libplasma plasma5support qt6-5compat qt6-base qt6-declarative
+plasma-systemmonitor	extra-cmake-modules kconfig kcoreaddons kcrash kdbusaddons kdeclarative kglobalaccel ki18n kiconthemes kio kirigami kirigami-addons kitemmodels knewstuff kquickcharts kservice ksystemstats kwindowsystem libksysguard qt6-base qt6-declarative
+plasma-thunderbolt	bolt extra-cmake-modules kcmutils kcoreaddons kdbusaddons ki18n kirigami knotifications qt6-base qt6-declarative
+plasma-vault	extra-cmake-modules fuse3 gocryptfs kconfig kcoreaddons kdbusaddons ki18n kio kirigami kitemmodels kservice kwidgetsaddons libksysguard libplasma networkmanager-qt plasma-activities plasma-workspace qt6-base qt6-declarative
+plasma-welcome	extra-cmake-modules kcmutils kconfig kcoreaddons kcrash kdbusaddons kglobalaccel ki18n kio kirigami kirigami-addons kjobwidgets knewstuff kservice ksvg kuserfeedback kwindowsystem libplasma plasma-nm plasma5support qt6-5compat qt6-base qt6-declarative
+playerctl	glib2 gobject-introspection gtk-doc
+plymouth-kcm	extra-cmake-modules karchive kauth kcmutils kconfig kcoreaddons ki18n kio kirigami knewstuff plymouth qt6-base qt6-declarative
+python-argparse-manpage	python-build python-installer
+python-shtab	git python-build python-installer python-setuptools-scm
+power-profiles-daemon	bash-completion git glib2 libgudev polkit python-argparse-manpage python-shtab upower
+print-manager	cups extra-cmake-modules kcmutils kconfig kcoreaddons kdbusaddons kdeclarative kdoctools ki18n kio kirigami kirigami-addons kitemmodels knotifications kwidgetsaddons kwindowsystem libplasma qt6-base qt6-declarative
+qt5ct	cmake qt5-base qt5-svg qt5-tools
+qt6-imageformats	cmake git jasper libmng libtiff libwebp qt6-base
+qt6ct	cmake git qt6-base qt6-svg qt6-tools
+quickshell	cli11 cmake cpptrace hicolor-icon-theme jemalloc libdrm libglvnd libxcb mesa pam pipewire polkit qt6-base qt6-declarative qt6-shadertools qt6-svg qt6-wayland spirv-tools vulkan-headers wayland wayland-protocols
+xorg-xauth	libx11 libxau libxext libxmu xorg-util-macros
+sddm	extra-cmake-modules git libxau libxcb noto-fonts pam python-docutils qt5-base qt5-declarative qt5-tools qt6-base qt6-declarative qt6-tools xorg-server xorg-xauth
+sddm-kcm	extra-cmake-modules karchive kauth kcmutils kconfig kcoreaddons kdoctools ki18n kio kirigami knewstuff kservice kwidgetsaddons qt6-base qt6-declarative sddm
+slurp	cairo libxkbcommon scdoc wayland wayland-protocols
+spectacle	extra-cmake-modules kconfig kconfigwidgets kcoreaddons kcrash kdbusaddons kdoctools kglobalaccel kguiaddons ki18n kio kirigami kjobwidgets knotifications kpipewire kquickimageeditor kservice kstatusnotifieritem kwidgetsaddons kwindowsystem kxmlgui layer-shell-qt libxcb plasma-wayland-protocols prison purpose qt6-base qt6-declarative qt6-imageformats qt6-multimedia tesseract wayland xcb-util xcb-util-cursor xcb-util-image
+wf-recorder	ffmpeg pulseaudio wayland wayland-protocols
+xdg-desktop-portal-hyprland	cmake hyprland-protocols hyprlang hyprtoolkit hyprutils hyprwayland-scanner libinih pipewire qt6-base sdbus-cpp util-linux wayland wayland-protocols xdg-desktop-portal

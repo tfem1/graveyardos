@@ -1,0 +1,120 @@
+# Builds the packages of the desktop images from Arch Linux's recipes
+# (arch/order: both desktops and what they need to be built), in the
+# GraveyardOS base system, as many as one job's time allows; then starts the
+# next pass with what this one built, until every package is built, failed,
+# or skipped because a build dependency failed (arch/build-wave.sh).
+name: arch-build
+
+on:
+  workflow_dispatch:
+    inputs:
+      base_run:
+        description: "Run id whose graveyard-base artifact is the system to build in"
+        type: string
+        required: true
+      prev_run:
+        description: "Run id of the previous pass (its arch-repo artifact); empty for the first"
+        type: string
+        default: ""
+      chain:
+        description: "Start the next pass when this one made progress"
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+  actions: write   # download artifacts of other runs, start the next pass
+
+env:
+  LFS: /mnt/lfs
+
+concurrency:
+  group: arch-build
+
+jobs:
+  pass:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 350
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Free disk space
+        run: |
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL
+          sudo docker image prune --all --force > /dev/null 2>&1 || true
+          df -h / /mnt
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: graveyard-base
+          path: ${{ runner.temp }}
+          run-id: ${{ inputs.base_run }}
+          github-token: ${{ github.token }}
+
+      - name: The base system
+        run: |
+          sudo -E bash lfs/build.sh unpack "$RUNNER_TEMP"/graveyard-base.tar.zst
+          sudo rm -f "$RUNNER_TEMP"/graveyard-base.tar.zst
+
+      - name: What earlier passes built
+        if: inputs.prev_run != ''
+        uses: actions/download-artifact@v4
+        with:
+          name: arch-repo
+          path: /mnt/arch-work
+          run-id: ${{ inputs.prev_run }}
+          github-token: ${{ github.token }}
+
+      - name: Yone (static)
+        working-directory: yone
+        run: |
+          rustup target add x86_64-unknown-linux-musl
+          sudo apt-get update -qq && sudo apt-get install -y -qq musl-tools > /dev/null
+          cargo build --release --target x86_64-unknown-linux-musl
+          echo "YONE=$PWD/target/x86_64-unknown-linux-musl/release/yone" >> "$GITHUB_ENV"
+
+      - name: Build (about five hours)
+        run: |
+          set -o pipefail
+          sudo mkdir -p /mnt/arch-work && sudo chown -R root:root /mnt/arch-work
+          sudo -E YONE="$YONE" bash arch/build-wave.sh "$LFS" /mnt/arch-work 17400 | tee "$RUNNER_TEMP/pass.txt"
+          {
+            echo '## This pass'; echo '```'; tail -n 1 "$RUNNER_TEMP/pass.txt"; echo '```'
+            echo '## Failed'; echo '```'; cut -c1-180 /mnt/arch-work/failed | tail -n 60; echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Keep the state for the next pass
+        if: always()
+        run: |
+          sudo rm -rf /mnt/arch-work/recipes /mnt/arch-work/arch-repos /mnt/arch-work/sources
+          sudo tar -C /mnt/arch-work -czf "$RUNNER_TEMP/arch-logs.tar.gz" logs
+          sudo rm -rf /mnt/arch-work/logs
+          sudo chown -R "$(id -u)" /mnt/arch-work
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: arch-repo
+          path: /mnt/arch-work
+          compression-level: 0
+          retention-days: 30
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: arch-logs
+          path: ${{ runner.temp }}/arch-logs.tar.gz
+          retention-days: 14
+
+      - name: Next pass
+        if: success() && inputs.chain
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          left=$(grep -cvxF -f <(cat /mnt/arch-work/done /mnt/arch-work/failed /mnt/arch-work/skipped | cut -f1) arch/order || true)
+          tried=$(grep -c '^   ' "$RUNNER_TEMP/pass.txt" || true)
+          echo "left: $left, tried this pass: $tried"
+          if [ "$left" -gt 0 ] && [ "$tried" -gt 0 ]; then
+            gh workflow run arch-build.yml --ref "$GITHUB_REF_NAME" \
+              -f base_run="${{ inputs.base_run }}" -f prev_run="${{ github.run_id }}" -f chain=true
+          fi

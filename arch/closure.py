@@ -31,13 +31,16 @@ def get(url, cache):
     return text
 
 def bare(dep):
-    return re.split(r"[<>=]", dep, 1)[0]
+    return re.split(r"[<>=]", dep, maxsplit=1)[0]
 
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--make", action="store_true")
     ap.add_argument("--cache", default=os.path.expanduser("~/.cache/graveyard-arch"))
     ap.add_argument("--base", help="file: Arch names the base provides, one per line")
+    ap.add_argument("--graph", help="with --order: write 'base<TAB>bases it needs' to this file")
+    ap.add_argument("--order", action="store_true",
+                    help="print the package bases in build order (dependencies and build dependencies first)")
     ap.add_argument("targets", nargs="+")
     a = ap.parse_args()
     os.makedirs(a.cache, exist_ok=True)
@@ -84,8 +87,39 @@ def main():
     bases = {}
     for r in order:
         bases.setdefault(r["pkgbase"], []).append(r["pkgname"])
-    for b, names in sorted(bases.items()):
-        print(b + ("" if names == [b] else "\t" + " ".join(sorted(names))))
+    if a.order:
+        # base -> bases it needs (runtime and build), within the set
+        base_of = {r["pkgname"]: r["pkgbase"] for r in order}
+        for r in order:
+            for p in r.get("provides", []):
+                base_of.setdefault(bare(p), r["pkgbase"])
+        need = {b: set() for b in bases}
+        for r in order:
+            for d in r["depends"] + r["makedepends"]:
+                nb = base_of.get(bare(d))
+                if nb and nb != r["pkgbase"]:
+                    need[r["pkgbase"]].add(nb)
+        done, out, active = set(), [], set()
+        def visit(b):
+            if b in done or b in active:  # a cycle: the book of the world breaks it by order
+                return
+            active.add(b)
+            for n in sorted(need[b]):
+                visit(n)
+            active.discard(b)
+            done.add(b)
+            out.append(b)
+        for b in sorted(bases):
+            visit(b)
+        for b in out:
+            print(b)
+        if a.graph:
+            with open(a.graph, "w") as g:
+                for b in out:
+                    g.write(b + "\t" + " ".join(sorted(need[b])) + "\n")
+    else:
+        for b, names in sorted(bases.items()):
+            print(b + ("" if names == [b] else "\t" + " ".join(sorted(names))))
     size = sum(r["installed_size"] for r in order)
     print(f"# {len(order)} packages from {len(bases)} package bases, {size/2**30:.1f} GiB installed; "
           f"{len(unresolved)} names not found as packages (virtual: provided by another): "
