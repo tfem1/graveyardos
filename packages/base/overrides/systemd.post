@@ -1,0 +1,13 @@
+# Files systemd generates from what packages install: Yone hooks keep them
+# current (the book makes them once, on the machine).
+install -d "$PKGDIR/usr/share/yone/hooks"
+cat > "$PKGDIR/usr/share/yone/hooks/30-hwdb.hook" << "EOF2"
+desc = Updating the hardware database
+paths = usr/lib/udev/hwdb.d/
+run = /usr/bin/systemd-hwdb update
+EOF2
+cat > "$PKGDIR/usr/share/yone/hooks/31-journal-catalog.hook" << "EOF2"
+desc = Updating the journal's message catalog
+paths = usr/lib/systemd/catalog/
+run = /usr/bin/journalctl --update-catalog
+EOF2

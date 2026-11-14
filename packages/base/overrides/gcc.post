@@ -1,0 +1,3 @@
+# cc: the book makes the link in chapter 6 (gcc pass 2) and never again, so no
+# final package owned it.
+ln -sf gcc "$PKGDIR/usr/bin/cc"

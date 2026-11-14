@@ -27,7 +27,24 @@ EXCLUDE = (
     # tools' backups, journalctl's catalog index, sudo's lecture marks
     "etc/passwd-", "etc/group-", "etc/shadow-", "etc/gshadow-",
     "var/lib/systemd/catalog/database", "var/lib/sudo/lectured/",
+    "usr/share/graveyard/initramfs/live/usr/lib/graveyard/installer/__pycache__/",
 )
+
+
+def known_difference(rel):
+    """Differences that are by design, not missing packages."""
+    # the book's stripping section (8.84) keeps debug copies of a few
+    # libraries; packages carry no debug information
+    if rel.startswith("usr/lib/") and rel.endswith(".dbg"):
+        return True
+    # bc installs its message catalogs for the locales the build machine
+    # has (de_AT.utf8...) but, into a package, for every charset its
+    # catalogs support (de_AT.UTF-8...): upstream's choice
+    parts = rel.split("/")
+    if len(parts) >= 4 and parts[:3] == ["usr", "share", "locale"] and "." in parts[3] \
+            and parts[3].split(".", 1)[1].lower().replace("-", "") == "utf8" and (len(parts) == 4 or parts[4] == "bc"):
+        return True
+    return False
 
 
 def excluded(rel):
@@ -79,8 +96,8 @@ def main():
     ref, new, report = sys.argv[1:4]
     os.makedirs(report, exist_ok=True)
     a, b = scan(ref), scan(new)
-    missing = sorted(set(a) - set(b))
-    extra = sorted(set(b) - set(a))
+    missing = sorted(p for p in set(a) - set(b) if not known_difference(p))
+    extra = sorted(p for p in set(b) - set(a) if not known_difference(p))
     kind, mode, owner, link, content = [], [], [], [], []
     for rel in sorted(set(a) & set(b)):
         x, y = a[rel], b[rel]
