@@ -38,13 +38,26 @@ SOURCES = {
                "https://opengameart.org/content/1-bit-graveyard-pixel-art-asset-pack", "CC0-1.0"),
 }
 
+# SHA-256 of each download, as first fetched (inspect prints them)
+PINS = {
+    "larry-graveyard1": "515e293086c42dee344c3771f1505bf14ab2eadd0ae2c7f3fd284bf612bc8c8e",
+    "larry-graveyard2": "017dd73f0a181f0a0c22875c474021292a53626f5d401875b03a17ed1c99c024",
+    "gothicvania": "992f3792b49391da4d97c29da47c8f3d2f438ca10d7db03f9a3166d655600871",
+    "onebit": "b880c311d63dc3ecb6e506137efd347c655df9e26b4a5d0e0ebdaeaa016393ef",
+}
+
+
 def fetch(work, name):
     url = SOURCES[name][0]
+    os.makedirs(work, exist_ok=True)
     path = os.path.join(work, os.path.basename(url))
     if not os.path.exists(path):
         req = urllib.request.Request(url, headers={"User-Agent": "graveyardos-wallpapers"})
         with urllib.request.urlopen(req, timeout=120) as r, open(path, "wb") as f:
             f.write(r.read())
+    got = hashlib.sha256(open(path, "rb").read()).hexdigest()
+    if PINS.get(name) and got != PINS[name]:
+        raise SystemExit(f"{name}: sha256 {got}, expected {PINS[name]}")
     return path
 
 
