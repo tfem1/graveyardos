@@ -64,11 +64,17 @@ needs() { awk -F'\t' -v b="$1" '$1 == b { print $2 }' "$HERE/needs"; }
 state() { grep -qx "$1" "$work/done" "$work/failed" "$work/skipped" 2> /dev/null; }
 listed() { cut -f1 "$work/$2" | grep -qx "$1"; }
 
-n=0
+n=0 okn=0
 while read -r base; do
   [ -n "$base" ] || continue
   if state "$base" || listed "$base" failed || listed "$base" skipped; then continue; fi
   if [ $((SECONDS - start)) -ge "$budget" ]; then log "time budget spent"; break; fi
+  # twelve tries and nothing built: something general is wrong, not a package
+  if [ "$n" -ge 12 ] && [ "$okn" -eq 0 ]; then
+    log "the first $n packages all failed: stopping (see the logs)"
+    for f in "$work"/logs/*.log; do echo "---- $f"; tail -n 15 "$f"; done | head -n 120
+    exit 1
+  fi
   blocked=""
   for d in $(needs "$base"); do
     if listed "$d" failed || listed "$d" skipped; then blocked=$d; break; fi
@@ -102,7 +108,7 @@ while read -r base; do
     index
     if in /usr/local/bin/yone --noconfirm --overwrite --color never refresh >> "$lf" 2>&1 \
        && in /usr/local/bin/yone --noconfirm --overwrite --color never install "${names[@]}" >> "$lf" 2>&1; then
-      echo "$base" >> "$work/done"; printf 'ok   %5ds\n' $((SECONDS - t0))
+      echo "$base" >> "$work/done"; okn=$((okn + 1)); printf 'ok   %5ds\n' $((SECONDS - t0))
       continue
     fi
     printf '%s\tinstall: %s\n' "$base" "$(tail -n 1 "$lf" | cut -c1-200)" >> "$work/failed"; echo "INSTALL FAILED"
