@@ -1,6 +1,7 @@
 # Wallpapers from free pixel art online (branding/wallpapers/src/external.py):
 # "inspect" prints what the sources hold (a contact sheet in the log);
-# "build" makes the black and white Plasma packages and commits them.
+# "preview" builds them and prints them; "build" makes the black and white
+# Plasma packages and commits them.
 name: wallpapers
 
 on:
@@ -8,7 +9,7 @@ on:
     inputs:
       mode:
         type: choice
-        options: [inspect, build]
+        options: [inspect, preview, build]
         default: inspect
 
 permissions:
@@ -23,6 +24,9 @@ jobs:
       - name: Inspect
         if: inputs.mode == 'inspect'
         run: python3 branding/wallpapers/src/external.py inspect "$RUNNER_TEMP/src"
+      - name: Preview (built, not committed)
+        if: inputs.mode == 'preview'
+        run: python3 branding/wallpapers/src/external.py build "$RUNNER_TEMP/src" "$RUNNER_TEMP/out"
       - name: Build and commit
         if: inputs.mode == 'build'
         run: |

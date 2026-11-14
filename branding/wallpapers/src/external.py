@@ -21,9 +21,10 @@ import json
 import os
 import sys
 import urllib.request
+import random
 import zipfile
 
-from PIL import Image
+from PIL import Image, ImageOps
 
 SOURCES = {
     # name: (url, author, page, license)
@@ -36,10 +37,6 @@ SOURCES = {
     "onebit": ("https://opengameart.org/sites/default/files/1-bit_pixel_art_graveyard_pack.zip", "Fava Beans",
                "https://opengameart.org/content/1-bit-graveyard-pixel-art-asset-pack", "CC0-1.0"),
 }
-
-# name -> (title, description, [(source, member in its zip or "", ...)] back to front)
-WALLPAPERS = {}
-
 
 def fetch(work, name):
     url = SOURCES[name][0]
@@ -69,7 +66,7 @@ def sheet(images, width=1600):
     """Thumbnails in rows, each labelled by its index."""
     thumbs = []
     for im in images:
-        k = min(1.0, 300 / max(im.width, 1), 200 / max(im.height, 1))
+        k = min(1.0, (840 if len(images) <= 2 else 300) / max(im.width, 1), (480 if len(images) <= 2 else 200) / max(im.height, 1))
         t = im.resize((max(1, int(im.width * k)), max(1, int(im.height * k))), Image.NEAREST)
         bg = Image.new("RGBA", t.size, (255, 0, 255, 255))
         bg.alpha_composite(t)
@@ -117,46 +114,89 @@ def inspect(work):
 
 def grey(im):
     """Luminance, keeping transparency."""
-    a = im.getchannel("A")
-    g = im.convert("L")
-    return Image.merge("LA", (g, a))
+    return Image.merge("LA", (im.convert("L"), im.getchannel("A")))
 
 
-def compose(work, layers, gw, gh):
-    """The layers stacked on a grid gw x gh, each tiled across and anchored at the bottom."""
-    canvas = Image.new("LA", (gw, gh), (0, 255))
-    for src, member, scale in layers:
-        path = fetch(work, src)
-        im = dict(pictures(path))[member]
-        im = grey(im)
-        if scale != 1:
-            im = im.resize((im.width * scale, im.height * scale), Image.NEAREST)
-        y = gh - im.height
-        for x in range(0, gw, im.width):
-            canvas.alpha_composite(im, (x, y)) if hasattr(canvas, "alpha_composite") else canvas.paste(im, (x, y), im)
-    return canvas.convert("L")
+def member(work, src, suffix):
+    for m, im in pictures(fetch(work, src)):
+        if m.endswith(suffix):
+            return im
+    raise SystemExit(f"{src}: no {suffix}")
+
+
+def gothic(work, gw, gh):
+    """GothicVania's three loopable layers (moonlit sky, mountains, graveyard),
+    tiled across and standing on the bottom edge; the sky carried up."""
+    env = "demo/assets/environment/"
+    layers = [grey(member(work, "gothicvania", env + n)) for n in ("bg-moon.png", "bg-mountains.png", "bg-graveyard.png")]
+    lw, lh = layers[0].size
+    top = layers[0].crop((0, 0, lw, 1)).resize((1, 1), Image.BOX).getpixel((0, 0))[0]
+    canvas = Image.new("LA", (gw, gh), (top, 255))
+    x0 = (gw - lw) // 2 % lw - lw  # centred: the moon in the middle
+    for im in layers:
+        for x in range(x0, gw, lw):
+            canvas.paste(im, (x, gh - lh), im)
+    return ImageOps.autocontrast(canvas.convert("L"), cutoff=0.5)
+
+
+def onebit(work, gw, gh, seed=7):
+    """The 1-bit pack's buildings and statues in a row on a night ground,
+    under a pixel moon and stars."""
+    rng = random.Random(seed)
+    c = Image.new("L", (gw, gh), 0)
+    px = c.load()
+    ground = int(gh * 0.80)
+    for _ in range(gw // 3):
+        x, y = rng.randrange(gw), rng.randrange(int(gh * 0.6))
+        px[x, y] = rng.choice((120, 180, 255))
+    r = gh // 9
+    mx, my = int(gw * 0.80), int(gh * 0.22)
+    for y in range(my - r, my + r + 1):
+        for x in range(mx - r, mx + r + 1):
+            if (x - mx) ** 2 + (y - my) ** 2 <= r * r:
+                px[x, y] = 235
+    for x in range(gw):
+        px[x, ground] = 255
+    names = ["GRAVE-Mausoleum_A.png", "NOTABLE-Angel Statue.png", "GRAVE-Mausoleum_C.png", "NOTABLE-Main Gate_A_Closed.png",
+             "NOTABLE-Skull Statue.png", "GRAVE-Mausoleum_E.png", "NOTABLE-Pavilion_A.png", "GRAVE-Mausoleum_B.png"]
+    n = max(3, min(len(names), gw // 72))
+    order = names[:n]
+    sp = gw // n
+    for i, name in enumerate(order):
+        im = grey(member(work, "onebit", "/" + name))
+        x = i * sp + (sp - im.width) // 2
+        c.paste(im.convert("L"), (x, ground - im.height + 1), im.getchannel("A"))
+    return c
+
+
+WALLPAPERS = {
+    # name: (scene, title, description, sources)
+    "Gothic-Cemetery": (gothic, "Gothic cemetery", "A moonlit graveyard in pixel art", ["gothicvania"]),
+    "One-Bit-Cemetery": (onebit, "One-bit cemetery", "Mausoleums, a gate and statues under the moon, in 1-bit pixel art", ["onebit"]),
+}
+GRIDS = {(480, 270): [(1920, 1080), (3840, 2160)], (320, 200): [(2560, 1600)]}
 
 
 def build(work, out):
-    for name, (title, desc, layers, grids) in WALLPAPERS.items():
+    for name, (scene, title, desc, srcs) in WALLPAPERS.items():
         d = os.path.join(out, name, "contents", "images")
         os.makedirs(d, exist_ok=True)
-        for (gw, gh), sizes in grids.items():
-            im = compose(work, layers, gw, gh)
+        for (gw, gh), sizes in GRIDS.items():
+            im = scene(work, gw, gh)
             for sw, sh in sizes:
                 im.resize((sw, sh), Image.NEAREST).save(os.path.join(d, f"{sw}x{sh}.png"), optimize=True)
         Image.open(os.path.join(d, "1920x1080.png")).convert("RGB").resize((400, 225), Image.NEAREST).save(
             os.path.join(out, name, "contents", "screenshot.jpg"), quality=92)
-        srcs = sorted({s for s, _, _ in layers})
         meta = {"KPlugin": {
             "Authors": [{"Name": SOURCES[s][1]} for s in srcs],
-            "Description": desc + " — " + "; ".join(f"{SOURCES[s][2]} ({SOURCES[s][3]})" for s in srcs)
-                           + "; made black and white for GraveyardOS",
+            "Description": f"{desc}, black and white. From {'; '.join(SOURCES[s][2] for s in srcs)} ({SOURCES[srcs[0]][3]})",
             "Id": name, "License": SOURCES[srcs[0]][3], "Name": title}}
         with open(os.path.join(out, name, "metadata.json"), "w") as f:
             json.dump(meta, f, indent=4)
             f.write("\n")
         print("wrote", name)
+    show(sheet([Image.open(os.path.join(out, n, "contents", "images", "1920x1080.png")).convert("RGBA")
+                for n in WALLPAPERS], width=1700))
 
 
 if __name__ == "__main__":
