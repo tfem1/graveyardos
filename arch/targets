@@ -3,12 +3,12 @@
 # to be built. Names are Arch's; @group is an Arch package group.
 # Hyprland edition (tfem1/dotfiles)
 hyprland hyprlock hypridle hyprsunset xdg-desktop-portal-hyprland quickshell kitty wl-clipboard cliphist
-grim slurp fastfetch wf-recorder libnotify libpulse ffmpeg brightnessctl playerctl cava gamemode
+grim slurp wf-recorder libnotify libpulse ffmpeg brightnessctl playerctl cava gamemode
 qt5ct qt6ct adw-gtk-theme papirus-icon-theme inter-font ttf-jetbrains-mono-nerd adwaita-cursors xdg-desktop-portal-gtk
 # KDE edition: Plasma on Wayland, the standard desktop
 @plasma dolphin ark kate spectacle gwenview okular
 # both
-sddm pipewire pipewire-pulse wireplumber networkmanager bluez bluez-utils power-profiles-daemon flatpak git curl
+sddm fastfetch pipewire pipewire-pulse wireplumber networkmanager bluez bluez-utils power-profiles-daemon flatpak git curl
 # NVIDIA (the image's nvidia.sfs layer, iso/nvidia.sh): the driver's user
 # space; its open kernel modules are built for GraveyardOS's kernel
 nvidia-utils

@@ -10,7 +10,7 @@
   },
   "display": {
     "separator": "  ",
-    "color": { "keys": "38;2;139;92;246", "title": "38;2;139;92;246" }
+    "color": { "keys": "1;97", "title": "1;97" }  // black and white, like the rest
   },
   "modules": [
     "title",

@@ -163,17 +163,17 @@ Rectangle {
             Rectangle {
                 id: lockBox
                 anchors.left: parent.left
-                anchors.leftMargin: 8 * root.u
+                anchors.leftMargin: 10 * root.u
                 anchors.verticalCenter: parent.verticalCenter
-                width: 34 * root.u
-                height: 34 * root.u
-                radius: 9 * root.u
+                width: 26 * root.u
+                height: 26 * root.u
+                radius: 7 * root.u
                 color: Qt.alpha(root.ink, 0.12)
                 Icon {
                     anchors.centerIn: parent
                     name: "lock"
                     color: root.ink
-                    size: 18 * root.u
+                    size: 14 * root.u
                 }
             }
 
@@ -214,11 +214,11 @@ Rectangle {
             Rectangle {
                 id: go
                 anchors.right: parent.right
-                anchors.rightMargin: 8 * root.u
+                anchors.rightMargin: 10 * root.u
                 anchors.verticalCenter: parent.verticalCenter
-                width: 34 * root.u
-                height: 34 * root.u
-                radius: 9 * root.u
+                width: 26 * root.u
+                height: 26 * root.u
+                radius: 7 * root.u
                 color: root.ink
                 opacity: root.busy ? 0.5 : goHover.hovered ? 0.85 : 1
                 Behavior on color { ColorAnimation { duration: 450 } }
@@ -226,7 +226,7 @@ Rectangle {
                     anchors.centerIn: parent
                     name: "next"
                     color: root.dark ? "#000000" : "#FFFFFF"
-                    size: 20 * root.u
+                    size: 15 * root.u
                 }
                 HoverHandler { id: goHover; cursorShape: Qt.PointingHandCursor }
                 TapHandler { onTapped: root.login() }

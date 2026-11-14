@@ -1,0 +1,56 @@
+# GraveyardOS boot menu: black, white, the tomb.
+# Fonts: Rubik (SIL OFL), converted with grub-mkfont; images: make-images.py.
+desktop-color: "#000000"
+title-text: ""
+terminal-font: "Rubik Regular 16"
+terminal-box: "term_*.png"
+
++ image {
+    left = 50%-48
+    top = 13%
+    width = 96
+    height = 96
+    file = "logo.png"
+}
+
++ label {
+    left = 0
+    top = 13%+112
+    width = 100%
+    height = 48
+    align = "center"
+    text = "GraveyardOS"
+    font = "RubikBold Regular 40"
+    color = "#FFFFFF"
+}
+
++ boot_menu {
+    left = 50%-320
+    top = 42%
+    width = 640
+    height = 44%
+    item_font = "Rubik Regular 24"
+    item_color = "#A3A3A3"
+    selected_item_font = "Rubik Regular 24"
+    selected_item_color = "#000000"
+    selected_item_pixmap_style = "select_*.png"
+    item_height = 34
+    item_padding = 14
+    item_spacing = 18
+    item_icon_space = 0
+    icon_width = 0
+    icon_height = 0
+    scrollbar = false
+}
+
++ label {
+    id = "__timeout__"
+    left = 0
+    top = 92%
+    width = 100%
+    height = 24
+    align = "center"
+    font = "Rubik Regular 16"
+    color = "#6B6B6B"
+    text = "Starting in %d s · arrows to choose, Enter to start"
+}

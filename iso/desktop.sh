@@ -117,6 +117,9 @@ install -d "$LFS/usr/share/wallpapers"
 rm -rf "$LFS/usr/share/wallpapers/Graveyard-Dunes"
 cp -R "$REPO/branding/wallpapers/Graveyard-Dunes" "$LFS/usr/share/wallpapers/"
 install -Dm644 "$REPO/branding/graveyard-icon.svg" "$LFS/usr/share/pixmaps/graveyard.svg"
+# Fastfetch: the owner's Eye of Horus, in white (a user's own config wins)
+install -Dm644 "$REPO/branding/fastfetch/graveyard.txt" "$LFS/usr/share/graveyard/fastfetch/graveyard.txt"
+install -Dm644 "$REPO/branding/fastfetch/config.jsonc" "$LFS/etc/xdg/fastfetch/config.jsonc"
 install -Dm644 "$REPO/branding/graveyard-icon.svg" "$LFS/usr/share/icons/hicolor/scalable/apps/graveyard.svg"
 if [ "$edition" = kde ]; then
   # A look-and-feel of its own: Breeze Dark with the Dunes, the default for

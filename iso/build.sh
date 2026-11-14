@@ -82,6 +82,10 @@ install -m 644 "$stage/BOOTX64.EFI" "$tree/EFI/BOOT/BOOTX64.EFI"
 for platform in i386-pc x86_64-efi; do
   cp "$grub/$platform"/*.mod "$grub/$platform"/*.lst "$tree/boot/grub/$platform/"
 done
+# the menu's look (branding/grub/graveyard: theme, Rubik fonts, the tomb)
+mkdir -p "$tree/boot/grub/themes"
+cp -R "$HERE/../branding/grub/graveyard" "$tree/boot/grub/themes/graveyard"
+rm -f "$tree/boot/grub/themes/graveyard/"*.py
 cat > "$stage/esp.cfg" <<CFG
 search --no-floppy --set=root --label $label
 set prefix=(\$root)/boot/grub
