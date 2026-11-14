@@ -324,6 +324,14 @@ def sources_index():
         parts = line.split()
         if len(parts) == 2:
             sums[parts[1]] = parts[0]
+    # the GraveyardOS sections' own sources: url md5 sha256
+    for line in open(os.path.join(LFS, "graveyard", "sources")):
+        parts = line.split()
+        if len(parts) == 3 and not line.startswith("#"):
+            f = parts[0].rsplit("/", 1)[-1]
+            urls[f] = parts[0]
+            if parts[2] != "-":
+                sums[f] = parts[2]
     return urls, sums
 
 
@@ -347,7 +355,7 @@ def version_of(title):
 
 
 def package_name(sid):
-    return sid.replace("ch-system-", "").replace("ch-tools-", "").lower()
+    return sid.replace("ch-system-", "").replace("ch-tools-", "").replace("graveyard-", "").lower()
 
 
 # ------------------------------------------------------------ recipes
@@ -404,16 +412,26 @@ def apply_edits(name, text, edits_file):
     return text
 
 
+def book_sections():
+    """(chapter, sid, tarball, title, script) of every section built from a
+    tarball into a package: chapter 8 of the book, then the GraveyardOS
+    sections of other software (BLFS: dosfstools, sudo; not the kernel)."""
+    for d, sections in ((os.path.join(LFS, "book"), "sections.tsv"), (os.path.join(LFS, "graveyard"), "sections.tsv")):
+        for line in open(os.path.join(d, sections)):
+            if line.startswith("#") or not line.strip():
+                continue
+            ch, order, sid, tb, title = line.rstrip("\n").split("\t")
+            if tb == "-" or sid in NOT_PACKAGES or sid == "graveyard-kernel":
+                continue
+            if d.endswith("book") and ch != "ch08":
+                continue
+            yield ch, sid, tb, re.sub(r"\s*\(.*\)\s*$", "", title), os.path.join(d, ch, f"{order}-{sid}.sh")
+
+
 def chapter8(sources, urls, sums, extra_skip, overrides):
     recipes = {}
-    for line in open(os.path.join(LFS, "book", "sections.tsv")):
-        if line.startswith("#") or not line.strip():
-            continue
-        ch, order, sid, tb, title = line.rstrip("\n").split("\t")
-        if ch != "ch08" or sid in NOT_PACKAGES or tb == "-":
-            continue
+    for ch, sid, tb, title, script in book_sections():
         name = package_name(sid)
-        script = os.path.join(LFS, "book", ch, f"{order}-{sid}.sh")
         header = open(script).read()
         url = (re.search(r"^# source: (\S+)", header, re.M) or [None, None])[1]
         version = version_of(title) or die(f"{sid}: no version in '{title}'")
@@ -438,7 +456,7 @@ def chapter8(sources, urls, sums, extra_skip, overrides):
         ])
         title_clean = re.sub(r"^\d+\.\d+\s+", "", title)
         recipes[name] = recipe_text(
-            name, version, f"{title_clean} (LFS 13.1-systemd, chapter 8)", url,
+            name, version, f"{title_clean} (" + ("LFS 13.1-systemd, chapter 8" if ch == "ch08" else "BLFS 13.1-systemd, GraveyardOS") + ")", url,
             [tb] + extras, urls, sums,
             [e for e in extras if re.search(r"\.(tar\.\w+|tgz)$", e)],
             body, ["filesystem"], backup=["etc/"])
@@ -505,6 +523,20 @@ def graveyard_recipes(build_id):
         'install -d "$PKGDIR/usr/lib/graveyard"',
         'gcc -O2 -Wall -o "$PKGDIR/usr/lib/graveyard/vtoy-param" vtoy-param.c',
         'strip --strip-unneeded "$PKGDIR/usr/lib/graveyard/vtoy-param"',
+        "# the live session's installer and GPU detection (as lfs/graveyard's initramfs section)",
+        embed_tree(os.path.join(REPO, "installer", "web"), "usr/share/graveyard/initramfs/live/usr/lib/graveyard/installer/web"),
+        *[part for f, mode in (("graveyard-installer", "755"), ("graveyard_install.py", "644")) for part in (
+            'install -d "$PKGDIR/usr/share/graveyard/initramfs/live/usr/lib/graveyard/installer"',
+            f"cat > \"$PKGDIR/usr/share/graveyard/initramfs/live/usr/lib/graveyard/installer/{f}\" <<'GRAVEYARD_EOF'",
+            open(os.path.join(REPO, "installer", f)).read().rstrip("\n"),
+            "GRAVEYARD_EOF",
+            f'chmod {mode} "$PKGDIR/usr/share/graveyard/initramfs/live/usr/lib/graveyard/installer/{f}"')],
+        'install -d "$PKGDIR/usr/share/graveyard/initramfs/live/usr/bin"',
+        'ln -sfn ../lib/graveyard/installer/graveyard-installer "$PKGDIR/usr/share/graveyard/initramfs/live/usr/bin/graveyard-installer"',
+        "cat > \"$PKGDIR/usr/share/graveyard/initramfs/live/usr/bin/graveyard-gpu-detect\" <<'GRAVEYARD_EOF'",
+        open(os.path.join(REPO, "tools", "graveyard-gpu-detect")).read().rstrip("\n"),
+        "GRAVEYARD_EOF",
+        'chmod 755 "$PKGDIR/usr/share/graveyard/initramfs/live/usr/bin/graveyard-gpu-detect"',
     ])
     recipes["graveyard-initramfs-tools"] = recipe_text(
         "graveyard-initramfs-tools", version, "Builds the GraveyardOS initramfs (installed system or live medium)",

@@ -1,0 +1,4 @@
+# pip: make install hands it to ensurepip, which leaves it out when the system
+# building the package already has pip; the bundled wheel, installed here.
+python3 -m pip install --root="$PKGDIR" --ignore-installed --no-index --no-cache-dir \
+  --no-warn-script-location --find-links Lib/ensurepip/_bundled pip

@@ -53,6 +53,7 @@ jobs:
           sudo -E bash lfs/build.sh unpack "$RUNNER_TEMP"/graveyard-base.tar.zst
           sudo rm -f "$RUNNER_TEMP"/graveyard-base.tar.zst
           bash lfs/fetch-sources.sh "$RUNNER_TEMP/sources"
+          bash lfs/graveyard/fetch-sources.sh "$RUNNER_TEMP/sources"   # dosfstools, sudo
 
       - name: Yone (static)
         working-directory: yone

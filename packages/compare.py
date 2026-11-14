@@ -23,6 +23,10 @@ EXCLUDE = (
     "proc/", "sys/", "boot/", "usr/lib/modules/", "var/lib/yone/", "var/cache/yone/",
     "var/log/yone.log", "etc/yone/", "usr/local/bin/yone", "root/.cache/",
     "var/log/journal/", "etc/machine-id",
+    # written by the system as it runs, owned by no package: the account
+    # tools' backups, journalctl's catalog index, sudo's lecture marks
+    "etc/passwd-", "etc/group-", "etc/shadow-", "etc/gshadow-",
+    "var/lib/systemd/catalog/database", "var/lib/sudo/lectured/",
 )
 
 
