@@ -31,6 +31,7 @@ changing one is a decision of the same kind, recorded here.
 | Code name | None |
 | License | GNU GPL v3 or later; the name and logo reserved (TRADEMARKS.md); © tfem1 |
 | Extras wanted | zram, a welcome screen at first start, the gaming profile |
+| Yone and the disk | `sync = no` by default (2026-11-14), as pacman, rpm and apk: no flush to disk before a transaction commits, for installs faster than pacman's; `sync = yes` in yone.conf gives power-cut durability back. The journal finishes or undoes any transaction Yone itself did not complete |
 | Extras declined | Firewall on by default, copy-to-RAM boot entry, `yone rollback`, backup LTS kernel, update robot, btrfs snapshots |
 
 Test hardware: an NVIDIA RTX card (open modules apply).
