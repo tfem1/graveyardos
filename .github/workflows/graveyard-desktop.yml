@@ -24,6 +24,10 @@ on:
         description: "Install what is built of the edition and list what is missing (a trial image)"
         type: boolean
         default: false
+      nvidia:
+        description: "Add the NVIDIA layer (open modules + nvidia-utils) and its boot entry"
+        type: boolean
+        default: true
 
 permissions:
   contents: read
@@ -85,7 +89,6 @@ jobs:
           set -o pipefail
           sudo -E YONE="$YONE" GRAVEYARD_PARTIAL=${{ inputs.partial && '1' || '0' }} \
             bash iso/desktop.sh ${{ inputs.edition }} /mnt/arch-work | tee "$RUNNER_TEMP/desktop.txt"
-          sudo rm -rf /mnt/arch-work
           {
             echo "## GraveyardOS-${{ inputs.edition }}"
             echo '```'
@@ -93,8 +96,20 @@ jobs:
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
 
+      - name: The NVIDIA layer
+        if: inputs.nvidia
+        run: |
+          set -o pipefail
+          if ls /mnt/arch-work/repo/nvidia-utils-*.yon > /dev/null 2>&1; then
+            sudo -E bash iso/nvidia.sh /mnt/arch-work | tee "$RUNNER_TEMP/nvidia.txt"
+            { echo '### NVIDIA layer'; echo '```'; sed 's/\x1b\[[0-9;]*m//g' "$RUNNER_TEMP/nvidia.txt" | grep -E '==>|^   ' | head -n 30; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "nvidia-utils is not built yet: no NVIDIA layer on this image" | tee -a "$GITHUB_STEP_SUMMARY"
+          fi
+
       - name: Build the ISO
         run: |
+          sudo rm -rf /mnt/arch-work
           sudo apt-get install -y -qq squashfs-tools xorriso mtools dosfstools qemu-system-x86 ovmf > /dev/null
           sudo -E GRAVEYARD_EDITION=${{ inputs.edition }} bash iso/build.sh "$RUNNER_TEMP/iso" | tee "$RUNNER_TEMP/iso-build.txt"
           sudo chmod -R a+rX "$RUNNER_TEMP/iso"

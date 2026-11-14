@@ -1242,11 +1242,16 @@ haskell-regex-tdfa
 haskell-stringbuilder
 haskell-markdown-unlit
 haskell-toml-parser
+haskell-inspection-testing
+haskell-template-haskell-lift
+haskell-quote-quot
+haskell-text-builder-linear
+haskell-yamlet
+haskell-typst
 haskell-logging-facade
 haskell-mockery
 haskell-raw-strings-qq
 haskell-yaml
-haskell-typst
 haskell-digest
 haskell-zip-archive
 haskell-pandoc

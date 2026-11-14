@@ -1242,11 +1242,16 @@ haskell-regex-tdfa	ghc haskell-regex-base uusi
 haskell-stringbuilder	ghc
 haskell-markdown-unlit	ghc haskell-base-compat haskell-hspec haskell-hspec-discover haskell-silently haskell-stringbuilder haskell-temporary
 haskell-toml-parser	alex ghc happy haskell-hspec haskell-hspec-discover haskell-markdown-unlit haskell-prettyprinter uusi
+haskell-inspection-testing	ghc
+haskell-template-haskell-lift	ghc uusi
+haskell-quote-quot	ghc haskell-tasty haskell-tasty-quickcheck haskell-template-haskell-lift uusi
+haskell-text-builder-linear	ghc haskell-quote-quot haskell-tasty haskell-tasty-quickcheck uusi
+haskell-yamlet	ghc haskell-aeson haskell-attoparsec haskell-attoparsec-aeson haskell-inspection-testing haskell-integer-logarithms haskell-scientific haskell-tasty haskell-tasty-hunit haskell-tasty-quickcheck haskell-text-builder-linear haskell-text-iso8601 haskell-uuid-types haskell-vector uusi
+haskell-typst	ghc haskell-aeson haskell-cassava haskell-erf haskell-ordered-containers haskell-pretty-show haskell-regex-tdfa haskell-scientific haskell-tasty haskell-tasty-golden haskell-toml-parser haskell-typst-symbols haskell-vector haskell-xml-conduit haskell-yamlet uusi
 haskell-logging-facade	ghc haskell-call-stack
 haskell-mockery	ghc haskell-base-compat haskell-logging-facade haskell-temporary
 haskell-raw-strings-qq	ghc haskell-hunit
 haskell-yaml	ghc haskell-aeson haskell-attoparsec haskell-base-compat haskell-conduit haskell-hspec haskell-hunit haskell-libyaml haskell-mockery haskell-optparse-applicative haskell-raw-strings-qq haskell-resourcet haskell-scientific haskell-temporary haskell-unordered-containers haskell-vector
-haskell-typst	ghc haskell-aeson haskell-cassava haskell-erf haskell-ordered-containers haskell-pretty-show haskell-regex-tdfa haskell-scientific haskell-tasty haskell-tasty-golden haskell-toml-parser haskell-typst-symbols haskell-vector haskell-xml-conduit haskell-yaml uusi
 haskell-digest	ghc
 haskell-zip-archive	ghc haskell-digest haskell-hunit haskell-old-time haskell-temporary haskell-zlib unzip
 haskell-pandoc	ghc haskell-aeson haskell-aeson-pretty haskell-asciidoc haskell-attoparsec haskell-base64-bytestring haskell-blaze-html haskell-blaze-markup haskell-case-insensitive haskell-citeproc haskell-commonmark haskell-commonmark-extensions haskell-commonmark-pandoc haskell-crypton haskell-crypton-connection haskell-crypton-x509-system haskell-data-default haskell-diff haskell-djot haskell-doclayout haskell-doctemplates haskell-emojis haskell-file-embed haskell-glob haskell-gridtables haskell-haddock-library haskell-http-client haskell-http-client-tls haskell-http-types haskell-ipynb haskell-jira-wiki-markup haskell-juicypixels haskell-libyaml haskell-mime-types haskell-network haskell-network-uri haskell-pandoc-types haskell-pretty-show haskell-random haskell-safe haskell-scientific haskell-skylighting haskell-skylighting-core haskell-split haskell-syb haskell-tagsoup haskell-tasty haskell-tasty-golden haskell-tasty-hunit haskell-tasty-quickcheck haskell-temporary haskell-texmath haskell-text-conversions haskell-tls haskell-typst haskell-unicode-collation haskell-unicode-data haskell-unicode-transforms haskell-vector haskell-xml haskell-xml-conduit haskell-xml-types haskell-yaml haskell-zip-archive haskell-zlib uusi
@@ -1343,7 +1348,7 @@ rrdtool	git libxml2 lua51 pango python-installer ruby ttf-dejavu
 lm_sensors	rrdtool
 python-sphinx-hawkmoth	git llvm python-build python-docutils python-hatchling python-installer python-sphinx
 mesa	cbindgen cmake directx-headers elfutils glslang libdisplay-info libdrm libglvnd libpng libva libx11 libxcb libxext libxml2 libxrandr libxshmfence libxxf86vm llvm lm_sensors python-mako python-ply python-pycparser python-sphinx python-sphinx-hawkmoth python-yaml rust rust-bindgen spirv-llvm-translator spirv-tools valgrind vulkan-icd-loader wayland wayland-protocols xcb-util-keysyms xorgproto
-libglvnd	libx11 libxext mesa xorgproto
+libglvnd	libx11 libxext mesa nvidia-utils xorgproto
 eglexternalplatform	git libglvnd
 egl-gbm	eglexternalplatform libdrm mesa
 egl-wayland	eglexternalplatform git libdrm libglvnd wayland wayland-protocols
@@ -1480,7 +1485,7 @@ hyprutils	cmake pixman
 hyprwayland-scanner	cmake git pugixml
 scdoc	
 seatd	scdoc
-aquamarine	cmake hyprutils hyprwayland-scanner libdisplay-info libdrm libglvnd libinput mesa pixman seatd wayland wayland-protocols
+aquamarine	cmake hyprutils hyprwayland-scanner libdisplay-info libdrm libglvnd libinput mesa nvidia-utils pixman seatd wayland wayland-protocols
 archlinux-appstream-data	
 breeze-icons	extra-cmake-modules python-lxml qt6-base
 kconfig	doxygen extra-cmake-modules qt6-base qt6-declarative qt6-tools
@@ -1695,7 +1700,7 @@ xf86-input-libinput	libinput libx11 libxi xorg-server xorgproto
 xorg-setxkbmap	libx11 libxkbfile libxrandr xorg-util-macros
 xorg-server	git libdrm libepoxy libglvnd libpciaccess libtirpc libunwind libx11 libxau libxaw libxcvt libxdmcp libxfont2 libxi libxkbfile libxmu libxrender libxres libxshmfence libxtst libxv mesa nettle pixman xcb-util xcb-util-image xcb-util-keysyms xcb-util-renderutil xcb-util-wm xf86-input-libinput xkeyboard-config xorg-font-util xorg-setxkbmap xorg-util-macros xorg-xkbcomp xorgproto xtrans
 xorg-xwayland	libdecor libdrm libei libepoxy libglvnd libtirpc libxau libxcvt libxfont2 libxkbfile libxshmfence mesa nettle pixman wayland wayland-protocols xorg-font-util xorg-server xorgproto xtrans
-hyprland	aquamarine cairo cmake glaze glib2 glslang hyprcursor hyprgraphics hyprland-guiutils hyprland-protocols hyprlang hyprutils hyprwayland-scanner hyprwire lcms2 libcanberra libdrm libei libglvnd libinput libx11 libxcb libxcomposite libxcursor libxfixes libxkbcommon libxrender lua mesa muparser pango pixman re2 sdbus-cpp tomlplusplus util-linux wayland wayland-protocols xcb-proto xcb-util xcb-util-errors xcb-util-image xcb-util-keysyms xcb-util-renderutil xcb-util-wm xorg-xwayland xorgproto
+hyprland	aquamarine cairo cmake glaze glib2 glslang hyprcursor hyprgraphics hyprland-guiutils hyprland-protocols hyprlang hyprutils hyprwayland-scanner hyprwire lcms2 libcanberra libdrm libei libglvnd libinput libx11 libxcb libxcomposite libxcursor libxfixes libxkbcommon libxrender lua mesa muparser nvidia-utils pango pixman re2 sdbus-cpp tomlplusplus util-linux wayland wayland-protocols xcb-proto xcb-util xcb-util-errors xcb-util-image xcb-util-keysyms xcb-util-renderutil xcb-util-wm xorg-xwayland xorgproto
 hyprlock	cairo cmake hyprgraphics hyprlang hyprutils hyprwayland-scanner libdrm libglvnd libxkbcommon mesa pam sdbus-cpp wayland wayland-protocols
 hyprsunset	cmake hyprland-protocols hyprlang hyprutils hyprwayland-scanner wayland wayland-protocols
 protobuf-c	protobuf

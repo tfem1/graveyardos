@@ -61,7 +61,7 @@ Quickshell, Flatpak and kitty as GraveyardOS recipes (not in BLFS).
 | 10b | Hyprland + Quickshell + user dotfiles (`graveyard-hyprland-config`), selectable in SDDM | 🔨 dotfiles support GraveyardOS (branch `yvis` of tfem1/dotfiles: install via Yone, updates via `yone check-updates`, GraveyardOS themes) |
 | 11 | Flatpak + Flathub preconfigured + portals (KDE and Hyprland) | ⏳ |
 | 12 | Logo approved and branding integrated (Fastfetch, SDDM, boot, KDE) | 🔨 Fastfetch ASCII supplied by the user |
-| 13 | Live ISO (over 2 GiB allowed: hosted on SourceForge), measured in CI, boot menu: default / NVIDIA / safe graphics | ⏳ |
+| 13 | Live ISO (over 2 GiB allowed: hosted on SourceForge), measured in CI, boot menu: default / NVIDIA / safe graphics | 🔨 `iso/desktop.sh` + `graveyard-desktop` workflow (GraveyardOS-kde / -hyprland, booted to the live desktop with a screenshot); NVIDIA entry with the `nvidia.sfs` layer (`iso/nvidia.sh`) |
 
 ## v0.3.0 — "installable"
 
@@ -69,7 +69,7 @@ Quickshell, Flatpak and kitty as GraveyardOS recipes (not in BLFS).
 |---|---|---|
 | 14 | GraveyardOS Installer (graphical): KDE / Hyprland / both, NVIDIA option pre-selected by `graveyard-gpu-detect`, Minimal/Desktop/Gaming profiles | ⏳ (GPU detection ✅) |
 | 15 | Automated install + reboot test in QEMU (UEFI/OVMF) | ⏳ |
-| 16 | AMD GPU stack; NVIDIA open kernel modules (`nvidia.sfs` boot entry) with module signing | ⏳ |
+| 16 | AMD GPU stack; NVIDIA open kernel modules (`nvidia.sfs` boot entry) with module signing | 🔨 layer and entry written (open modules built for the system's kernel, Arch's nvidia-utils); not signed yet; untested on hardware |
 
 ## v0.4.0+ 
 

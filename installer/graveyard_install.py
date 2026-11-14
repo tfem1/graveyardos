@@ -18,6 +18,7 @@ import time
 
 TARGET = "/mnt/graveyard-target"
 LIVE_SYSTEM = "/run/graveyard/system"   # the live medium's read-only system image
+LIVE_NVIDIA = "/run/graveyard/nvidia"   # its NVIDIA driver layer, when it has one
 MIN_DISK = 16 * 1024 ** 3          # bytes
 EFI_SIZE = "1GiB"
 BOOT_SIZE = "1GiB"                 # separate /boot when the root is encrypted
@@ -114,6 +115,8 @@ def facts(source=LIVE_SYSTEM):
             "sudo": has("sudo"),
             "efibootmgr": has("efibootmgr"),
             "desktops": [d for d in DESKTOPS if os.path.exists(os.path.join(source, "usr/share/graveyard/installer/desktop-" + d))],
+            # the driver layer of the medium (iso/nvidia.sh), copied over the system
+            "nvidia": os.path.isdir(os.path.join(LIVE_NVIDIA, "usr")),
         },
     }
 
@@ -169,6 +172,8 @@ def validate(c, f, secrets):
     for d in c.get("desktops") or []:
         if d not in DESKTOPS:
             e["desktops"] = f"unknown desktop {d}"
+    if c.get("nvidia") and not f["can"].get("nvidia"):
+        e["nvidia"] = "this medium has no NVIDIA driver"
     if c.get("profile") not in PROFILES:
         e["profile"] = "unknown profile"
     if not f.get("kernel"):
@@ -284,6 +289,12 @@ def plan(c, f):
         f"cp -a {q(f['source'])}/. {T}/",
         f"[ -s {T}/boot/vmlinuz-{kernel} ] || {{ echo 'no kernel in the copy' >&2; exit 1; }}",
     ])))
+    if c.get("nvidia"):
+        # the NVIDIA layer over it, as the live system's NVIDIA entry has it
+        steps.append(("Add the NVIDIA driver", "\n".join([
+            f"cp -a {LIVE_NVIDIA}/. {T}/",
+            f"ls {T}/usr/lib/modules/{kernel}/extramodules/nvidia.ko* > /dev/null",
+        ])))
 
     # 3. configuration
     tz = c["timezone"]
@@ -341,6 +352,8 @@ def plan(c, f):
     # 6. boot loader
     kpath = "" if boot else "/boot"
     cmdline = f"root=UUID=$ROOT_UUID rw quiet" if not enc else "root=/dev/mapper/graveyard-root rw quiet"
+    if c.get("nvidia"):
+        cmdline += " modprobe.blacklist=nouveau nvidia-drm.modeset=1"
     grub_cfg = "\n".join([
         "set timeout=3",
         "set default=0",

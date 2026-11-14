@@ -43,7 +43,7 @@ mountpoint -q /sys || mount -t sysfs -o nosuid,noexec,nodev sysfs /sys
 mountpoint -q /dev || mount -t devtmpfs -o mode=755,nosuid devtmpfs /dev
 mountpoint -q /run || mount -t tmpfs -o mode=755,nosuid,nodev tmpfs /run
 
-root='' live='' iso='' rootflags='' rootfstype='' mode=ro init=/usr/lib/systemd/systemd stop=''
+root='' live='' nvidia='' iso='' rootflags='' rootfstype='' mode=ro init=/usr/lib/systemd/systemd stop=''
 for arg in $(cat /proc/cmdline); do
   case $arg in
     root=*) root=${arg#root=} ;;
@@ -53,6 +53,7 @@ for arg in $(cat /proc/cmdline); do
     ro) mode=ro ;;
     rw) mode=rw ;;
     graveyard.live=*) live=${arg#graveyard.live=} ;;
+    graveyard.nvidia=1) nvidia=1 ;;
     graveyard.iso=*) iso=${arg#graveyard.iso=} ;;
     graveyard.break) stop=yes ;;
   esac
@@ -244,10 +245,22 @@ mount_live() {
   [ -f $m/medium/graveyard/rootfs.sfs ] || { rescue "the medium has no /graveyard/rootfs.sfs"; return 1; }
   mountpoint -q $m/system || mount -t squashfs -o ro,loop $m/medium/graveyard/rootfs.sfs $m/system \
     || { rescue "cannot mount the system image"; return 1; }
+  # The NVIDIA driver (open kernel modules, its user space and firmware), a
+  # layer of its own: mounted whenever the medium has it (the installer
+  # copies it), part of the system with graveyard.nvidia=1 only.
+  local lower=$m/system
+  if [ -f $m/medium/graveyard/nvidia.sfs ]; then
+    mkdir -p $m/nvidia
+    if mountpoint -q $m/nvidia || mount -t squashfs -o ro,loop $m/medium/graveyard/nvidia.sfs $m/nvidia; then
+      [ -z "$nvidia" ] || lower=$m/nvidia:$m/system
+    else
+      say "cannot mount the NVIDIA layer: starting without it" >&2
+    fi
+  fi
   # What the live session writes stays in memory, at most three quarters of it.
   mountpoint -q $m/changes || mount -t tmpfs -o mode=755,size=75% tmpfs $m/changes
   mkdir -p $m/changes/upper $m/changes/work
-  mount -t overlay -o "lowerdir=$m/system,upperdir=$m/changes/upper,workdir=$m/changes/work" \
+  mount -t overlay -o "lowerdir=$lower,upperdir=$m/changes/upper,workdir=$m/changes/work" \
     graveyard-live /sysroot || { rescue "cannot assemble the live file system"; return 1; }
   # Settings of the live session only (automatic login...).
   cp -a /live/. /sysroot/

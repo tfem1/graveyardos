@@ -9,3 +9,6 @@ qt5ct qt6ct adw-gtk-theme papirus-icon-theme inter-font ttf-jetbrains-mono-nerd 
 @plasma dolphin ark kate spectacle gwenview okular
 # both
 sddm pipewire pipewire-pulse wireplumber networkmanager bluez bluez-utils power-profiles-daemon flatpak git curl
+# NVIDIA (the image's nvidia.sfs layer, iso/nvidia.sh): the driver's user
+# space; its open kernel modules are built for GraveyardOS's kernel
+nvidia-utils

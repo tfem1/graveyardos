@@ -48,7 +48,7 @@ def main():
     os.makedirs(a.cache, exist_ok=True)
     base = set()
     if a.base:
-        base = {l.split("#")[0].strip() for l in open(a.base) if l.split("#")[0].strip()}
+        base = {n for l in open(a.base) for n in l.split("#")[0].split()}
 
     by_name, provides = {}, {}
 

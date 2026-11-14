@@ -150,6 +150,21 @@ class Summary(unittest.TestCase):
         self.assertIn("The whole disk /dev/nvme0n1", s[0]["value"])
         self.assertFalse(any(r["danger"] for r in s[1:]))
 
+    def test_nvidia_needs_the_medium_s_layer(self):
+        c = dict(copy.deepcopy(CHOICES), nvidia=True)
+        self.assertIn("nvidia", yi.validate(c, FACTS, SECRETS))
+        has = dict(FACTS, can=dict(FACTS["can"], nvidia=True))
+        self.assertEqual(yi.validate(c, has, SECRETS), {})
+
+    def test_nvidia_layer_copied_and_nouveau_kept_out(self):
+        has = dict(FACTS, can=dict(FACTS["can"], nvidia=True))
+        s = script(yi.plan(dict(copy.deepcopy(CHOICES), nvidia=True), has))
+        self.assertIn("cp -a /run/graveyard/nvidia/. /mnt/graveyard-target/", s)
+        self.assertIn("modprobe.blacklist=nouveau nvidia-drm.modeset=1", s)
+        s = script(yi.plan(CHOICES, has))
+        self.assertNotIn("/run/graveyard/nvidia", s)
+        self.assertNotIn("blacklist=nouveau", s)
+
     def test_manual_keeps_windows_efi_not_danger(self):
         c = dict(CHOICES, disk={"mode": "manual", "root": "/dev/nvme0n1p3", "efi": "/dev/nvme0n1p1"})
         rows = yi.summary(c, FACTS)

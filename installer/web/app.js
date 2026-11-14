@@ -150,8 +150,9 @@ function software() {
   $("profile-hint").textContent = hints[C.profile];
   const nv = F.gpu.nvidia;
   $("nvidia").checked = C.nvidia;
-  $("nvidia").disabled = nv !== "open";
-  $("nvidia-field").classList.toggle("disabled", nv !== "open");
+  const nvOk = nv === "open" && !!F.can.nvidia;
+  $("nvidia").disabled = !nvOk;
+  $("nvidia-field").classList.toggle("disabled", !nvOk);
   $("nvidia-hint").textContent = nv === "open" ? "An NVIDIA card was found: the open kernel modules are recommended."
     : nv === "unsupported" ? "This NVIDIA card is too old for the open modules: the free nouveau driver is used."
     : "No NVIDIA card in this computer.";
@@ -308,7 +309,7 @@ $("consent").onchange = (e) => ($("next").disabled = !e.target.checked);
   F = await api("/api/facts");
   Object.assign(C, structuredClone(F.defaults));
   C.disk = { mode: "auto", device: null, root: "", efi: "", format_efi: false };
-  C.nvidia = F.gpu.nvidia === "open";
+  C.nvidia = F.gpu.nvidia === "open" && !!F.can.nvidia;
   C.desktops = C.desktops.filter((d) => d in F.desktops);
   welcome(); region(); disk(); software(); account();
   show("welcome");

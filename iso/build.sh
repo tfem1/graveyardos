@@ -52,6 +52,15 @@ mksquashfs "$LFS" "$tree/graveyard/rootfs.sfs" -noappend -no-progress \
   -wildcards -e sources .graveyard 'proc/*' 'sys/*' 'dev/*' 'run/*' 'tmp/*' > "$out/mksquashfs.log"
 grep -E 'Filesystem size|inodes' "$out/mksquashfs.log" | sed 's/^/   /'
 
+# The NVIDIA layer (iso/nvidia.sh), with its own boot entry.
+if [ -s "$LFS/.graveyard/nvidia.sfs" ]; then
+  log "NVIDIA layer"
+  install -m 644 "$LFS/.graveyard/nvidia.sfs" "$tree/graveyard/nvidia.sfs"
+  nvidia_entry=keep
+else
+  nvidia_entry=drop
+fi
+
 log "kernel $kver and initramfs"
 install -m 644 "$LFS/boot/vmlinuz-$kver" "$tree/boot/vmlinuz"
 install -m 644 "$LFS/boot/initramfs-$kver.img" "$tree/boot/initramfs.img"
@@ -84,7 +93,8 @@ mkfs.vfat -n GRAVE_EFI "$esp" > /dev/null
 mmd -i "$esp" ::/EFI ::/EFI/BOOT ::/boot ::/boot/grub
 mcopy -i "$esp" "$stage/BOOTX64.EFI" ::/EFI/BOOT/BOOTX64.EFI
 mcopy -i "$esp" "$stage/esp.cfg" ::/boot/grub/grub.cfg
-sed -e "s/@LABEL@/$label/g" -e "s/@VERSION@/$version/g" -e "s|@CMDLINE@|${GRAVEYARD_ISO_CMDLINE:-}|g" \
+if [ "$nvidia_entry" = keep ]; then nv='/^# @NVIDIA-/d'; else nv='/^# @NVIDIA-BEGIN/,/^# @NVIDIA-END/d'; fi
+sed -e "$nv" -e "s/@LABEL@/$label/g" -e "s/@VERSION@/$version/g" -e "s|@CMDLINE@|${GRAVEYARD_ISO_CMDLINE:-}|g" \
   -e 's/ *$//' "$HERE/grub.cfg" > "$tree/boot/grub/grub.cfg"
 
 log "ISO (bootable from disc or USB stick, BIOS or UEFI)"
@@ -105,6 +115,7 @@ size=$(stat -c %s "$iso")
 limit=5000000000
 printf '   %s\n   label %s, %d MiB (limit: 5 GB%s)\n' "$iso" "$label" "$((size / 1048576))" \
   "$([ "$size" -le $((2 * 1024 * 1024 * 1024)) ] || echo '; over 2 GiB: SourceForge, not GitHub Releases')"
+[ ! -s "$tree/graveyard/nvidia.sfs" ] || printf '   NVIDIA layer %d MiB\n' "$(($(stat -c %s "$tree/graveyard/nvidia.sfs") / 1048576))"
 printf '   system image %d MiB, kernel %d MiB, initramfs %d MiB\n' \
   "$(($(stat -c %s "$tree/graveyard/rootfs.sfs") / 1048576))" \
   "$(($(stat -c %s "$tree/boot/vmlinuz") / 1048576))" \
