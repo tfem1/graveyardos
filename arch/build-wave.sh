@@ -69,14 +69,24 @@ build_dir() { # recipe dir (host path), log
   name=$(sed -n 's/^name = //p' "$src/YONEBUILD")
   d=$sys/packages/recipes/$name
   rm -rf "$d"; mkdir -p "$d/.yone-sources"; cp -a "$src/." "$d/"
-  # a source not pinned yet: pinned to what is downloaded now (bootstrap)
-  if grep -q '^sha256 = TODO' "$d/YONEBUILD"; then
-    local url f
-    url=$(sed -n 's/^source = \(.*::\)\{0,1\}//p' "$d/YONEBUILD" | head -n 1)
-    f=$d/.yone-sources/$(basename "$url")
-    curl -fsSL --retry 3 -o "$f" "$url"
-    sed -i "s/^sha256 = TODO$/sha256 = $(sha256sum "$f" | cut -d' ' -f1)/" "$d/YONEBUILD"
-  fi
+  # Every source where yone looks first: the system being built has no curl.
+  # Downloaded here (the importer already fetched Arch's), pinned on first use
+  # when the recipe says "sha256 = TODO" (bootstrap).
+  local line url f i=0
+  while IFS= read -r line; do
+    url=${line#source = }
+    f=${url%%::*}; [ "$f" != "$url" ] || f=$(basename "$url")
+    url=${url#*::}
+    case $url in *://*) ;; *) continue ;; esac
+    if [ -s "$work/sources/$f" ]; then cp "$work/sources/$f" "$d/.yone-sources/$f"
+    else curl -fsSL --retry 3 -o "$d/.yone-sources/$f" "$url" >> "$lf" 2>&1 || true; cp "$d/.yone-sources/$f" "$work/sources/$f" 2> /dev/null || true
+    fi
+  done < <(grep '^source = ' "$d/YONEBUILD")
+  while grep -q '^sha256 = TODO' "$d/YONEBUILD"; do
+    i=$((i + 1))
+    f=$(grep '^source = ' "$d/YONEBUILD" | sed -n "${i}p" | sed 's/^source = //'); f=${f%%::*}; f=$(basename "$f")
+    sed -i "0,/^sha256 = TODO$/s//sha256 = $(sha256sum "$d/.yone-sources/$f" | cut -d' ' -f1)/" "$d/YONEBUILD"
+  done
   timeout --kill-after=1m "${ARCH_PACKAGE_TIMEOUT:-150m}" setsid --wait chroot "$sys" /usr/bin/env -i \
     HOME=/root TERM=xterm LC_ALL=C.UTF-8 PATH=/usr/bin:/usr/sbin:/usr/local/bin MAKEFLAGS="-j$(nproc)" \
     /usr/local/bin/yone build "/packages/recipes/$name" --out /packages/repo --sign /packages/key.key \
