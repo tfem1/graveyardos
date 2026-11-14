@@ -37,7 +37,7 @@ impl Ui {
         }
     }
     pub fn accent(&self, s: &str) -> String {
-        self.paint("1;38;5;141", s)
+        self.paint("1;97", s) // GraveyardOS: white on black
     }
     pub fn bold(&self, s: &str) -> String {
         self.paint("1", s)
@@ -86,14 +86,59 @@ impl Ui {
         Ok(a.is_empty() || a == "y" || a == "yes" || a == "o" || a == "oui")
     }
 
+    /// A smooth bar: white blocks to an eighth of a character, on grey.
     pub fn bar(&self, frac: f64, width: usize) -> String {
-        let f = frac.clamp(0.0, 1.0);
-        let filled = (f * width as f64).round() as usize;
-        format!(
-            "{}{}",
-            self.accent(&"━".repeat(filled)),
-            self.dim(&"─".repeat(width - filled))
-        )
+        const PARTS: [&str; 8] = ["", "▏", "▎", "▍", "▌", "▋", "▊", "▉"];
+        let eighths = (frac.clamp(0.0, 1.0) * (width * 8) as f64).round() as usize;
+        let (full, part) = (eighths / 8, eighths % 8);
+        let mut filled = "█".repeat(full);
+        let mut used = full;
+        if full < width && part > 0 {
+            filled.push_str(PARTS[part]);
+            used += 1;
+        }
+        let empty = "░".repeat(width.saturating_sub(used));
+        if self.color {
+            format!("\x1b[97m{filled}\x1b[0m\x1b[38;5;238m{empty}\x1b[0m")
+        } else {
+            format!("{filled}{empty}")
+        }
+    }
+
+    /// The one-line status of a long operation, redrawn in place:
+    ///   verb  ████████▌░░░░░░░  12/84  52%  detail
+    pub fn status(&self, verb: &str, frac: f64, count: &str, detail: &str) {
+        let width = terminal_width();
+        let mut line = format!(
+            " {} {}  {}  {:>3}%",
+            self.bold(&format!("{verb:<11}")),
+            self.bar(frac, 28),
+            self.dim(count),
+            (frac.clamp(0.0, 1.0) * 100.0).round() as u32
+        );
+        // the detail fills what is left of the line, cut on the left
+        let used = 1 + 11 + 1 + 28 + 2 + count.chars().count() + 2 + 4 + 2;
+        if width > used + 4 {
+            let room = width - used;
+            // "name › path": the name stays, the path is cut on its left
+            let (keep, cut) = match detail.find(" › ") {
+                Some(i) => detail.split_at(i + " › ".len()),
+                None => ("", detail),
+            };
+            let keep_n = keep.chars().count();
+            let c: Vec<char> = cut.chars().collect();
+            let shown: String = if keep_n + c.len() <= room {
+                detail.to_string()
+            } else if room > keep_n + 2 {
+                let n = room - keep_n - 1;
+                format!("{keep}…{}", c[c.len() - n..].iter().collect::<String>())
+            } else {
+                detail.chars().take(room).collect()
+            };
+            line.push_str("  ");
+            line.push_str(&self.dim(&shown));
+        }
+        self.progress(&line);
     }
 
     pub fn progress(&self, line: &str) {
@@ -107,6 +152,36 @@ impl Ui {
             eprint!("\r\x1b[2K");
             io::stderr().flush().ok();
         }
+    }
+}
+
+/// Columns of the terminal on stderr (80 when it cannot be read).
+fn terminal_width() -> usize {
+    #[repr(C)]
+    struct WinSize {
+        row: u16,
+        col: u16,
+        x: u16,
+        y: u16,
+    }
+    extern "C" {
+        fn ioctl(fd: i32, req: u64, ...) -> i32;
+    }
+    let mut w = WinSize {
+        row: 0,
+        col: 0,
+        x: 0,
+        y: 0,
+    };
+    // TIOCGWINSZ on Linux
+    let ok = unsafe { ioctl(2, 0x5413, &mut w as *mut WinSize) } == 0;
+    if ok && w.col > 20 {
+        w.col as usize
+    } else {
+        std::env::var("COLUMNS")
+            .ok()
+            .and_then(|c| c.parse().ok())
+            .unwrap_or(80)
     }
 }
 

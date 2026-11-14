@@ -715,7 +715,9 @@ fn run_plan(
     let mut journal = Journal::create(cfg)?;
     let root_canon = fs::canonicalize(&cfg.root).ctx(|| format!("root {}", cfg.root.display()))?;
     let total = plan.len();
+    let total_bytes: u64 = plan.iter().map(|it| it.info.isize).sum();
     let result: Result<Vec<(Installed, Vec<FileRec>)>> = (|| {
+        let mut base_bytes = 0u64;
         let mut out = vec![];
         let mut dir_ok: HashSet<PathBuf> = HashSet::new();
         let mut fault_budget = fault_injection();
@@ -730,11 +732,19 @@ fn run_plan(
             } else {
                 HashMap::new()
             };
-            ui.stage(
-                n + 1,
+            if !ui.tty {
+                ui.stage(
+                    n + 1,
+                    total,
+                    &format!("{} {}", it.info.name, it.info.version),
+                );
+            }
+            let prog = Progress {
+                n: n + 1,
                 total,
-                &format!("{} {}", it.info.name, it.info.version),
-            );
+                base: base_bytes,
+                total_bytes,
+            };
             let recs = extract(
                 cfg,
                 ui,
@@ -747,7 +757,18 @@ fn run_plan(
                 &old_files,
                 &mut fault_budget,
                 &mut owners,
+                &prog,
             )?;
+            base_bytes += it.info.isize;
+            if ui.tty {
+                ui.progress_end();
+                eprintln!(
+                    "  {} {} {}",
+                    ui.green("✓"),
+                    it.info.name,
+                    ui.dim(&it.info.version)
+                );
+            }
             // reasons only ever widen (dependency -> explicit), except that
             // an explicit reinstall keeps the existing reason (see install())
             let explicit = match &old {
@@ -1014,6 +1035,15 @@ fn place(j: &mut Journal, tmp: &Path, target: &Path) -> Result<()> {
 }
 
 #[allow(clippy::too_many_arguments)]
+/// Where one package stands in its transaction, for the progress bar.
+struct Progress {
+    n: usize,
+    total: usize,
+    base: u64,
+    total_bytes: u64,
+}
+
+#[allow(clippy::too_many_arguments)]
 fn extract(
     cfg: &Config,
     ui: &Ui,
@@ -1026,6 +1056,7 @@ fn extract(
     old_files: &HashMap<String, FileRec>,
     fault: &mut Option<usize>,
     owners: &mut Owners,
+    prog: &Progress,
 ) -> Result<Vec<FileRec>> {
     let mut tr = archive::open_tar(file)?;
     let mut planned = planned.iter();
@@ -1199,17 +1230,18 @@ fn extract(
             }
         }
         if ui.tty && throttle.ready() {
-            let frac = if info.isize > 0 {
-                done_bytes as f64 / info.isize as f64
+            // the whole transaction, by installed size
+            let frac = if prog.total_bytes > 0 {
+                (prog.base + done_bytes.min(info.isize)) as f64 / prog.total_bytes as f64
             } else {
-                0.0
+                (prog.n - 1) as f64 / prog.total.max(1) as f64
             };
-            ui.progress(&format!(
-                "     {} {:>3}%  {}",
-                ui.bar(frac, 28),
-                (frac * 100.0).round() as u32,
-                ui.dim(&e.path)
-            ));
+            ui.status(
+                "installing",
+                frac,
+                &format!("{}/{}", prog.n, prog.total),
+                &format!("{} › {}", info.name, e.path),
+            );
         }
     }
     tr.into_inner()

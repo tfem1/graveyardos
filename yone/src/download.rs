@@ -152,15 +152,17 @@ pub fn fetch_all(jobs: Vec<Job>, parallel: usize, ui: &Ui) -> Result<()> {
             } else {
                 "0:00".into()
             };
-            ui.progress(&format!(
-                " {} {} {:>3}%  {:>10}/s  ETA {}  {}",
-                ui.dim(&format!("[{done}/{n}]")),
-                ui.bar(frac, 28),
-                (frac * 100.0).round() as u32,
-                human_bytes(speed as u64),
-                eta,
-                ui.dim(&human_bytes(bytes))
-            ));
+            ui.status(
+                "downloading",
+                frac,
+                &format!("{done}/{n}"),
+                &format!(
+                    "{}/s  ETA {}  {}",
+                    human_bytes(speed as u64),
+                    eta,
+                    human_bytes(bytes)
+                ),
+            );
         }
         if finished {
             break;
