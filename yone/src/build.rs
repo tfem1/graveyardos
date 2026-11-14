@@ -576,3 +576,52 @@ pub fn repo_index(dir: &Path, name: &str, key: Option<&Path>, ui: &Ui) -> Result
     ));
     Ok(())
 }
+
+#[cfg(test)]
+mod manifest_tests {
+    use super::*;
+    use std::os::unix::fs::{symlink, PermissionsExt};
+
+    /// The file list a package carries is exactly what its content holds.
+    #[test]
+    fn manifest_matches_content() {
+        let t = std::env::temp_dir().join(format!("yone-manifest-{}", std::process::id()));
+        let _ = fs::remove_dir_all(&t);
+        let pkg = t.join("pkg");
+        let long = format!("usr/share/{}/{}", "d".repeat(90), "f".repeat(80));
+        fs::create_dir_all(pkg.join(&long).parent().unwrap()).unwrap();
+        fs::write(pkg.join(&long), b"long").unwrap();
+        fs::create_dir_all(pkg.join("usr/bin")).unwrap();
+        fs::write(pkg.join("usr/bin/tool"), b"#!/bin/sh\n").unwrap();
+        fs::set_permissions(pkg.join("usr/bin/tool"), fs::Permissions::from_mode(0o4755)).unwrap();
+        symlink("tool", pkg.join("usr/bin/alias")).unwrap();
+        let mut info = PkgInfo {
+            name: "m".into(),
+            version: "1-1".into(),
+            arch: "x86_64".into(),
+            ..Default::default()
+        };
+        let out = t.join("m.yon");
+        write_package(&mut info, &pkg, &out, "zstd", 0).unwrap();
+
+        let listed = archive::list(&out).unwrap().entries;
+        let mut tr = archive::open_tar(&out).unwrap();
+        let mut scanned = vec![];
+        while let Some(mut e) = tr.next_entry().unwrap() {
+            if e.path == INFO_NAME || e.path == FILES_NAME {
+                continue;
+            }
+            e.path = util::safe_rel_path(&e.path).unwrap();
+            scanned.push(e);
+        }
+        assert_eq!(listed.len(), scanned.len());
+        assert!(listed.iter().any(|e| e.path == long));
+        for (a, b) in listed.iter().zip(&scanned) {
+            assert_eq!(
+                (&a.path, &a.kind, a.mode, a.size, &a.owner, &a.xattrs),
+                (&b.path, &b.kind, b.mode, b.size, &b.owner, &b.xattrs)
+            );
+        }
+        let _ = fs::remove_dir_all(&t);
+    }
+}
