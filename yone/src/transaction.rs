@@ -1191,13 +1191,12 @@ fn resolve_entry(root: &Path, path: &str, kind: &Kind) -> Result<String> {
 
 /// Move the new object (already written at `tmp`) into place, keeping the
 /// previous one aside for rollback.
-fn place(j: &Journal, tmp: &Path, target: &Path) -> Result<()> {
+/// `tmp_is_link`: what was just written at `tmp` is a symlink.
+fn place(j: &Journal, tmp: &Path, target: &Path, tmp_is_link: bool) -> Result<()> {
     let old = fs::symlink_metadata(target);
-    let link_involved = old
-        .as_ref()
-        .map(|m| m.file_type().is_symlink())
-        .unwrap_or(false)
-        || fs::symlink_metadata(tmp)
+    let link_involved = tmp_is_link
+        || old
+            .as_ref()
             .map(|m| m.file_type().is_symlink())
             .unwrap_or(false);
     if link_involved {
@@ -1390,7 +1389,7 @@ fn extract(
                     });
                     continue;
                 }
-                place(j, &tmp, &target)?;
+                place(j, &tmp, &target, false)?;
                 recs.push(FileRec {
                     kind: 'f',
                     mode: e.mode,
@@ -1406,7 +1405,7 @@ fn extract(
                 std::os::unix::fs::symlink(t, &tmp)
                     .ctx(|| format!("symlink {}", target.display()))?;
                 let owner = lock(owners).apply(ui, &tmp, &e.owner, &rel)?;
-                place(j, &tmp, &target)?;
+                place(j, &tmp, &target, true)?;
                 recs.push(FileRec {
                     kind: 'l',
                     mode: 0o777,
@@ -1427,7 +1426,7 @@ fn extract(
                 j.rec('T', &target)?;
                 let _ = fs::remove_file(&tmp);
                 fs::hard_link(&src, &tmp).ctx(|| format!("link {}", target.display()))?;
-                place(j, &tmp, &target)?;
+                place(j, &tmp, &target, false)?;
                 let sha = sha256::file_hex(&target)?;
                 recs.push(FileRec {
                     kind: 'f',
