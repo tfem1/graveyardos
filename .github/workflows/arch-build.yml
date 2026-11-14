@@ -1,8 +1,8 @@
 # Builds the packages of the desktop images from Arch Linux's recipes
 # (arch/order: both desktops and what they need to be built), in the
 # GraveyardOS base system, as many as one job's time allows; then starts the
-# next pass with what this one built, until every package is built, failed,
-# or skipped because a build dependency failed (arch/build-wave.sh).
+# next pass with what this one built, until every package is built
+# and a pass builds nothing new (arch/build-wave.sh).
 name: arch-build
 
 on:
@@ -79,7 +79,7 @@ jobs:
           sudo mkdir -p /mnt/arch-work && sudo chown -R root:root /mnt/arch-work
           sudo -E YONE="$YONE" bash arch/build-wave.sh "$LFS" /mnt/arch-work 17400 | tee "$RUNNER_TEMP/pass.txt"
           {
-            echo '## This pass'; echo '```'; tail -n 1 "$RUNNER_TEMP/pass.txt"; echo '```'
+            echo '## This pass'; echo '```'; tail -n 2 "$RUNNER_TEMP/pass.txt"; echo '```'
             echo '## Failed'; echo '```'; cut -c1-180 /mnt/arch-work/failed | tail -n 60; echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
 
@@ -111,10 +111,10 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          left=$(grep -cvxF -f <(cat /mnt/arch-work/done /mnt/arch-work/failed /mnt/arch-work/skipped | cut -f1) arch/order || true)
-          tried=$(grep -c '^   ' "$RUNNER_TEMP/pass.txt" || true)
-          echo "left: $left, tried this pass: $tried"
-          if [ "$left" -gt 0 ] && [ "$tried" -gt 0 ]; then
+          left=$(grep -cvxF -f /mnt/arch-work/done arch/order || true)
+          built=$(sed -n 's/^built this pass: \([0-9]*\).*/\1/p' "$RUNNER_TEMP/pass.txt")
+          echo "left: $left, built this pass: ${built:-0}"
+          if [ "$left" -gt 0 ] && [ "${built:-0}" -gt 0 ]; then
             gh workflow run arch-build.yml --ref "$GITHUB_REF_NAME" \
               -f base_run="${{ inputs.base_run }}" -f prev_run="${{ github.run_id }}" -f chain=true
           fi

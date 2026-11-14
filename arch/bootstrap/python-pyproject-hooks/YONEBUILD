@@ -1,0 +1,12 @@
+# replaces: python-pyproject-hooks
+name = python-pyproject-hooks
+version = 1.3.3
+release = 0
+desc = pyproject-hooks for Python (bootstrap, from its wheel)
+url = https://pypi.org/project/pyproject-hooks/
+source = pyproject_hooks-1.3.3-py3-none-any.whl::https://files.pythonhosted.org/packages/85/11/044d1ae1b4ec0d7af88ee5bc91e081be1022533032b906a7bdabdbb60977/pyproject_hooks-1.3.3-py3-none-any.whl
+sha256 = 5fc53fdac9f7bd63fbcdc868fb5f90b4784d78a53a3d3388cd738b807441a20b
+noextract = pyproject_hooks-1.3.3-py3-none-any.whl
+
+@package
+python3 -m pip install --no-deps --no-index --no-compile --root "$PKGDIR" --prefix /usr "$SRCDIR/pyproject_hooks-1.3.3-py3-none-any.whl"

@@ -1,0 +1,9 @@
+# What the GraveyardOS base system has (its 84 packages, by name): the build
+# system declares them to Yone with one package that provides them all, so
+# Arch packages depending on glibc, bash, perl... install over the base.
+filesystem man-pages iana-etc glibc zlib bzip2 xz lz4 zstd file readline pcre2 m4 bc flex tcl expect dejagnu
+ninja pkgconf binutils gmp mpfr mpc attr acl libcap libxcrypt shadow gawk gcc ncurses sed psmisc gettext bison
+grep bash libtool gdbm gperf expat inetutils less perl autoconf automake openssl libelf libffi sqlite mpdecimal
+python flit-core packaging wheel setuptools meson kmod coreutils diffutils findutils groff grub gzip iproute2 kbd
+libpipeline make patch tar texinfo vim markupsafe jinja2 systemd dbus man-db procps util-linux e2fsprogs sudo
+dosfstools

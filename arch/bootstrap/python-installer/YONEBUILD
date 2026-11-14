@@ -1,0 +1,12 @@
+# replaces: python-installer
+name = python-installer
+version = 1.1.0
+release = 0
+desc = installer for Python (bootstrap, from its wheel)
+url = https://pypi.org/project/installer/
+source = installer-1.1.0-py3-none-any.whl::https://files.pythonhosted.org/packages/d7/7a/63547a792a12148882205d79e07644091d5b7690f40c2bb9d41452a8bdc2/installer-1.1.0-py3-none-any.whl
+sha256 = f55f5728ff61d3dd54dbc5a397cf3f7307cb64b180c20b72afbebf01c9e2c8a0
+noextract = installer-1.1.0-py3-none-any.whl
+
+@package
+python3 -m pip install --no-deps --no-index --no-compile --root "$PKGDIR" --prefix /usr "$SRCDIR/installer-1.1.0-py3-none-any.whl"

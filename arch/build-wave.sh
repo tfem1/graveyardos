@@ -8,12 +8,12 @@
 #           installed into it as they are built, so the next ones find their
 #           build dependencies (it is a throwaway copy)
 #   work    the state carried from pass to pass: repo/ (signed .yon files and
-#           index), key.*, done, failed, skipped; plus logs/ for this pass
+#           index), archkey.*, done, failed; plus logs/ for this pass
 #
 # Each package base of arch/order is imported (arch/import.py), built with
-# Yone in a chroot, then installed. A base whose build dependency failed is
-# skipped, and the pass goes on. Exit status 0 when the budget ran out or
-# nothing was left; the caller compares done/failed/skipped with arch/order.
+# Yone in a chroot, then installed. What fails is tried again by the next
+# pass (its build dependencies may be there by then). Exit status 0 when the
+# budget ran out or nothing was left.
 set -euo pipefail
 HERE=$(cd "$(dirname "$0")" && pwd)
 REPO=$(cd "$HERE/.." && pwd)
@@ -21,7 +21,10 @@ sys=$(realpath "${1:?system}") work=${2:?work} budget=${3:?seconds}
 yone=${YONE:?a static yone binary (YONE=...)}
 mkdir -p "$work" && work=$(realpath "$work")
 mkdir -p "$work/repo" "$work/logs" "$work/recipes" "$work/arch-repos" "$work/sources"
-touch "$work/done" "$work/failed" "$work/skipped"
+touch "$work/done" "$work/failed"
+# a package that failed may build now that more is built: every pass tries
+# again all that is not done
+mv "$work/failed" "$work/failed.before"; : > "$work/failed"
 : > "$work/logs/.keep"
 start=$SECONDS
 log() { printf '\033[1;35m==>\033[0m %s\n' "$*"; }
@@ -60,14 +63,61 @@ if ls "$work"/repo/*.yon > /dev/null 2>&1; then
     || { echo "reinstall failed:"; tail -n 20 "$work/logs/reinstall.log"; exit 1; }
 fi
 
+# build one recipe directory in the chroot and install what it made
+build_dir() { # recipe dir (host path), log
+  local src=$1 lf=$2 name d
+  name=$(sed -n 's/^name = //p' "$src/YONEBUILD")
+  d=$sys/packages/recipes/$name
+  rm -rf "$d"; mkdir -p "$d/.yone-sources"; cp -a "$src/." "$d/"
+  # a source not pinned yet: pinned to what is downloaded now (bootstrap)
+  if grep -q '^sha256 = TODO' "$d/YONEBUILD"; then
+    local url f
+    url=$(sed -n 's/^source = \(.*::\)\{0,1\}//p' "$d/YONEBUILD" | head -n 1)
+    f=$d/.yone-sources/$(basename "$url")
+    curl -fsSL --retry 3 -o "$f" "$url"
+    sed -i "s/^sha256 = TODO$/sha256 = $(sha256sum "$f" | cut -d' ' -f1)/" "$d/YONEBUILD"
+  fi
+  timeout --kill-after=1m "${ARCH_PACKAGE_TIMEOUT:-150m}" setsid --wait chroot "$sys" /usr/bin/env -i \
+    HOME=/root TERM=xterm LC_ALL=C.UTF-8 PATH=/usr/bin:/usr/sbin:/usr/local/bin MAKEFLAGS="-j$(nproc)" \
+    /usr/local/bin/yone build "/packages/recipes/$name" --out /packages/repo --sign /packages/key.key \
+    --compress zstd --color never < /dev/null >> "$lf" 2>&1 || return 1
+  index
+  inroot /usr/local/bin/yone --noconfirm --overwrite --color never refresh >> "$lf" 2>&1 &&
+    inroot /usr/local/bin/yone --noconfirm --overwrite --color never install "$name" >> "$lf" 2>&1
+}
+
+# The base system, declared to Yone: one package that provides every base
+# package's name, so packages depending on glibc, perl... install.
+if ! grep -qx graveyard-base-provides "$work/done"; then
+  r=$work/recipes/graveyard-base-provides; mkdir -p "$r"
+  {
+    echo "name = graveyard-base-provides"; echo "version = 1"; echo "release = 1"
+    echo "desc = The GraveyardOS base system, installed by the image itself"
+    echo "provides = $(grep -v '^#' "$HERE/base-provides" | tr '\n' ' ' | tr -s ' ')"
+    echo; echo "@package"; echo 'mkdir -p "$PKGDIR/usr/share/graveyard"; echo base > "$PKGDIR/usr/share/graveyard/base-provides"'
+  } > "$r/YONEBUILD"
+  build_dir "$r" "$work/logs/graveyard-base-provides.log" || { tail -n 20 "$work/logs/graveyard-base-provides.log"; exit 1; }
+  echo graveyard-base-provides >> "$work/done"
+fi
+
+# Tools Arch builds with themselves, from arch/bootstrap first.
+for r in "$HERE"/bootstrap/python-pyproject-hooks "$HERE"/bootstrap/python-installer "$HERE"/bootstrap/python-build "$HERE"/bootstrap/cmake; do
+  b=$(basename "$r")
+  grep -qx "$b" "$work/done" && continue
+  printf '   %-30s ' "$b (bootstrap)"
+  if build_dir "$r" "$work/logs/$b.log"; then
+    sed -n 's/^# replaces: //p' "$r/YONEBUILD" | tr ' ' '\n' | grep . >> "$work/done"; echo ok
+  else
+    echo FAIL; tail -n 15 "$work/logs/$b.log"
+  fi
+done
+
 needs() { awk -F'\t' -v b="$1" '$1 == b { print $2 }' "$HERE/needs"; }
-state() { grep -qx "$1" "$work/done" "$work/failed" "$work/skipped" 2> /dev/null; }
-listed() { cut -f1 "$work/$2" | grep -qx "$1"; }
 
 n=0 okn=0
 while read -r base; do
   [ -n "$base" ] || continue
-  if state "$base" || listed "$base" failed || listed "$base" skipped; then continue; fi
+  if grep -qx "$base" "$work/done"; then continue; fi
   if [ $((SECONDS - start)) -ge "$budget" ]; then log "time budget spent"; break; fi
   # twelve tries and nothing built: something general is wrong, not a package
   if [ "$n" -ge 12 ] && [ "$okn" -eq 0 ]; then
@@ -75,11 +125,6 @@ while read -r base; do
     for f in "$work"/logs/*.log; do echo "---- $f"; tail -n 15 "$f"; done | head -n 120
     exit 1
   fi
-  blocked=""
-  for d in $(needs "$base"); do
-    if listed "$d" failed || listed "$d" skipped; then blocked=$d; break; fi
-  done
-  if [ -n "$blocked" ]; then printf '%s\tneeds %s\n' "$base" "$blocked" >> "$work/skipped"; continue; fi
   n=$((n + 1)); t0=$SECONDS
   printf '   %-30s ' "$base"
   lf=$work/logs/$base.log
@@ -91,33 +136,17 @@ while read -r base; do
   mapfile -t names < <(echo "$out" | sed -n 's/^[^ ]* *ok: //p' | tr ' ' '\n' | grep .)
   ok=1
   for name in "${names[@]}"; do
-    d=$sys/packages/recipes/$name
-    rm -rf "$d"; mkdir -p "$d/.yone-sources"; cp -a "$work/recipes/$name/." "$d/"
-    # the sources the importer downloaded, where yone looks first
-    for f in $(sed -n 's|^source = \([^:/]*\)::.*|\1|p; s|^source = .*/\([^/]*\)$|\1|p' "$d/YONEBUILD"); do
-      [ -e "$work/sources/$f" ] && cp "$work/sources/$f" "$d/.yone-sources/$f"
-    done
-    if ! timeout --kill-after=1m "${ARCH_PACKAGE_TIMEOUT:-150m}" setsid --wait chroot "$sys" /usr/bin/env -i \
-        HOME=/root TERM=xterm LC_ALL=C.UTF-8 PATH=/usr/bin:/usr/sbin:/usr/local/bin MAKEFLAGS="-j$(nproc)" \
-        /usr/local/bin/yone build "/packages/recipes/$name" --out /packages/repo --sign /packages/key.key \
-        --compress zstd --color never < /dev/null >> "$lf" 2>&1; then
-      ok=0; break
-    fi
+    build_dir "$work/recipes/$name" "$lf" || { ok=0; break; }
   done
   if [ "$ok" = 1 ]; then
-    index
-    if inroot /usr/local/bin/yone --noconfirm --overwrite --color never refresh >> "$lf" 2>&1 \
-       && inroot /usr/local/bin/yone --noconfirm --overwrite --color never install "${names[@]}" >> "$lf" 2>&1; then
-      echo "$base" >> "$work/done"; okn=$((okn + 1)); printf 'ok   %5ds\n' $((SECONDS - t0))
-      continue
-    fi
-    printf '%s\tinstall: %s\n' "$base" "$(tail -n 1 "$lf" | cut -c1-200)" >> "$work/failed"; echo "INSTALL FAILED"
+    echo "$base" >> "$work/done"; okn=$((okn + 1)); printf 'ok   %5ds\n' $((SECONDS - t0))
   else
-    printf '%s\tbuild: %s\n' "$base" "$(grep -v '^\s*$' "$lf" | tail -n 1 | cut -c1-200)" >> "$work/failed"
+    printf '%s\t%s\n' "$base" "$(grep -v '^\s*$' "$lf" | tail -n 1 | cut -c1-200)" >> "$work/failed"
     printf 'FAIL %5ds\n' $((SECONDS - t0))
   fi
 done < "$HERE/order"
 
 total=$(grep -c . "$HERE/order")
 echo
-echo "this pass: $n tried; overall: $(grep -c . "$work/done") built, $(grep -c . "$work/failed") failed, $(grep -c . "$work/skipped") skipped, of $total"
+echo "built this pass: $okn (of $n tried)"
+echo "overall: $(grep -c . "$work/done") done, $(grep -c . "$work/failed") failing, of $total package bases"

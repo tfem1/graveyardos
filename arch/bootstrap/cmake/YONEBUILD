@@ -1,0 +1,20 @@
+# replaces: cmake
+# CMake with its own bundled libraries (no system curl, libarchive, jsoncpp...)
+name = cmake
+version = 4.4.2
+release = 0
+desc = Cross-platform make (bootstrap, bundled libraries)
+url = https://cmake.org
+license = BSD-3-Clause
+source = https://cmake.org/files/v4.4/cmake-4.4.2.tar.gz
+sha256 = TODO
+
+@build
+cd cmake-4.4.2
+./bootstrap --prefix=/usr --mandir=/share/man --docdir=/share/doc/cmake \
+  --no-system-libs --parallel="$(nproc)" -- -DCMAKE_USE_OPENSSL=ON
+make
+
+@package
+cd cmake-4.4.2
+make DESTDIR="$PKGDIR" install

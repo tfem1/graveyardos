@@ -1,0 +1,12 @@
+# replaces: python-build
+name = python-build
+version = 1.6.1
+release = 0
+desc = build for Python (bootstrap, from its wheel)
+url = https://pypi.org/project/build/
+source = build-1.6.1-py3-none-any.whl::https://files.pythonhosted.org/packages/ad/9b/9fb3585dabcd73a1b2a6267f63f62649347c9e6d072c9fde365b105abb2c/build-1.6.1-py3-none-any.whl
+sha256 = ecd351a4be9d35a9eaaba244a7687143c9c7d4aea6ac964e7e7ddab20cbcf4e7
+noextract = build-1.6.1-py3-none-any.whl
+
+@package
+python3 -m pip install --no-deps --no-index --no-compile --root "$PKGDIR" --prefix /usr "$SRCDIR/build-1.6.1-py3-none-any.whl"

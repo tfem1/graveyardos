@@ -1,0 +1,5 @@
+Bootstrap recipes: built before arch/order, for the tools Arch builds
+with themselves (cmake needs cmake's own build tools; python-build and
+python-installer need each other). A recipe's "# replaces:" line names the
+Arch package bases it stands for: build-wave.sh counts them as done.
+"sha256 = TODO" is filled in from the downloaded file on first use.
