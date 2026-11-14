@@ -16,7 +16,8 @@ from the downloaded file (--sources keeps the downloads).
 
 Dependency names are Arch's, mapped to GraveyardOS's base where they differ
 (arch/names); library (soname) dependencies are dropped: GraveyardOS records
-packages, not libraries. A package the importer cannot convert (a VCS source,
+packages, not libraries. Git sources are cloned here and packed with their history. A package the
+importer cannot convert (Subversion, Mercurial or Bazaar sources,
 an architecture other than x86_64) is reported and skipped.
 """
 import argparse
@@ -138,23 +139,38 @@ def url_repo_name(src):
     return u.rsplit("/", 1)[-1]
 
 
-def vcs_archive(src):
-    """git+https://host/owner/repo.git#tag=X -> (archive URL, top directory)."""
-    u = src.split("::", 1)[-1]
-    u = re.sub(r"^git\+", "", u)
+def git_snapshot(src, dirname, sources_dir):
+    """A Git source as makepkg would check it out ($srcdir/<dirname>, with
+    its .git: PKGBUILDs cherry-pick, apply and describe), packed in a tarball
+    Yone unpacks. Cloned on this host: the build system has no network."""
+    u = re.sub(r"^git\+", "", src.split("::", 1)[-1])
     frag = u.split("#", 1)[1] if "#" in u else ""
-    base = u.split("#")[0].split("?")[0].rstrip("/")
-    base = re.sub(r"\.git$", "", base)
-    m = re.match(r"(tag|commit)=(.+)", frag)
-    if not m:
-        return None
-    ref = m.group(2)
-    repo = base.rsplit("/", 1)[-1]
-    if base.startswith("https://github.com/"):
-        return f"{base}/archive/{ref}.tar.gz", f"{repo}-{ref.lstrip('v') if m.group(1) == 'tag' else ref}"
-    if re.match(r"https://(gitlab\.[^/]+|invent\.kde\.org|gitlab\.freedesktop\.org|gitlab\.gnome\.org)/", base):
-        return f"{base}/-/archive/{ref}/{repo}-{ref}.tar.gz", f"{repo}-{ref}"
-    return None
+    base = u.split("#")[0].split("?")[0]
+    kind, _, ref = frag.partition("=")
+    mirror = os.path.join(sources_dir, "git", re.sub(r"[^A-Za-z0-9._-]", "_", base))
+    if os.path.isdir(mirror):
+        run(["git", "-C", mirror, "fetch", "-q", "--tags", "--force", "origin", "+refs/heads/*:refs/heads/*"])
+    else:
+        run(["git", "clone", "-q", "--mirror", base, mirror])
+    tag = re.sub(r"[^A-Za-z0-9._-]", "_", f"{kind}-{ref}" if ref else "HEAD")
+    out = os.path.join(sources_dir, f"{dirname}-git-{tag}.tar.gz")
+    if os.path.exists(out) and ref and kind in ("tag", "commit"):
+        return out  # a tag or commit does not move
+    work = out + ".d"
+    shutil.rmtree(work, ignore_errors=True)
+    os.makedirs(work)
+    co = os.path.join(work, dirname)
+    run(["git", "clone", "-q", "--no-checkout", mirror, co])
+    run(["git", "-C", co, "remote", "set-url", "origin", base])
+    target = {"tag": f"refs/tags/{ref}", "commit": ref, "branch": f"origin/{ref}"}.get(kind, "HEAD")
+    run(["git", "-C", co, "-c", "advice.detachedHead=false", "checkout", "-q", target])
+    if kind == "branch":
+        run(["git", "-C", co, "checkout", "-q", "-B", ref])
+    run(["tar", "-C", work, "--sort=name", "--owner=0", "--group=0", "--numeric-owner",
+         "-czf", out + ".part", dirname])
+    os.replace(out + ".part", out)
+    shutil.rmtree(work, ignore_errors=True)
+    return out
 
 
 def convert(pkgbase, cache, out, sources_dir, nmap, no_download=False):
@@ -169,22 +185,20 @@ def convert(pkgbase, cache, out, sources_dir, nmap, no_download=False):
         v = info[keys[0]] + info[keys[1]]
         if len(v) == len(srcs):
             sums[algo] = v
-    lines_src, local, renames = [], [], []
+    lines_src, local = [], []
     for i, s in enumerate(srcs):
         name, _, url = s.rpartition("::") if "::" in s else ("", "", s)
-        rename = None
         if re.match(r"^(svn|hg|bzr)(\+|://)", url):
             return f"skipped: VCS source {url}"
         if re.match(r"^git(\+|://)", url):
-            # A tag or commit of a Git repository: the host's archive of it,
-            # unpacked under the name the clone would have had.
-            arch = vcs_archive(url)
-            if not arch:
-                return f"skipped: Git source without an archive URL: {url}"
-            url, top = arch
-            rename = (top, name or re.sub(r"\.git$", "", url_repo_name(srcs[i])))
-            fname = rename[1] + "-" + os.path.basename(url)
-            name = fname
+            dirname = name or re.sub(r"\.git$", "", url_repo_name(srcs[i]))
+            if no_download:
+                fname, sha = f"{dirname}-git.tar.gz", "TODO"
+            else:
+                path = git_snapshot(s, dirname, sources_dir)
+                fname, sha = os.path.basename(path), checksum(path, "sha256")
+            lines_src.append((f"{fname}::{url}", sha))
+            continue
         else:
             fname = name or url.rsplit("/", 1)[-1]
         if "://" not in url:  # a file of the packaging repository
@@ -194,15 +208,13 @@ def convert(pkgbase, cache, out, sources_dir, nmap, no_download=False):
             continue
         if url.endswith((".sig", ".asc", ".sign")):
             continue  # signatures: the checksums pin the files
-        if rename:
-            renames.append(rename)
         if no_download:
             known = sums.get("sha256", [None] * len(srcs))[i]
-            sha = known if known and known != "SKIP" and not rename else "TODO"
+            sha = known if known and known != "SKIP" else "TODO"
         else:
             path = download(url, os.path.join(sources_dir, fname))
             for algo, vals in sums.items():
-                if not rename and vals[i] != "SKIP" and checksum(path, algo) != vals[i]:
+                if vals[i] != "SKIP" and checksum(path, algo) != vals[i]:
                     raise SystemExit(f"{pkgbase}: {fname}: {algo} does not match the PKGBUILD")
             sha = checksum(path, "sha256")
         lines_src.append((f"{fname}::{url}" if name else url, sha))
@@ -249,13 +261,15 @@ def convert(pkgbase, cache, out, sources_dir, nmap, no_download=False):
             "@package",
             "# --- makepkg's environment",
             FLAGS,
-            'srcdir="$SRCDIR"; pkgdir="$PKGDIR"; startdir="$SRCDIR"; CARCH=x86_64',
+            # makepkg: srcdir is $startdir/src, and the PKGBUILD's own files
+            # are in $startdir too (patches read as ../file)
+            'srcdir="$SRCDIR"; pkgdir="$PKGDIR"; startdir="${SRCDIR%/*}"; CARCH=x86_64',
+            *[f'cp -n "$srcdir"/{shq(f)} "$startdir"/' for f in local],
             "# --- the PKGBUILD, as Arch publishes it",
             "set +u",
             pkgbuild.replace("\r", ""),
             f"pkgname={name}",
             "# --- what makepkg runs",
-            *[f'cd "$srcdir"; mv {shq(t)} {shq(n)}  # a Git tag, as its archive unpacks' for t, n in renames],
             'cd "$srcdir"; if declare -F prepare >/dev/null; then prepare; fi',
             'cd "$srcdir"; if declare -F build >/dev/null; then build; fi',
             f'cd "$srcdir"; {pfunc}',

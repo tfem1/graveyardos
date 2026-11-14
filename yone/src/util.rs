@@ -214,6 +214,41 @@ pub fn set_owner(p: &Path, uid: u32, gid: u32) -> std::io::Result<()> {
     Ok(())
 }
 
+type ResolvedMap = std::collections::HashMap<(PathBuf, String), Vec<String>>;
+
+// A transaction resolves the parent directory of thousands of files that
+// share it: while a ResolveCache is alive, each parent is walked once. The
+// cache is dropped whenever a symbolic link is put in place (the only change
+// that can alter a resolution) and when the guard ends.
+thread_local! {
+    static RESOLVED: std::cell::RefCell<Option<ResolvedMap>> = const { std::cell::RefCell::new(None) };
+}
+
+/// Caches path resolutions until dropped (see above).
+pub struct ResolveCache;
+
+impl ResolveCache {
+    pub fn enable() -> ResolveCache {
+        RESOLVED.with(|c| *c.borrow_mut() = Some(Default::default()));
+        ResolveCache
+    }
+}
+
+impl Drop for ResolveCache {
+    fn drop(&mut self) {
+        RESOLVED.with(|c| *c.borrow_mut() = None);
+    }
+}
+
+/// Forget cached resolutions (a symbolic link was created or replaced).
+pub fn forget_resolutions() {
+    RESOLVED.with(|c| {
+        if let Some(m) = c.borrow_mut().as_mut() {
+            m.clear();
+        }
+    });
+}
+
 /// Resolve the directories of a package path inside `root` the way a
 /// chroot would: absolute symlinks are relative to `root`, `..` never climbs
 /// above it. The last component is not followed (it is what gets replaced).
@@ -225,6 +260,12 @@ pub fn resolve_in_root(root: &Path, rel: &str) -> Result<String> {
         Some((p, n)) => (p, n),
         None => return Ok(rel),
     };
+    let key = (root.to_path_buf(), parent.to_string());
+    if let Some(stack) = RESOLVED.with(|c| c.borrow().as_ref().and_then(|m| m.get(&key).cloned())) {
+        let mut stack = stack;
+        stack.push(name.to_string());
+        return Ok(stack.join("/"));
+    }
     let mut queue: std::collections::VecDeque<String> =
         parent.split('/').map(str::to_string).collect();
     let mut stack: Vec<String> = vec![];
@@ -259,6 +300,11 @@ pub fn resolve_in_root(root: &Path, rel: &str) -> Result<String> {
             _ => stack.push(c),
         }
     }
+    RESOLVED.with(|c| {
+        if let Some(m) = c.borrow_mut().as_mut() {
+            m.insert(key, stack.clone());
+        }
+    });
     stack.push(name.to_string());
     Ok(stack.join("/"))
 }

@@ -622,6 +622,8 @@ fn run_plan(
     }
 
     // 3. listings + metadata binding + conflicts
+    // resolutions are cached from here to the end of the extraction
+    let resolve_cache = util::ResolveCache::enable();
     ui.header("Checking file conflicts");
     let owners = db.owners()?;
     let mut claimed: HashMap<String, String> = HashMap::new();
@@ -787,6 +789,7 @@ fn run_plan(
         }
         Ok(out)
     })();
+    drop(resolve_cache);
     let done = match result {
         Ok(d) => d,
         Err(e) => {
@@ -1024,7 +1027,18 @@ fn resolve_entry(root: &Path, path: &str, kind: &Kind) -> Result<String> {
 /// Move the new object (already written at `tmp`) into place, keeping the
 /// previous one aside for rollback.
 fn place(j: &mut Journal, tmp: &Path, target: &Path) -> Result<()> {
-    if fs::symlink_metadata(target).is_ok() {
+    let old = fs::symlink_metadata(target);
+    let link_involved = old
+        .as_ref()
+        .map(|m| m.file_type().is_symlink())
+        .unwrap_or(false)
+        || fs::symlink_metadata(tmp)
+            .map(|m| m.file_type().is_symlink())
+            .unwrap_or(false);
+    if link_involved {
+        util::forget_resolutions();
+    }
+    if old.is_ok() {
         j.rec('B', target)?;
         fs::rename(target, util::suffixed(target, ".yone-old"))
             .ctx(|| format!("move aside {}", target.display()))?;
@@ -1064,7 +1078,7 @@ fn extract(
     let mut done_bytes = 0u64;
     let mut throttle = Throttle::new();
     while let Some(e) = tr.next_entry().ctx(|| file.display().to_string())? {
-        if e.path == archive::INFO_NAME {
+        if e.path == archive::INFO_NAME || e.path == archive::FILES_NAME {
             continue;
         }
         check_interrupted()?;
@@ -1083,7 +1097,28 @@ fn extract(
         // The conflict check ran on the paths resolved before extraction. A
         // symlinked directory created meanwhile (by this or an earlier package
         // of the transaction) must not redirect a file somewhere unchecked.
-        if planned.next().map(|p| p.path.as_str()) != Some(rel.as_str()) {
+        let plan = planned.next();
+        // the conflict check may have read the package's file list instead of
+        // its content: the content must be exactly what the list says
+        if let Some(p) = plan {
+            let same_kind = match (&p.kind, &e.kind) {
+                (Kind::Hardlink(a), Kind::Hardlink(b)) => util::safe_rel_path(b)? == *a,
+                (a, b) => a == b,
+            };
+            if !same_kind
+                || p.mode != e.mode
+                || p.size != e.size
+                || p.owner != e.owner
+                || p.xattrs != e.xattrs
+            {
+                bail!(
+                    "{}: /{} differs from the package's file list; refusing a damaged package",
+                    info.name,
+                    spelled
+                );
+            }
+        }
+        if plan.map(|p| p.path.as_str()) != Some(rel.as_str()) {
             bail!(
                 "{}: /{} would be redirected to /{} by a symlink installed in the same \
                  transaction; refusing",
@@ -1126,14 +1161,19 @@ fn extract(
                 let tmp = util::suffixed(&target, ".yone-new");
                 j.rec('T', &target)?;
                 let sha = {
-                    // never write through something already sitting at the temp path
-                    let _ = fs::remove_file(&tmp);
-                    let out = OpenOptions::new()
-                        .write(true)
-                        .create_new(true)
-                        .open(&tmp)
-                        .ctx(|| format!("create {}", tmp.display()))?;
-                    let mut w = HashingWriter::new(BufWriter::new(out));
+                    // never write through something already sitting at the
+                    // temp path: create it new, removing a leftover only when
+                    // there is one (one system call per file, not two)
+                    let create = || OpenOptions::new().write(true).create_new(true).open(&tmp);
+                    let out = match create() {
+                        Err(e) if e.kind() == std::io::ErrorKind::AlreadyExists => {
+                            fs::remove_file(&tmp)?;
+                            create()
+                        }
+                        r => r,
+                    }
+                    .ctx(|| format!("create {}", tmp.display()))?;
+                    let mut w = HashingWriter::new(BufWriter::with_capacity(1 << 18, out));
                     tr.copy_data(&mut w)?;
                     w.flush()?;
                     w.hasher.finalize_hex()

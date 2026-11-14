@@ -101,17 +101,19 @@ build_dir() { # recipe dir (host path), log
 if ! grep -qx graveyard-base-provides "$work/done"; then
   r=$work/recipes/graveyard-base-provides; mkdir -p "$r"
   {
-    echo "name = graveyard-base-provides"; echo "version = 1"; echo "release = 1"
+    echo "name = graveyard-base-provides"; echo "version = 2"; echo "release = 1"
     echo "desc = The GraveyardOS base system, installed by the image itself"
     echo "provides = $(grep -v '^#' "$HERE/base-provides" | tr '\n' ' ' | tr -s ' ')"
     echo; echo "@package"; echo 'mkdir -p "$PKGDIR/usr/share/graveyard"; echo base > "$PKGDIR/usr/share/graveyard/base-provides"'
+    # Arch's python package is python 3 under the name "python"
+    echo 'mkdir -p "$PKGDIR/usr/bin"; ln -s python3 "$PKGDIR/usr/bin/python"'
   } > "$r/YONEBUILD"
   build_dir "$r" "$work/logs/graveyard-base-provides.log" || { tail -n 20 "$work/logs/graveyard-base-provides.log"; exit 1; }
   echo graveyard-base-provides >> "$work/done"
 fi
 
 # Tools Arch builds with themselves, from arch/bootstrap first.
-for r in "$HERE"/bootstrap/python-pyproject-hooks "$HERE"/bootstrap/python-installer "$HERE"/bootstrap/python-build "$HERE"/bootstrap/cmake; do
+for r in "$HERE"/bootstrap/git "$HERE"/bootstrap/python-pyproject-hooks "$HERE"/bootstrap/python-installer "$HERE"/bootstrap/python-build "$HERE"/bootstrap/cmake; do
   b=$(basename "$r")
   grep -qx "$b" "$work/done" && continue
   printf '   %-30s ' "$b (bootstrap)"

@@ -22,7 +22,7 @@
 //! make DESTDIR="$PKGDIR" install
 //! ```
 
-use crate::archive::{self, INFO_NAME};
+use crate::archive::{self, FILES_NAME, INFO_NAME};
 use crate::download::{fetch_all, Job};
 use crate::error::{Context, Result};
 use crate::pkginfo::{parse_kv, IndexEntry, PkgInfo};
@@ -285,6 +285,43 @@ pub fn write_package(
         let mut tw = TarWriter::new(BufWriter::new(File::create(&tarpath)?), mtime);
         let meta = info.to_text();
         tw.add_file(INFO_NAME, 0o644, meta.len() as u64, &mut meta.as_bytes())?;
+        // the file list, described as the entries below are written
+        let mut manifest = String::new();
+        for n in &nodes {
+            let mode = n.meta.permissions().mode();
+            let ft = n.meta.file_type();
+            let (kind, size, xattrs) = if ft.is_dir() {
+                (crate::tar::Kind::Dir, 0, vec![])
+            } else if ft.is_symlink() {
+                let t = fs::read_link(&n.abs)?.to_string_lossy().into_owned();
+                (crate::tar::Kind::Symlink(t), 0, vec![])
+            } else {
+                let x: Vec<(String, Vec<u8>)> = util::get_capability(&n.abs)
+                    .ctx(|| format!("read capabilities of {}", n.rel))?
+                    .map(|v| vec![(util::CAPABILITY_XATTR.to_string(), v)])
+                    .unwrap_or_default();
+                (crate::tar::Kind::File, n.meta.len(), x)
+            };
+            manifest.push_str(&archive::manifest_line(&crate::tar::Entry {
+                path: n.rel.clone(),
+                mode: if ft.is_symlink() {
+                    0o777
+                } else {
+                    mode & 0o7777
+                },
+                size,
+                kind,
+                xattrs,
+                owner: owners.of(&n.meta),
+            }));
+        }
+        tw.owner = crate::tar::Owner::root();
+        tw.add_file(
+            FILES_NAME,
+            0o644,
+            manifest.len() as u64,
+            &mut manifest.as_bytes(),
+        )?;
         for n in &nodes {
             tw.owner = owners.of(&n.meta);
             let mode = n.meta.permissions().mode();
