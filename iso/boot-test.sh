@@ -10,6 +10,11 @@
 # system credentials (SMBIOS strings, see systemd.system-credentials(7)),
 # and the unit reports on the second serial port.
 # The CPU is QEMU's plain x86-64 one, emulated.
+#
+# GRAVEYARD_DESKTOP=kde|hyprland: a desktop image. The live user's graphical
+# session must come up instead of root's console; a picture of the screen is
+# taken once it has (<case>-desktop.png). With /dev/kvm, the machine runs on
+# the host's CPU (a desktop under emulation is very slow).
 set -euo pipefail
 iso=${1:?ISO file}
 work=${2:-$(mktemp -d)}
@@ -20,7 +25,10 @@ ovmf=/usr/share/OVMF
 label=$(xorriso -indev "$iso" -pvd_info 2> /dev/null | sed -n 's/^Volume Id *: *//p')
 [ -n "$label" ] || { echo "cannot read the volume label of $iso" >&2; exit 1; }
 
-cat > "$work/test.sh" <<'TEST'
+desktop=${GRAVEYARD_DESKTOP:-}
+case $desktop in '' | kde | hyprland) ;; *) echo "GRAVEYARD_DESKTOP: kde or hyprland" >&2; exit 64 ;; esac
+printf 'desktop=%s\n' "$desktop" > "$work/test.sh"
+cat >> "$work/test.sh" <<'TEST'
 exec > /dev/ttyS1 2>&1
 for _ in $(seq 1 150); do
   state=$(systemctl is-system-running)
@@ -40,9 +48,22 @@ echo "GRAVEYARD-TEST host=$(findmnt -no FSTYPE /run/graveyard/host 2> /dev/null)
 echo "GRAVEYARD-TEST system=$(findmnt -no FSTYPE /run/graveyard/system)"
 echo "GRAVEYARD-TEST writable=$(touch /root/written-by-the-test && echo yes || echo no)"
 echo "GRAVEYARD-TEST medium-untouched=$(touch /run/graveyard/medium/x 2> /dev/null && echo no || echo yes)"
-# the automatic login: root's shell on the first console
-for _ in $(seq 1 30); do pgrep -t tty1 -u root -x bash > /dev/null && break; sleep 1; done
-echo "GRAVEYARD-TEST login=$(pgrep -t tty1 -u root -x bash > /dev/null && echo root@tty1)"
+if [ -n "$desktop" ]; then
+  # the automatic login: the live user's graphical session
+  case $desktop in kde) shell=plasmashell ;; hyprland) shell=Hyprland ;; esac
+  for _ in $(seq 1 240); do pgrep -u live -x "$shell" > /dev/null && break; sleep 1; done
+  echo "GRAVEYARD-TEST desktop=$(pgrep -u live -x "$shell" > /dev/null && echo "$shell@live")"
+  echo "GRAVEYARD-TEST display-manager=$(systemctl is-active display-manager)"
+  echo "GRAVEYARD-TEST session=$(loginctl list-sessions --no-legend 2> /dev/null | awk '$3 == "live" { print $1 }' | head -n 1 | xargs -r loginctl show-session -p Type --value)"
+  echo "GRAVEYARD-TEST installer-window=$([ -e /etc/xdg/autostart/graveyard-installer.desktop ] && echo yes)"
+  sleep 40  # let it draw
+  echo "GRAVEYARD-TEST screenshot-now"
+  sleep 15
+else
+  # the automatic login: root's shell on the first console
+  for _ in $(seq 1 30); do pgrep -t tty1 -u root -x bash > /dev/null && break; sleep 1; done
+  echo "GRAVEYARD-TEST login=$(pgrep -t tty1 -u root -x bash > /dev/null && echo root@tty1)"
+fi
 for _ in $(seq 1 45); do
   ip -4 -o addr show scope global | grep -q . && break
   sleep 1
@@ -102,15 +123,28 @@ boot() { # name: bios-disc | bios-usb | uefi-disc | uefi-usb | bios-ventoy | uef
 s = socket.socket(socket.AF_UNIX); s.connect(sys.argv[1])
 s.sendall(b"screendump " + sys.argv[2].encode() + b"\n"); time.sleep(3)' \
     "$work/$name.monitor" "$work/$name.ppm" > /dev/null 2>&1) &
-  local shooter=$!
+  local shooter=$! accel=(-accel tcg,thread=multi -cpu qemu64) memory=3072 grabber=
+  if [ -n "$desktop" ]; then
+    memory=6144
+    [ -w /dev/kvm ] && accel=(-accel kvm -cpu host)
+    # the desktop's picture, when the test says it is up
+    rm -f "$work/$name-desktop.ppm"
+    (until grep -aq 'screenshot-now' "$report" 2> /dev/null; do sleep 2; done
+     python3 -c 'import socket, sys, time
+s = socket.socket(socket.AF_UNIX); s.connect(sys.argv[1])
+s.sendall(b"screendump " + sys.argv[2].encode() + b"\n"); time.sleep(3)' \
+       "$work/$name.monitor" "$work/$name-desktop.ppm" > /dev/null 2>&1) &
+    grabber=$!
+  fi
   timeout "$limit" qemu-system-x86_64 \
-    -accel tcg,thread=multi -cpu qemu64 -smp 4 -m 3072 "${machine[@]}" "${drive[@]}" \
+    "${accel[@]}" -smp 4 -m "$memory" "${machine[@]}" "${drive[@]}" \
     -netdev user,id=net0 -device virtio-net-pci,netdev=net0 \
     "${credentials[@]}" \
     -display none -serial "file:$work/$name.console" -serial "file:$report" -no-reboot \
     -monitor "unix:$work/$name.monitor,server,nowait" \
     > "$work/$name.qemu" 2>&1 || rc=$?
   kill "$shooter" 2> /dev/null || true
+  [ -z "$grabber" ] || kill "$grabber" 2> /dev/null || true
   sed -i 's/\r$//' "$report"
   grep -a '^GRAVEYARD-TEST' "$report" | cut -c1-200 || true
   local bad=0
@@ -129,7 +163,18 @@ s.sendall(b"screendump " + sys.argv[2].encode() + b"\n"); time.sleep(3)' \
   check "on the ISO file system" '^GRAVEYARD-TEST medium=iso9660$'
   check "the session can write" '^GRAVEYARD-TEST writable=yes$'
   check "but not to the medium" '^GRAVEYARD-TEST medium-untouched=yes$'
-  check "root is logged in on the first console" '^GRAVEYARD-TEST login=root@tty1$'
+  if [ -n "$desktop" ]; then
+    check "the login screen's service is running" '^GRAVEYARD-TEST display-manager=active$'
+    check "the live user's $desktop session came up" "^GRAVEYARD-TEST desktop=[A-Za-z]+@live\$"
+    check "a Wayland session" '^GRAVEYARD-TEST session=wayland$'
+    check "the installer's window starts with it" '^GRAVEYARD-TEST installer-window=yes$'
+    if [ -s "$work/$name-desktop.ppm" ]; then
+      echo "  ---- the desktop ($name-desktop.png)"
+      python3 "$(dirname "$0")/screenshot.py" "$work/$name-desktop.ppm" "$work/$name-desktop.png" > "$work/$name-desktop.b64" || true
+    fi
+  else
+    check "root is logged in on the first console" '^GRAVEYARD-TEST login=root@tty1$'
+  fi
   check "the network got an address by DHCP" '^GRAVEYARD-TEST ipv4=10\.0\.2\.'
   if [ "$rc" -ne 0 ]; then
     echo "  FAIL  QEMU ended with status $rc (124: time limit)"

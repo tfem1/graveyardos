@@ -1,0 +1,27 @@
+#!/bin/sh
+# The installer's window in the live desktop: starts the installer (as root)
+# on 127.0.0.1, shows its page in a Qt WebEngine window, stops it on close.
+set -u
+url=http://127.0.0.1:8475/
+qml=/usr/lib/graveyard/installer/window.qml
+if ! python3 -c "import socket; socket.create_connection(('127.0.0.1', 8475), 1)" 2> /dev/null; then
+  sudo -n /usr/bin/graveyard-installer > "${XDG_RUNTIME_DIR:-/tmp}/graveyard-installer.log" 2>&1 &
+  server=$!
+  i=0
+  until python3 -c "import socket; socket.create_connection(('127.0.0.1', 8475), 1)" 2> /dev/null; do
+    i=$((i + 1)); [ "$i" -lt 50 ] || break; sleep 0.2
+  done
+fi
+for tool in qml6 /usr/lib/qt6/bin/qml qml; do
+  if command -v "$tool" > /dev/null 2>&1; then
+    "$tool" "$qml" -- "$url"
+    status=$?
+    break
+  fi
+done
+if [ "${status:-1}" -ne 0 ]; then
+  xdg-open "$url" 2> /dev/null || echo "open $url"
+  wait
+fi
+[ -n "${server:-}" ] && sudo -n kill "$server" 2> /dev/null
+exit 0

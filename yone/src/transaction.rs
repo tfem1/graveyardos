@@ -762,7 +762,11 @@ fn run_plan(
                     ui.dim(&it.info.version)
                 );
             } else {
-                ui.stage(finished, total, &format!("{} {}", it.info.name, it.info.version));
+                ui.stage(
+                    finished,
+                    total,
+                    &format!("{} {}", it.info.name, it.info.version),
+                );
             }
         };
         let run = |n: usize, prog: Option<&Progress>| {

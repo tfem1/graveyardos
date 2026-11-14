@@ -41,6 +41,8 @@ def main():
     ap.add_argument("--graph", help="with --order: write 'base<TAB>bases it needs' to this file")
     ap.add_argument("--order", action="store_true",
                     help="print the package bases in build order (dependencies and build dependencies first)")
+    ap.add_argument("--expand", action="store_true",
+                    help="print the targets with their @groups expanded, one per line, and stop")
     ap.add_argument("targets", nargs="+")
     a = ap.parse_args()
     os.makedirs(a.cache, exist_ok=True)
@@ -70,6 +72,9 @@ def main():
     todo = []
     for t in a.targets:
         todo += group(t[1:]) if t.startswith("@") else [t]
+    if a.expand:
+        print("\n".join(dict.fromkeys(todo)))
+        return
     seen, unresolved, order = set(), set(), []
     while todo:
         batch = [n for n in dict.fromkeys(todo) if n not in seen and n not in base]

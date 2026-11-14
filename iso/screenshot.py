@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 """Print a QEMU screendump (PPM) as a base64 PNG between markers.
 
-    python3 iso/screenshot.py screen.ppm
+    python3 iso/screenshot.py screen.ppm [screen.png]
 
 CI logs are the one output always at hand: the image is decoded from the log
 with `sed -n '/^GRAVEYARD-SCREEN-BEGIN/,/^GRAVEYARD-SCREEN-END/p' | sed '1d;$d' |
-base64 -d > screen.png`. Screens wider than 1024 pixels are halved.
+base64 -d > screen.png`. Screens wider than 1024 pixels are halved. With a
+second argument, the PNG (full size) is also written to that file.
 """
 import base64
 import struct
@@ -16,7 +17,8 @@ data = open(sys.argv[1], "rb").read()
 parts = data.split(maxsplit=4)
 assert parts[0] == b"P6", "not a binary PPM"
 w, h, pixels = int(parts[1]), int(parts[2]), parts[4]
-step = 2 if w > 1024 else 1  # text modes (720x400) stay readable at full size
+full = len(sys.argv) > 2
+step = 2 if w > 1024 and not full else 1  # text modes (720x400) stay readable at full size
 rows = []
 for y in range(0, h, step):
     row = bytearray(b"\0")
@@ -33,6 +35,8 @@ def chunk(kind, body):
 
 png = (b"\x89PNG\r\n\x1a\n" + chunk(b"IHDR", struct.pack(">IIBBBBB", w2, h2, 8, 2, 0, 0, 0))
        + chunk(b"IDAT", zlib.compress(b"".join(rows), 9)) + chunk(b"IEND", b""))
+if full:
+    open(sys.argv[2], "wb").write(png)
 print("GRAVEYARD-SCREEN-BEGIN")
 text = base64.b64encode(png).decode()
 for i in range(0, len(text), 76):
