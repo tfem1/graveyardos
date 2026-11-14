@@ -182,7 +182,7 @@ def onebit(work, gw, gh, seed=7):
     # in front, a row of the pack's small headstones and crosses
     small = [(m, im) for m, im in pictures(fetch(work, "onebit"))
              if "/Environment/" in m and im.width <= 32 and im.height <= 32
-             and __import__("re").search(r"(?i)grave|tomb|stone|cross|head", m.rsplit("/", 1)[-1])]
+             and "Gravestone" in m.rsplit("/", 1)[-1]]
     if gw == 480:
         print("   small headstones:", ", ".join(m.rsplit("/", 1)[-1] for m, _ in small) or "none")
     if small:
