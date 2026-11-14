@@ -35,7 +35,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          iso=$(ls "$RUNNER_TEMP"/iso/graveyard-*.iso)
+          iso=$(ls "$RUNNER_TEMP"/iso/GraveyardOS-*.iso)
           fail=0
           for v in ${{ inputs.variants }}; do
             echo "::group::variant $v"

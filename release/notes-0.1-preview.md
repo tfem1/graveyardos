@@ -13,8 +13,8 @@ Secure Boot must be off.
 with `lsblk`):
 
 ```
-sha256sum -c graveyard-0.1-x86_64.iso.sha256
-sudo dd if=graveyard-0.1-x86_64.iso of=/dev/sdX bs=4M status=progress oflag=sync
+sha256sum -c GraveyardOS-console-0.1-x86_64.iso.sha256
+sudo dd if=GraveyardOS-console-0.1-x86_64.iso of=/dev/sdX bs=4M status=progress oflag=sync
 ```
 
 At the boot menu, choose GraveyardOS. You are logged in as root on the first

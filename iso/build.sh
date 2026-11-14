@@ -33,7 +33,10 @@ log() { printf '\033[1;35m==>\033[0m %s\n' "$*"; }
 kver=${GRAVEYARD_KERNEL_RELEASE:-$(cat "$LFS/.graveyard/kernel-release")}
 version=$(. "$LFS/usr/lib/os-release" && echo "$VERSION_ID")
 label=GRAVEYARD_$(echo "$version" | tr -c 'A-Za-z0-9\n' '_' | tr a-z A-Z)
-iso=$out/graveyard-$version-x86_64.iso
+# GraveyardOS-<edition>-<version>-x86_64.iso: kde, hyprland, or console
+# while no desktop is on the image (GRAVEYARD_EDITION)
+edition=${GRAVEYARD_EDITION:-console}
+iso=$out/GraveyardOS-$edition-$version-x86_64.iso
 tree=$out/tree
 grub=$LFS/usr/lib/grub
 [ -s "$LFS/boot/vmlinuz-$kver" ] || { echo "no kernel $kver in $LFS/boot" >&2; exit 1; }

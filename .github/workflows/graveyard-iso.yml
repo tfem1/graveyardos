@@ -101,7 +101,7 @@ jobs:
           retention-days: 14
 
       - name: Boot the ISO (disc and USB stick, BIOS and UEFI)
-        run: bash iso/boot-test.sh "$RUNNER_TEMP"/iso/graveyard-*.iso "$RUNNER_TEMP/boot"
+        run: bash iso/boot-test.sh "$RUNNER_TEMP"/iso/GraveyardOS-*.iso "$RUNNER_TEMP/boot"
 
       # The same ISO copied to a stick prepared with the current Ventoy release,
       # which boots it by itself (iso/ventoy-stick.sh), with both firmwares.
@@ -111,11 +111,11 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           sudo apt-get install -y -qq exfatprogs > /dev/null
-          sudo GH_TOKEN="$GH_TOKEN" bash iso/ventoy-stick.sh "$(ls "$RUNNER_TEMP"/iso/graveyard-*.iso)" "$RUNNER_TEMP/ventoy.img"
+          sudo GH_TOKEN="$GH_TOKEN" bash iso/ventoy-stick.sh "$(ls "$RUNNER_TEMP"/iso/GraveyardOS-*.iso)" "$RUNNER_TEMP/ventoy.img"
           sudo chown "$(id -u):$(id -g)" "$RUNNER_TEMP/ventoy.img"  # QEMU writes to the stick
           echo "Ventoy $(cat "$RUNNER_TEMP/ventoy.img.ventoy-version")" >> "$GITHUB_STEP_SUMMARY"
           GRAVEYARD_VENTOY_IMG="$RUNNER_TEMP/ventoy.img" GRAVEYARD_BOOT_CASES="bios-ventoy uefi-ventoy" \
-            bash iso/boot-test.sh "$(ls "$RUNNER_TEMP"/iso/graveyard-*.iso)" "$RUNNER_TEMP/boot"
+            bash iso/boot-test.sh "$(ls "$RUNNER_TEMP"/iso/GraveyardOS-*.iso)" "$RUNNER_TEMP/boot"
 
       # The installer, unattended, onto an empty virtual disk; then the
       # installed system started from that disk alone (iso/install-test.sh).
@@ -123,7 +123,7 @@ jobs:
         if: always()
         run: |
           command -v qemu-img > /dev/null || sudo apt-get install -y -qq qemu-utils > /dev/null
-          bash iso/install-test.sh "$(ls "$RUNNER_TEMP"/iso/graveyard-*.iso)" "$RUNNER_TEMP/install" uefi bios
+          bash iso/install-test.sh "$(ls "$RUNNER_TEMP"/iso/GraveyardOS-*.iso)" "$RUNNER_TEMP/install" uefi bios
 
       - uses: actions/upload-artifact@v4
         if: always()
