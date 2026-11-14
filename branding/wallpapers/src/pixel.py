@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""GraveyardOS pixel-art wallpapers, black and white: cemeteries and tombs.
+"""GraveyardOS pixel-art wallpapers, black and white: a cemetery and a lone tomb.
 
     python3 branding/wallpapers/src/pixel.py branding/wallpapers
 
@@ -239,63 +239,11 @@ def lone_tomb(w, h, dark):
     return c.im
 
 
-def pixel_tombs(w, h, dark):
-    p, rng = palette(dark), random.Random(31)
-    c = Canvas(w, h, p["sky0"] if dark else p["sky0"])
-    kinds = ["round", "cross", "slab", "obelisk"]
-    sx, sy = 24, 30
-    lit = (w // sx // 2, h // sy // 2)
-    for gy in range(-1, h // sy + 2):
-        for gx in range(-1, w // sx + 2):
-            x = gx * sx + (sx // 2 if gy % 2 else 0)
-            base = gy * sy + 22
-            kind = kinds[(gx * 7 + gy * 3) % 4]
-            if (gx, gy) == lit:
-                logo(c, x, base + 2, 1, p["accent"])
-                continue
-            col = (28 if dark else 222) + rng.randint(0, 10) * (1 if dark else -1)
-            tomb(c, x, base, kind, 8, 14 + (6 if kind == "obelisk" else 0), p, rng, col=col)
-    return c.im
-
-
-def graveyard_hill(w, h, dark):
-    p, rng = palette(dark), random.Random(41)
-    c = Canvas(w, h)
-    # the sky lightens toward the horizon, where the silhouettes stand
-    c.gradient(0, h, p["sky0"], 58 if dark else p["sky1"])
-    if dark:
-        stars(c, rng, w // 3, int(h * 0.7), p["star"])
-    moon(c, int(w * 0.70), int(h * 0.36), int(h * 0.22), p, random.Random(6))
-    sil = 6 if dark else 30
-    # a hill rising to the right, crowded with crosses and tombs in silhouette
-    top = []
-    for x in range(w):
-        y = int(h * 0.92 - (h * 0.38) * (1 / (1 + math.exp(-(x - w * 0.62) / (w * 0.09)))) + 2 * math.sin(x / 7))
-        top.append(y)
-        c.rect(x, y, x, h - 1, sil)
-    for i in range(26):
-        x = int(w * 0.38 + i * (w * 0.6) / 26 + rng.uniform(-3, 3))
-        if not 0 <= x < w:
-            continue
-        kind = rng.choice(["cross", "cross", "round", "slab", "obelisk"])
-        tomb(c, x, top[x] + 1, kind, rng.choice([6, 8, 10]), rng.randint(10, 20) + (8 if kind == "obelisk" else 0),
-             p, rng, col=sil)
-    tree(c, int(w * 0.94), top[int(w * 0.94)], math.pi / 2 + 0.15, h * 0.18, 6, sil, random.Random(9))
-    for _ in range(w // 2):  # grass
-        x = rng.randrange(w)
-        c.set(x, top[x] - 1, sil)
-    return c.im
-
-
 SCENES = {
     "Graveyard-Night": (graveyard_night, "Graveyard by night",
                         "A pixel-art cemetery: headstones in rows, an iron fence, a dead tree, fog; moonlight or misty day"),
     "Lone-Tomb": (lone_tomb, "Lone tomb",
                   "The GraveyardOS tomb alone on its hill, before a huge moon"),
-    "Pixel-Tombs": (pixel_tombs, "Pixel tombs",
-                    "Rows of small pixel headstones; one of them is the GraveyardOS tomb"),
-    "Graveyard-Hill": (graveyard_hill, "Graveyard hill",
-                       "Crosses and tombs on a hill, in silhouette against the moon"),
 }
 # grid size -> the screen sizes made from it (integer enlargements)
 GRIDS = {(480, 270): [(1920, 1080), (3840, 2160)], (320, 200): [(2560, 1600)]}
