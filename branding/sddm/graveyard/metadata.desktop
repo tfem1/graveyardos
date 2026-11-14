@@ -1,0 +1,12 @@
+[SddmGreeterTheme]
+Name=GraveyardOS
+Description=The Graveyard Dunes, a large clock (hours over minutes), the password, who signs in and which desktop; black and white, light or dark.
+Author=tfem1
+License=GPL-3.0-or-later
+Type=sddm-theme
+Version=1.0
+MainScript=Main.qml
+ConfigFile=theme.conf
+Theme-Id=graveyard
+Theme-API=2.0
+QtVersion=6

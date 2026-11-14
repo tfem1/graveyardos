@@ -90,9 +90,17 @@ done
 inroot systemctl set-default graphical.target > /dev/null
 install -d "$LFS/etc/sddm.conf.d"
 case $edition in
-  kde) session=plasma.desktop theme=breeze ;;
-  hyprland) session=hyprland.desktop theme= ;;
+  kde) session=plasma.desktop ;;
+  hyprland) session=hyprland.desktop ;;
 esac
+# GraveyardOS's login screen (branding/sddm/graveyard), with the Dunes
+theme=graveyard
+tdir=$LFS/usr/share/sddm/themes/graveyard
+rm -rf "$tdir"; install -d "$tdir/backgrounds"
+cp -R "$REPO/branding/sddm/graveyard/." "$tdir/"
+install -m 644 "$REPO/branding/wallpapers/Graveyard-Dunes/contents/images_dark/2560x1600.jpg" "$tdir/backgrounds/night.jpg"
+install -m 644 "$REPO/branding/wallpapers/Graveyard-Dunes/contents/images/2560x1600.jpg" "$tdir/backgrounds/day.jpg"
+echo "   login screen: graveyard"
 cat > "$LFS/etc/sddm.conf.d/10-graveyard.conf" << EOF
 # GraveyardOS $edition
 [Theme]
