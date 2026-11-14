@@ -113,6 +113,9 @@ def main():
         if items and "informative" not in title:
             for g, n in group([i.split(":")[0] for i in items])[:12]:
                 print(f"            {n:5d}  {g}")
+                # a few of each, for the log (the report is an artifact)
+                for i in [i for i in items if i.startswith(g + "/") or i.split(":")[0] == g][:6]:
+                    print(f"                   {i}")
     print(f"details: {report}/compare.txt")
     hard = missing or extra or kind or mode or owner or link
     sys.exit(1 if hard else 0)

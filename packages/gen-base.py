@@ -546,6 +546,16 @@ def main():
     recipes = {"filesystem": filesystem_recipe(extra_skip)}
     recipes.update(chapter8(a.sources, urls, sums, extra_skip, os.path.join(BASE, "overrides")))
     recipes.update(graveyard_recipes(a.build_id))
+    # 5.4: the kernel's API headers are installed once, by the temporary
+    # toolchain chapter, and stay in the system: their own package
+    kernel = next(f for f in urls if re.fullmatch(r"linux-[0-9.]+\.tar\.xz", f))
+    kver = kernel[len("linux-"):-len(".tar.xz")]
+    recipes["linux-api-headers"] = recipe_text(
+        "linux-api-headers", kver, "Kernel headers sanitized for use in userspace",
+        "https://www.kernel.org", [kernel], urls, sums, [],
+        "\n".join([f"cd linux-{kver}", "make mrproper", "make headers",
+                   "find usr/include -type f ! -name '*.h' -delete",
+                   'mkdir -p "$PKGDIR/usr"', 'cp -r usr/include "$PKGDIR/usr"']), [])
     names = list(recipes)
     recipes["base"] = recipe_text(
         "base", "13.1", "The GraveyardOS base system", "https://github.com/tfem1/GraveyardOS",
