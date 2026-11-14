@@ -1,0 +1,29 @@
+# Arch Linux package name -> GraveyardOS package name, where they differ
+# (arch/import.py). A name alone: provided by the base system with nothing
+# to depend on. Names that are the same on both sides are not listed.
+gcc-libs gcc
+libgcc gcc
+libstdc++ gcc
+libgomp gcc
+libatomic gcc
+libquadmath gcc
+systemd-libs systemd
+libudev systemd
+systemd-sysvcompat systemd
+procps-ng procps
+libmpc mpc
+python-flit-core flit-core
+python-packaging packaging
+python-wheel wheel
+python-setuptools setuptools
+python-markupsafe markupsafe
+python-jinja jinja2
+perl-xml-parser perl
+linux-api-headers glibc
+sh bash
+awk gawk
+tzdata glibc
+pkg-config pkgconf
+libelf libelf
+filesystem
+iana-etc

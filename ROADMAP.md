@@ -76,6 +76,20 @@ Quickshell, Flatpak and kitty as GraveyardOS recipes (not in BLFS).
 COSMIC packages, gaming profile (Steam, Proton, Gamescope,
 GameMode, MangoHud), testing/stable channels, Secure Boot, upgrade tests.
 
+## Desktops from Arch's recipes (GraveyardOS-kde, GraveyardOS-hyprland)
+
+Two images, one per desktop. `arch/closure.py` gives what each needs from
+Arch's packages, minus the base: Hyprland with the owner's dotfiles, 404
+packages (2.0 GiB installed); KDE Plasma on Wayland with Dolphin, Kate,
+Ark, Spectacle, Gwenview and Okular, 656 (3.2 GiB); with what they need to
+be built, about 1,860 package bases. `arch/import.py` turns an Arch
+package base into Yone recipes (PKGBUILD evaluated by bash, makepkg's
+flags and steps, Arch's checksums checked, Git tags taken as their
+host's archives): 343 of the 381 bases of the Hyprland set convert as
+they are; the others use Git hosts or submodules it does not map yet.
+Next: a CI workflow that imports and builds them in waves, in the base
+system, with the checks of the base packages.
+
 ## Catalogue: 6000 packages and more (from Arch Linux's recipes)
 
 Yone itself is not the limit: `yone/tests/scale.sh` builds 6000 linked
