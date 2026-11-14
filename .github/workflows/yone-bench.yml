@@ -1,0 +1,34 @@
+# Yone against pacman, in an Arch Linux container, on the same packages
+# (yone/bench/vs-pacman.sh). The result is in the run's summary.
+name: yone-bench
+
+on:
+  workflow_dispatch:
+    inputs:
+      packages:
+        description: "Arch packages to install (one transaction)"
+        type: string
+        default: "llvm-libs python qt6-base gcc"
+
+permissions:
+  contents: read
+
+jobs:
+  bench:
+    runs-on: ubuntu-24.04
+    container: archlinux:latest
+    steps:
+      - name: Tools
+        run: pacman -Syu --noconfirm --needed git rust gcc zstd bc libarchive > /dev/null
+
+      - uses: actions/checkout@v4
+
+      - name: Build Yone
+        working-directory: yone
+        run: cargo build --release
+
+      - name: Yone against pacman
+        run: |
+          set -o pipefail
+          bash yone/bench/vs-pacman.sh yone/target/release/yone ${{ inputs.packages }} | tee bench.txt
+          { echo '## Yone against pacman'; echo '```'; cat bench.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
