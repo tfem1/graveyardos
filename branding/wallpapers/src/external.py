@@ -179,6 +179,20 @@ def onebit(work, gw, gh, seed=7):
         im = grey(member(work, "onebit", "/" + name))
         x = i * sp + (sp - im.width) // 2
         c.paste(im.convert("L"), (x, ground - im.height + 1), im.getchannel("A"))
+    # in front, a row of the pack's small headstones and crosses
+    small = [(m, im) for m, im in pictures(fetch(work, "onebit"))
+             if "/Environment/" in m and im.width <= 32 and im.height <= 32
+             and __import__("re").search(r"(?i)grave|tomb|stone|cross|head", m.rsplit("/", 1)[-1])]
+    if gw == 480:
+        print("   small headstones:", ", ".join(m.rsplit("/", 1)[-1] for m, _ in small) or "none")
+    if small:
+        y = ground + int(gh * 0.12)
+        x = 6
+        while x < gw - 20:
+            m, im = small[rng.randrange(len(small))]
+            g = grey(im)
+            c.paste(g.convert("L"), (x, y - im.height), g.getchannel("A"))
+            x += im.width + rng.randint(6, 14)
     return c
 
 
