@@ -1,0 +1,13 @@
+{
+    "KPlugin": {
+        "Authors": [
+            {
+                "Name": "GraveyardOS"
+            }
+        ],
+        "Description": "A pixel-art cemetery: headstones in rows, an iron fence, a dead tree, fog; moonlight or misty day (pixel art, black and white)",
+        "Id": "Graveyard-Night",
+        "License": "CC-BY-SA-4.0",
+        "Name": "Graveyard by night"
+    }
+}

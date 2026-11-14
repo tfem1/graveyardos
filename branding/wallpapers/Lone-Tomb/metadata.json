@@ -1,0 +1,13 @@
+{
+    "KPlugin": {
+        "Authors": [
+            {
+                "Name": "GraveyardOS"
+            }
+        ],
+        "Description": "The GraveyardOS tomb alone on its hill, before a huge moon (pixel art, black and white)",
+        "Id": "Lone-Tomb",
+        "License": "CC-BY-SA-4.0",
+        "Name": "Lone tomb"
+    }
+}
