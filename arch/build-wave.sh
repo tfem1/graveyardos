@@ -29,11 +29,11 @@ log() { printf '\033[1;35m==>\033[0m %s\n' "$*"; }
 LFS=$sys bash "$REPO/lfs/build.sh" mount > /dev/null
 trap 'LFS=$sys bash "$REPO/lfs/build.sh" umount > /dev/null 2>&1 || true' EXIT
 install -m 755 "$yone" "$sys/usr/local/bin/yone"
-in() { chroot "$sys" /usr/bin/env -i HOME=/root TERM=xterm LC_ALL=C.UTF-8 PATH=/usr/bin:/usr/sbin:/usr/local/bin "$@"; }
+inroot() { chroot "$sys" /usr/bin/env -i HOME=/root TERM=xterm LC_ALL=C.UTF-8 PATH=/usr/bin:/usr/sbin:/usr/local/bin "$@"; }
 
 # The development key of this chain (the repository is not a release).
 if [ ! -s "$work/archkey.key" ]; then
-  in /usr/local/bin/yone keygen /tmp/archkey > /dev/null
+  inroot /usr/local/bin/yone keygen /tmp/archkey > /dev/null
   cp "$sys/tmp/archkey.key" "$sys/tmp/archkey.pub.pem" "$work/"
 fi
 rm -rf "$sys/packages"; mkdir -p "$sys/packages/repo" "$sys/etc/yone/keys"
@@ -48,15 +48,15 @@ siglevel = required
 [arch]
 server = file:///packages/repo
 EOF
-index() { in /usr/local/bin/yone repo-index /packages/repo --name arch --sign /packages/key.key --color never > /dev/null; }
+index() { inroot /usr/local/bin/yone repo-index /packages/repo --name arch --sign /packages/key.key --color never > /dev/null; }
 
 # What earlier passes built goes back into the system.
 if ls "$work"/repo/*.yon > /dev/null 2>&1; then
   log "installing what earlier passes built"
   index
-  in /usr/local/bin/yone --noconfirm --overwrite --color never refresh > /dev/null
-  mapfile -t built < <(in /usr/local/bin/yone --color never list | sed 's|^[^/]*/||; s| .*||')
-  in /usr/local/bin/yone --noconfirm --overwrite --color never install "${built[@]}" > "$work/logs/reinstall.log" 2>&1 \
+  inroot /usr/local/bin/yone --noconfirm --overwrite --color never refresh > /dev/null
+  mapfile -t built < <(inroot /usr/local/bin/yone --color never list | sed 's|^[^/]*/||; s| .*||')
+  inroot /usr/local/bin/yone --noconfirm --overwrite --color never install "${built[@]}" > "$work/logs/reinstall.log" 2>&1 \
     || { echo "reinstall failed:"; tail -n 20 "$work/logs/reinstall.log"; exit 1; }
 fi
 
@@ -106,8 +106,8 @@ while read -r base; do
   done
   if [ "$ok" = 1 ]; then
     index
-    if in /usr/local/bin/yone --noconfirm --overwrite --color never refresh >> "$lf" 2>&1 \
-       && in /usr/local/bin/yone --noconfirm --overwrite --color never install "${names[@]}" >> "$lf" 2>&1; then
+    if inroot /usr/local/bin/yone --noconfirm --overwrite --color never refresh >> "$lf" 2>&1 \
+       && inroot /usr/local/bin/yone --noconfirm --overwrite --color never install "${names[@]}" >> "$lf" 2>&1; then
       echo "$base" >> "$work/done"; okn=$((okn + 1)); printf 'ok   %5ds\n' $((SECONDS - t0))
       continue
     fi
