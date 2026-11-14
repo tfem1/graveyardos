@@ -22,7 +22,7 @@ def stars(rng, n, ymax, r=(0.6, 1.6), op=(0.25, 0.9)):
     for _ in range(n):
         x, y = rng.uniform(0, W), rng.uniform(0, ymax)
         out.append(f'<circle cx="{x:.1f}" cy="{y:.1f}" r="{rng.uniform(*r):.2f}" '
-                   f'fill="#EEEAF6" opacity="{rng.uniform(*op):.2f}"/>')
+                   f'fill="#FFFFFF" opacity="{rng.uniform(*op):.2f}"/>')
     return "".join(out)
 
 # The open Y of the logo (viewBox 256), placed with a transform.
@@ -69,15 +69,16 @@ def aurore():
 def dunes(day=False):
     rng = random.Random(3)
     if day:
-        sky = ('<linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#F4F2F8"/>'
-               '<stop offset="1" stop-color="#E4DCF7"/></linearGradient>')
-        layers = ["#D9CCF8", "#C4AEF5", "#A98BF0", "#8B5CF6", "#6D28D9", "#4C1D95"]
+        # black and white, like the rest of GraveyardOS
+        sky = ('<linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FAFAFA"/>'
+               '<stop offset="1" stop-color="#E6E6E6"/></linearGradient>')
+        layers = ["#D4D4D4", "#B8B8B8", "#959595", "#6E6E6E", "#454545", "#1C1C1C"]
         sun, sunc = (1380, 420, 120), "#FFFFFF"
     else:
-        sky = ('<linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0d0a14"/>'
-               '<stop offset="1" stop-color="#2a1d4d"/></linearGradient>')
-        layers = ["#2e2152", "#3b2a6b", "#4c3489", "#5f40a8", "#2a1f47", "#16111f"]
-        sun, sunc = (1380, 400, 110), "#EEEAF6"
+        sky = ('<linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#000000"/>'
+               '<stop offset="1" stop-color="#1C1C1C"/></linearGradient>')
+        layers = ["#262626", "#303030", "#3D3D3D", "#4D4D4D", "#1F1F1F", "#0A0A0A"]
+        sun, sunc = (1380, 400, 110), "#F2F2F2"
     body = f'<rect width="{W}" height="{H}" fill="url(#sky)"/>'
     if not day:
         body += stars(rng, 140, 520, op=(0.2, 0.7))

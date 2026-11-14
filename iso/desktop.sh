@@ -113,9 +113,17 @@ install -d "$LFS/usr/share/graveyard/installer"
 echo "$session" > "$LFS/usr/share/graveyard/installer/desktop-$edition"
 
 log "look"
+# Every wallpaper package of branding/wallpapers (a folder with metadata.json
+# and contents/images, Plasma's layout); the Dunes are the default.
 install -d "$LFS/usr/share/wallpapers"
-rm -rf "$LFS/usr/share/wallpapers/Graveyard-Dunes"
-cp -R "$REPO/branding/wallpapers/Graveyard-Dunes" "$LFS/usr/share/wallpapers/"
+walls=()
+for w in "$REPO"/branding/wallpapers/*/; do
+  [ -f "$w/metadata.json" ] && [ -d "$w/contents/images" ] || continue
+  rm -rf "$LFS/usr/share/wallpapers/$(basename "$w")"
+  cp -R "$w" "$LFS/usr/share/wallpapers/"
+  walls+=("$(basename "$w")")
+done
+echo "   wallpapers: ${walls[*]}"
 install -Dm644 "$REPO/branding/graveyard-icon.svg" "$LFS/usr/share/pixmaps/graveyard.svg"
 # Fastfetch: the owner's Eye of Horus, in white (a user's own config wins)
 install -Dm644 "$REPO/branding/fastfetch/graveyard.txt" "$LFS/usr/share/graveyard/fastfetch/graveyard.txt"
@@ -169,9 +177,17 @@ else
   if grep -rlI -- "$LFS" "$LFS/etc/skel" "$LFS/usr/share/tfem" 2> /dev/null | head -n 5 | grep .; then
     echo "the files above name the build directory $LFS" >&2; exit 1
   fi
-  # the Dunes, where the dotfiles look for wallpapers
+  # the wallpapers, where the dotfiles look for them: the largest picture of
+  # each (and its dark variant), linked from the system's copy
   install -d "$LFS/etc/skel/Pictures/Wallpapers/GraveyardOS"
-  cp "$LFS/usr/share/wallpapers/Graveyard-Dunes/contents/images/"* "$LFS/etc/skel/Pictures/Wallpapers/GraveyardOS/" 2> /dev/null || true
+  for w in "${walls[@]}"; do
+    for v in images images_dark; do
+      big=$(ls "$LFS/usr/share/wallpapers/$w/contents/$v/" 2> /dev/null | sort -t x -k1,1n | tail -n 1)
+      [ -n "$big" ] || continue
+      ln -sfn "/usr/share/wallpapers/$w/contents/$v/$big" \
+        "$LFS/etc/skel/Pictures/Wallpapers/GraveyardOS/$w$([ "$v" = images_dark ] && echo -dark).${big##*.}"
+    done
+  done
   echo "   dotfiles of tfem1/dotfiles (branch ${GRAVEYARD_DOTFILES_BRANCH:-yvis}) in /etc/skel"
 fi
 

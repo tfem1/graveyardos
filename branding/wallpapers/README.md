@@ -1,7 +1,7 @@
 # GraveyardOS wallpapers
 
-**Graveyard Dunes**: violet dunes under the sun (light mode) and under the moon
-(dark mode), in the colors of the logo. `Graveyard-Dunes/` is a Plasma wallpaper
+**Graveyard Dunes**: black and white dunes under the sun (light mode) and under the moon
+(dark mode), like the rest of GraveyardOS. `Graveyard-Dunes/` is a Plasma wallpaper
 package: Plasma takes `contents/images/` in a light color scheme and
 `contents/images_dark/` in a dark one, at the resolution closest to the screen
 (3840x2160, 2560x1600, 1920x1080). Installed to `/usr/share/wallpapers/Graveyard-Dunes`.
@@ -15,3 +15,20 @@ node src/render.js Graveyard-Dunes     # needs Playwright + Chromium
 ```
 
 License: CC BY-SA 4.0.
+
+## More wallpapers
+
+Every folder here with Plasma's layout is installed in both editions by
+`iso/desktop.sh`: `/usr/share/wallpapers/<Name>` (KDE lists it in its
+wallpaper settings) and, for Hyprland, its largest picture in
+`~/Pictures/Wallpapers/GraveyardOS/` of every new user. A folder holds:
+
+```
+<Name>/metadata.json                      {"KPlugin": {"Id": "<Name>", "Name": "...", "Authors": [...], "License": "..."}}
+<Name>/contents/images/<W>x<H>.jpg        one or more sizes
+<Name>/contents/images_dark/<W>x<H>.jpg   optional: the dark-mode picture
+<Name>/contents/screenshot.jpg            a small preview
+```
+
+Only pictures that may be redistributed (own work, CC0, CC BY, CC BY-SA
+with credit in metadata.json) go here: the ISO is public.
