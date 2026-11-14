@@ -8,6 +8,7 @@
 //! siglevel = required       # required | optional | never
 //! compression = zstd        # used by `yone build`
 //! hold = linux nvidia-open  # never upgraded by `yone upgrade`
+//! sync = no                 # yes: flush to disk before a transaction commits
 //!
 //! [core]
 //! server = https://repo.graveyardos.org/$channel/$repo/$arch
@@ -43,6 +44,10 @@ pub struct Config {
     pub siglevel: SigLevel,
     pub compression: String,
     pub hold: Vec<String>,
+    /// Flush every write to disk before committing (power-cut durability).
+    /// Off by default, as in pacman, rpm and apk: the journal still undoes
+    /// or finishes a transaction that Yone itself did not complete.
+    pub sync: bool,
     pub repos: Vec<Repo>,
 }
 
@@ -59,6 +64,7 @@ impl Config {
             siglevel: SigLevel::Required,
             compression: "zstd".into(),
             hold: vec![],
+            sync: false,
             repos: vec![],
         };
         let path = file
@@ -107,6 +113,14 @@ impl Config {
                         .ctx(|| format!("{}:{}: parallel", path.display(), n + 1))?
                 }
                 ("options", "compression") => c.compression = v,
+                ("options", "sync") => {
+                    c.sync = match v.as_str() {
+                        "yes" => true,
+                        "no" => false,
+                        _ => bail!("{}:{}: sync must be yes|no", path.display(), n + 1),
+                    };
+                    crate::util::set_durable(c.sync);
+                }
                 ("options", "hold") => c.hold.extend(v.split_whitespace().map(str::to_string)),
                 ("options", "siglevel") => {
                     c.siglevel = match v.as_str() {

@@ -114,8 +114,9 @@ fn check_interrupted() -> Result<()> {
 
 // --------------------------------------------------------------- journal
 
+/// Shared by the threads that extract packages: one record is one line.
 struct Journal {
-    f: BufWriter<File>,
+    f: std::sync::Mutex<BufWriter<File>>,
 }
 
 impl Journal {
@@ -126,26 +127,37 @@ impl Journal {
         }
         LocalDb::open(&cfg.dbpath).discard_staged()?;
         let f = BufWriter::new(File::create(&path)?);
-        Ok(Journal { f })
+        Ok(Journal {
+            f: std::sync::Mutex::new(f),
+        })
     }
 
-    fn rec(&mut self, tag: char, p: &Path) -> Result<()> {
-        writeln!(self.f, "{} {}", tag, p.display())?;
-        self.f.flush()?;
+    fn rec(&self, tag: char, p: &Path) -> Result<()> {
+        let mut f = self.f.lock().unwrap_or_else(|e| e.into_inner());
+        writeln!(f, "{} {}", tag, p.display())?;
+        f.flush()?;
         Ok(())
     }
 
     fn sync(&mut self) -> Result<()> {
-        self.f.flush()?;
-        self.f.get_ref().sync_all()?;
+        let f = self.f.get_mut().unwrap_or_else(|e| e.into_inner());
+        f.flush()?;
+        if util::durable() {
+            f.get_ref().sync_all()?;
+        }
         Ok(())
     }
 
-    /// Point of no return. Flushes every filesystem write made so far, then
-    /// durably records `C`.
+    /// Point of no return: records `C` (with `sync = yes`, after flushing
+    /// every filesystem write made so far, and durably).
     fn commit_point(&mut self, root: &Path) -> Result<()> {
-        sync_fs(root);
-        self.f.write_all(b"C\n")?;
+        if util::durable() {
+            sync_fs(root);
+        }
+        self.f
+            .get_mut()
+            .unwrap_or_else(|e| e.into_inner())
+            .write_all(b"C\n")?;
         self.sync()?;
         crash_point("committed");
         Ok(())
@@ -719,12 +731,12 @@ fn run_plan(
     let total = plan.len();
     let total_bytes: u64 = plan.iter().map(|it| it.info.isize).sum();
     let result: Result<Vec<(Installed, Vec<FileRec>)>> = (|| {
-        let mut base_bytes = 0u64;
-        let mut out = vec![];
-        let mut dir_ok: HashSet<PathBuf> = HashSet::new();
-        let mut fault_budget = fault_injection();
-        let mut owners = Owners::new(&cfg.root);
-        for (n, (it, f)) in plan.iter().zip(&files).enumerate() {
+        let dir_ok = std::sync::Mutex::new(HashSet::new());
+        let fault_budget = std::sync::Mutex::new(fault_injection());
+        let owners_m = std::sync::Mutex::new(Owners::new(&cfg.root));
+        let bytes = std::sync::atomic::AtomicU64::new(0);
+        let mut olds = vec![];
+        for it in &plan {
             let old = db.get(&it.info.name)?;
             let old_files: HashMap<String, FileRec> = if old.is_some() {
                 db.files(&it.info.name)?
@@ -734,34 +746,13 @@ fn run_plan(
             } else {
                 HashMap::new()
             };
-            if !ui.tty {
-                ui.stage(
-                    n + 1,
-                    total,
-                    &format!("{} {}", it.info.name, it.info.version),
-                );
-            }
-            let prog = Progress {
-                n: n + 1,
-                total,
-                base: base_bytes,
-                total_bytes,
-            };
-            let recs = extract(
-                cfg,
-                ui,
-                &mut journal,
-                &root_canon,
-                &mut dir_ok,
-                f,
-                &it.info,
-                &listings[n].entries,
-                &old_files,
-                &mut fault_budget,
-                &mut owners,
-                &prog,
-            )?;
-            base_bytes += it.info.isize;
+            olds.push((old, old_files));
+        }
+        let (first, rest) = extraction_order(&listings);
+        let mut recs_of: Vec<Option<Vec<FileRec>>> = vec![None; plan.len()];
+        let mut finished = 0usize;
+        let done_line = |n: usize, finished: usize| {
+            let it = &plan[n];
             if ui.tty {
                 ui.progress_end();
                 eprintln!(
@@ -770,10 +761,132 @@ fn run_plan(
                     it.info.name,
                     ui.dim(&it.info.version)
                 );
+            } else {
+                ui.stage(finished, total, &format!("{} {}", it.info.name, it.info.version));
             }
+        };
+        let run = |n: usize, prog: Option<&Progress>| {
+            extract(
+                cfg,
+                ui,
+                &journal,
+                &root_canon,
+                &dir_ok,
+                &files[n],
+                &plan[n].info,
+                &listings[n].entries,
+                &olds[n].1,
+                &fault_budget,
+                &owners_m,
+                prog,
+                &bytes,
+            )
+        };
+        // What other packages build on (symlinked directories, accounts)
+        // goes first, one package at a time, in the order of the plan.
+        for &n in &first {
+            let base = bytes.load(std::sync::atomic::Ordering::Relaxed);
+            let prog = Progress {
+                n: finished + 1,
+                total,
+                base,
+                total_bytes,
+            };
+            recs_of[n] = Some(run(n, Some(&prog))?);
+            finished += 1;
+            done_line(n, finished);
+        }
+        // The rest touches disjoint paths (the conflict check made sure):
+        // extracted side by side, a package per thread.
+        let threads = std::env::var("YONE_EXTRACT_THREADS")
+            .ok()
+            .and_then(|v| v.parse().ok())
+            .unwrap_or_else(|| {
+                std::thread::available_parallelism()
+                    .map(|n| n.get())
+                    .unwrap_or(1)
+                    .clamp(1, 8)
+            })
+            .clamp(1, 64)
+            .min(rest.len().max(1));
+        if threads <= 1 {
+            for &n in &rest {
+                let base = bytes.load(std::sync::atomic::Ordering::Relaxed);
+                let prog = Progress {
+                    n: finished + 1,
+                    total,
+                    base,
+                    total_bytes,
+                };
+                recs_of[n] = Some(run(n, Some(&prog))?);
+                finished += 1;
+                done_line(n, finished);
+            }
+        } else {
+            let next = std::sync::atomic::AtomicUsize::new(0);
+            let stop = std::sync::atomic::AtomicBool::new(false);
+            let mut failure = None;
+            std::thread::scope(|sc| {
+                let (tx, rx) = std::sync::mpsc::channel();
+                for _ in 0..threads {
+                    let tx = tx.clone();
+                    let (next, stop, rest, run) = (&next, &stop, &rest, &run);
+                    sc.spawn(move || {
+                        let _cache = util::ResolveCache::enable();
+                        while !stop.load(std::sync::atomic::Ordering::Relaxed) {
+                            let k = next.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
+                            let Some(&n) = rest.get(k) else { break };
+                            let r = run(n, None);
+                            if r.is_err() {
+                                stop.store(true, std::sync::atomic::Ordering::Relaxed);
+                            }
+                            if tx.send((n, r)).is_err() {
+                                break;
+                            }
+                        }
+                    });
+                }
+                drop(tx);
+                loop {
+                    match rx.recv_timeout(std::time::Duration::from_millis(80)) {
+                        Ok((n, Ok(recs))) => {
+                            recs_of[n] = Some(recs);
+                            finished += 1;
+                            done_line(n, finished);
+                        }
+                        Ok((_, Err(e))) => {
+                            failure.get_or_insert(e);
+                        }
+                        Err(std::sync::mpsc::RecvTimeoutError::Timeout) => {}
+                        Err(std::sync::mpsc::RecvTimeoutError::Disconnected) => break,
+                    }
+                    if ui.tty && failure.is_none() {
+                        let b = bytes.load(std::sync::atomic::Ordering::Relaxed);
+                        let frac = if total_bytes > 0 {
+                            b as f64 / total_bytes as f64
+                        } else {
+                            finished as f64 / total.max(1) as f64
+                        };
+                        ui.status(
+                            "installing",
+                            frac.min(1.0),
+                            &format!("{finished}/{total}"),
+                            &format!("{threads} at a time"),
+                        );
+                    }
+                }
+            });
+            if let Some(e) = failure {
+                return Err(e);
+            }
+        }
+        let mut out = vec![];
+        for (n, it) in plan.iter().enumerate() {
+            let recs = recs_of[n].take().expect("every package extracted");
+            let old = &olds[n].0;
             // reasons only ever widen (dependency -> explicit), except that
             // an explicit reinstall keeps the existing reason (see install())
-            let explicit = match &old {
+            let explicit = match old {
                 Some(o) if o.info.version == it.info.version => it.explicit,
                 Some(o) => o.explicit || it.explicit,
                 None => it.explicit,
@@ -892,13 +1005,53 @@ fn fault_injection() -> Option<usize> {
     None
 }
 
+/// Which packages to extract alone, first (in plan order), and which can be
+/// extracted in parallel. Alone: a package with a symlink that is a directory
+/// of another package's paths (`lib -> usr/lib`: the others' paths resolve
+/// through it), or one shipping the account files other packages' owners are
+/// looked up in.
+fn extraction_order(listings: &[archive::Listing]) -> (Vec<usize>, Vec<usize>) {
+    let mut dirs: HashMap<&str, usize> = HashMap::new();
+    const SHARED: usize = usize::MAX;
+    for (n, l) in listings.iter().enumerate() {
+        for e in &l.entries {
+            let mut p = e.path.as_str();
+            while let Some((d, _)) = p.rsplit_once('/') {
+                let slot = dirs.entry(d).or_insert(n);
+                if *slot != n {
+                    *slot = SHARED;
+                }
+                p = d;
+            }
+        }
+    }
+    let (mut first, mut rest) = (vec![], vec![]);
+    for (n, l) in listings.iter().enumerate() {
+        let alone = l.entries.iter().any(|e| {
+            matches!(e.path.as_str(), "etc/passwd" | "etc/group")
+                || (matches!(e.kind, Kind::Symlink(_))
+                    && dirs.get(e.path.as_str()).is_some_and(|&o| o != n))
+        });
+        if alone {
+            first.push(n);
+        } else {
+            rest.push(n);
+        }
+    }
+    (first, rest)
+}
+
+fn lock<T>(m: &std::sync::Mutex<T>) -> std::sync::MutexGuard<'_, T> {
+    m.lock().unwrap_or_else(|e| e.into_inner())
+}
+
 fn ensure_dirs(
     dir: &Path,
     root_canon: &Path,
-    j: &mut Journal,
-    ok: &mut HashSet<PathBuf>,
+    j: &Journal,
+    ok: &std::sync::Mutex<HashSet<PathBuf>>,
 ) -> Result<()> {
-    if ok.contains(dir) {
+    if ok.lock().unwrap_or_else(|e| e.into_inner()).contains(dir) {
         return Ok(());
     }
     let mut missing = vec![];
@@ -912,7 +1065,7 @@ fn ensure_dirs(
     }
     for m in missing.iter().rev() {
         j.rec('D', m)?;
-        fs::create_dir(m).ctx(|| format!("mkdir {}", m.display()))?;
+        create_dir_shared(m)?;
     }
     let canon = fs::canonicalize(dir)?;
     if !canon.starts_with(root_canon) {
@@ -922,8 +1075,20 @@ fn ensure_dirs(
             canon.display()
         );
     }
-    ok.insert(dir.to_path_buf());
+    ok.lock()
+        .unwrap_or_else(|e| e.into_inner())
+        .insert(dir.to_path_buf());
     Ok(())
+}
+
+/// mkdir, where another package of the transaction may be creating the same
+/// directory at the same time. Whether this call made it.
+fn create_dir_shared(d: &Path) -> Result<bool> {
+    match fs::create_dir(d) {
+        Ok(()) => Ok(true),
+        Err(e) if e.kind() == std::io::ErrorKind::AlreadyExists && d.is_dir() => Ok(false),
+        Err(e) => Err(e).ctx(|| format!("mkdir {}", d.display())),
+    }
 }
 
 /// Gives installed files their owner. Names are looked up in the target
@@ -1026,7 +1191,7 @@ fn resolve_entry(root: &Path, path: &str, kind: &Kind) -> Result<String> {
 
 /// Move the new object (already written at `tmp`) into place, keeping the
 /// previous one aside for rollback.
-fn place(j: &mut Journal, tmp: &Path, target: &Path) -> Result<()> {
+fn place(j: &Journal, tmp: &Path, target: &Path) -> Result<()> {
     let old = fs::symlink_metadata(target);
     let link_involved = old
         .as_ref()
@@ -1061,16 +1226,17 @@ struct Progress {
 fn extract(
     cfg: &Config,
     ui: &Ui,
-    j: &mut Journal,
+    j: &Journal,
     root_canon: &Path,
-    dir_ok: &mut HashSet<PathBuf>,
+    dir_ok: &std::sync::Mutex<HashSet<PathBuf>>,
     file: &Path,
     info: &PkgInfo,
     planned: &[crate::tar::Entry],
     old_files: &HashMap<String, FileRec>,
-    fault: &mut Option<usize>,
-    owners: &mut Owners,
-    prog: &Progress,
+    fault: &std::sync::Mutex<Option<usize>>,
+    owners: &std::sync::Mutex<Owners>,
+    prog: Option<&Progress>,
+    bytes: &std::sync::atomic::AtomicU64,
 ) -> Result<Vec<FileRec>> {
     let mut tr = archive::open_tar(file)?;
     let mut planned = planned.iter();
@@ -1127,7 +1293,7 @@ fn extract(
                 rel
             );
         }
-        if let Some(n) = fault {
+        if let Some(n) = fault.lock().unwrap_or_else(|e| e.into_inner()).as_mut() {
             if *n == 0 {
                 bail!("injected failure (YONE_TEST_FAIL_AFTER)");
             }
@@ -1140,10 +1306,12 @@ fn extract(
         match &e.kind {
             Kind::Dir => {
                 // an existing directory keeps its owner and mode
-                let owner = if fs::metadata(&target).is_err() {
+                let created = fs::metadata(&target).is_err() && {
                     j.rec('D', &target)?;
-                    fs::create_dir(&target).ctx(|| format!("mkdir {}", target.display()))?;
-                    let o = owners.apply(ui, &target, &e.owner, &rel)?;
+                    create_dir_shared(&target)?
+                };
+                let owner = if created {
+                    let o = lock(owners).apply(ui, &target, &e.owner, &rel)?;
                     set_mode(&target, e.mode)?;
                     o
                 } else {
@@ -1178,7 +1346,7 @@ fn extract(
                     w.flush()?;
                     w.hasher.finalize_hex()
                 };
-                let owner = owners.apply(ui, &tmp, &e.owner, &rel)?;
+                let owner = lock(owners).apply(ui, &tmp, &e.owner, &rel)?;
                 set_mode(&tmp, e.mode)?;
                 for (k, v) in &e.xattrs {
                     if k != util::CAPABILITY_XATTR {
@@ -1192,6 +1360,7 @@ fn extract(
                     }
                 }
                 done_bytes += e.size;
+                bytes.fetch_add(e.size, std::sync::atomic::Ordering::Relaxed);
                 // configuration files changed by the administrator are preserved
                 let user_modified = (info.backup.contains(&rel) || info.backup.contains(&spelled))
                     && old_files
@@ -1236,7 +1405,7 @@ fn extract(
                 let _ = fs::remove_file(&tmp);
                 std::os::unix::fs::symlink(t, &tmp)
                     .ctx(|| format!("symlink {}", target.display()))?;
-                let owner = owners.apply(ui, &tmp, &e.owner, &rel)?;
+                let owner = lock(owners).apply(ui, &tmp, &e.owner, &rel)?;
                 place(j, &tmp, &target)?;
                 recs.push(FileRec {
                     kind: 'l',
@@ -1269,7 +1438,7 @@ fn extract(
                 });
             }
         }
-        if ui.tty && throttle.ready() {
+        if let Some(prog) = prog.filter(|_| ui.tty && throttle.ready()) {
             // the whole transaction, by installed size
             let frac = if prog.total_bytes > 0 {
                 (prog.base + done_bytes.min(info.isize)) as f64 / prog.total_bytes as f64

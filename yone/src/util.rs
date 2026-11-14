@@ -38,7 +38,18 @@ pub fn suffixed(p: &Path, suffix: &str) -> PathBuf {
     PathBuf::from(s)
 }
 
-/// Write a file atomically (temp file + fsync + rename).
+static DURABLE: std::sync::atomic::AtomicBool = std::sync::atomic::AtomicBool::new(false);
+
+/// `sync = yes` in yone.conf: writes reach the disk before a commit.
+pub fn set_durable(on: bool) {
+    DURABLE.store(on, std::sync::atomic::Ordering::Relaxed);
+}
+
+pub fn durable() -> bool {
+    DURABLE.load(std::sync::atomic::Ordering::Relaxed)
+}
+
+/// Write a file atomically (temp file, fsync with `sync = yes`, rename).
 pub fn write_atomic(path: &Path, data: &[u8]) -> Result<()> {
     if let Some(parent) = path.parent() {
         fs::create_dir_all(parent).ctx(|| format!("create {}", parent.display()))?;
@@ -47,7 +58,9 @@ pub fn write_atomic(path: &Path, data: &[u8]) -> Result<()> {
     {
         let mut f = fs::File::create(&tmp).ctx(|| format!("create {}", tmp.display()))?;
         f.write_all(data)?;
-        f.sync_all()?;
+        if durable() {
+            f.sync_all()?;
+        }
     }
     fs::rename(&tmp, path).ctx(|| format!("rename {}", path.display()))?;
     Ok(())

@@ -62,28 +62,33 @@ pac_run() {
     -S --noconfirm -dd --noscriptlet $names > "$W/pacman.log" 2>&1
   echo "$EPOCHREALTIME - $t0" | bc
 }
-yone_run() {
+yone_run() { # [env assignments for yone]
   rm -rf "$W/yroot"; mkdir -p "$W/yroot/etc/yone/keys"
   cp "$W/keys/k.pub.pem" "$W/yroot/etc/yone/keys/"
   printf '[options]\nsiglevel = required\n\n[bench]\nserver = file://%s/yone\n' "$W" > "$W/yroot/etc/yone/yone.conf"
   "$yone" --root "$W/yroot" --noconfirm --color never refresh > /dev/null
   sync; local t0=$EPOCHREALTIME
-  "$yone" --root "$W/yroot" --noconfirm --color never install $names > "$W/yone.log" 2>&1
+  env "$@" "$yone" --root "$W/yroot" --noconfirm --color never install $names 2>&1 |
+    while IFS= read -r l; do printf '%s %s\n' "$(echo "$EPOCHREALTIME - $t0" | bc)" "$l"; done > "$W/yone.log"
   echo "$EPOCHREALTIME - $t0" | bc
 }
 median() { sort -n | sed -n 3p; }
 
 echo "==> timing (5 runs each, alternated)"
-: > p.txt; : > y.txt
+: > p.txt; : > y.txt; : > y1.txt; : > ys.txt
 for i in 1 2 3 4 5; do
-  pac_run >> p.txt; yone_run >> y.txt
+  pac_run >> p.txt; yone_run >> y.txt; yone_run YONE_EXTRACT_THREADS=1 >> y1.txt
 done
-p=$(median < p.txt) y=$(median < y.txt)
+echo "    one Yone run, stage by stage:"
+grep -E '^[0-9.]+ (::|✓)' "$W/yone.log" | sed 's/^/      /'
+p=$(median < p.txt) y=$(median < y.txt) y1=$(median < y1.txt)
 files_p=$(find "$W/proot" -not -path '*/var/lib/pacman*' -not -path '*/var/cache*' | wc -l)
 files_y=$(find "$W/yroot" -not -path '*/var/lib/yone*' -not -path '*/var/cache*' -not -path '*/etc/yone*' | wc -l)
 echo "    pacman runs: $(tr '\n' ' ' < p.txt)"
 echo "    yone runs:   $(tr '\n' ' ' < y.txt)"
+echo "    yone, one thread: $(tr '\n' ' ' < y1.txt)"
 echo
 printf 'pacman %s: %.2f s\n' "$(pacman -Q pacman | cut -d' ' -f2)" "$p"
-printf 'yone:          %.2f s   (%.2fx pacman)\n' "$y" "$(echo "$p / $y" | bc -l)"
+printf 'yone:          %.2f s   (%.2fx the speed of pacman)\n' "$y" "$(echo "$p / $y" | bc -l)"
+printf 'yone, 1 thread: %.2f s  (%.2fx)\n' "$y1" "$(echo "$p / $y1" | bc -l)"
 echo "entries installed: pacman $files_p, yone $files_y"
