@@ -20,6 +20,7 @@ import io
 import json
 import os
 import sys
+import urllib.parse
 import urllib.request
 import zipfile
 
@@ -33,6 +34,12 @@ SOURCES = {
                          "https://opengameart.org/content/seamless-2d-graveyard-background", "CC0-1.0"),
     "gothicvania": ("https://opengameart.org/sites/default/files/gothicvania-cemetery-files_1.zip",
                     "Luis Zuno (ansimuz)", "https://opengameart.org/content/gothicvania-cemetery-pack", "CC0-1.0"),
+    "church": ("https://opengameart.org/sites/default/files/gothicvania%20church%20files.zip",
+               "Luis Zuno (ansimuz)", "https://opengameart.org/content/gothicvania-church-pack", "CC0-1.0"),
+    "town": ("https://opengameart.org/sites/default/files/gothicvania-town-files.zip",
+             "Luis Zuno (ansimuz)", "https://opengameart.org/content/gothicvania-town", "CC0-1.0"),
+    "swamp": ("https://opengameart.org/sites/default/files/gothicvania_swamp_files.zip",
+              "Luis Zuno (ansimuz)", "https://opengameart.org/content/gotthicvania-swamp", "CC0-1.0"),
 }
 
 # SHA-256 of each download, as first fetched (inspect prints them)
@@ -46,7 +53,7 @@ PINS = {
 def fetch(work, name):
     url = SOURCES[name][0]
     os.makedirs(work, exist_ok=True)
-    path = os.path.join(work, os.path.basename(url))
+    path = os.path.join(work, urllib.parse.unquote(os.path.basename(url)))
     if not os.path.exists(path):
         req = urllib.request.Request(url, headers={"User-Agent": "graveyardos-wallpapers"})
         with urllib.request.urlopen(req, timeout=120) as r, open(path, "wb") as f:
@@ -107,15 +114,17 @@ def show(im):
     print("GRAVEYARD-SCREEN-END")
 
 
-def inspect(work):
+def inspect(work, only=None):
     os.makedirs(work, exist_ok=True)
     allims = []
-    for name in SOURCES:
+    for name in only or SOURCES:
         path = fetch(work, name)
         print(f"== {name}: {os.path.basename(path)} sha256 {hashlib.sha256(open(path, 'rb').read()).hexdigest()}")
         for m, im in pictures(path):
-            if im.width * im.height < 64 * 64 and m:
+            if (im.width * im.height < 64 * 64 or im.width < 160) and m:
                 continue  # small sprites: not backgrounds
+            if m and any(k in m.lower() for k in ("sprite", "gif", "hero", "enemy", "player", "fx")):
+                continue
             print(f"   [{len(allims)}] {m or '(the picture)'} {im.width}x{im.height}")
             allims.append(im)
     show(sheet(allims))
@@ -179,6 +188,6 @@ def build(work, out):
 
 if __name__ == "__main__":
     if sys.argv[1] == "inspect":
-        inspect(sys.argv[2])
+        inspect(sys.argv[2], sys.argv[3:] or None)
     else:
         build(sys.argv[2], sys.argv[3])

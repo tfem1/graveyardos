@@ -11,6 +11,10 @@ on:
         type: choice
         options: [inspect, preview, build]
         default: inspect
+      only:
+        description: "inspect: these sources only (space separated)"
+        type: string
+        default: ""
 
 permissions:
   contents: write
@@ -23,7 +27,7 @@ jobs:
       - run: pip install -q pillow
       - name: Inspect
         if: inputs.mode == 'inspect'
-        run: python3 branding/wallpapers/src/external.py inspect "$RUNNER_TEMP/src"
+        run: python3 branding/wallpapers/src/external.py inspect "$RUNNER_TEMP/src" ${{ inputs.only }}
       - name: Preview (built, not committed)
         if: inputs.mode == 'preview'
         run: python3 branding/wallpapers/src/external.py build "$RUNNER_TEMP/src" "$RUNNER_TEMP/out"
