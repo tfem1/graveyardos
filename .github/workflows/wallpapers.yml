@@ -1,0 +1,33 @@
+# Wallpapers from free pixel art online (branding/wallpapers/src/external.py):
+# "inspect" prints what the sources hold (a contact sheet in the log);
+# "build" makes the black and white Plasma packages and commits them.
+name: wallpapers
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        type: choice
+        options: [inspect, build]
+        default: inspect
+
+permissions:
+  contents: write
+
+jobs:
+  wallpapers:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - run: pip install -q pillow
+      - name: Inspect
+        if: inputs.mode == 'inspect'
+        run: python3 branding/wallpapers/src/external.py inspect "$RUNNER_TEMP/src"
+      - name: Build and commit
+        if: inputs.mode == 'build'
+        run: |
+          python3 branding/wallpapers/src/external.py build "$RUNNER_TEMP/src" branding/wallpapers
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add branding/wallpapers
+          git diff --cached --quiet || { git commit -q -m "Wallpapers: black and white packages from CC0 pixel art (external.py)"; git push; }
