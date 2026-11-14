@@ -40,6 +40,12 @@ by SHA-256, made black and white:
 - **GraveyardOS Cemetery**: the three loopable layers of
   [GothicVania Cemetery](https://opengameart.org/content/gothicvania-cemetery-pack)
   by Luis Zuno (ansimuz), CC0
+- **GraveyardOS Town**: the sky and town layers of
+  [GothicVania Town](https://opengameart.org/content/gothicvania-town)
+  by Luis Zuno (ansimuz), CC0
+- **Haunted Swamp**: the forest layers of
+  [GothicVania Swamp](https://opengameart.org/content/gotthicvania-swamp)
+  by Luis Zuno (ansimuz), CC0
 
 ## More wallpapers
 
