@@ -1,0 +1,13 @@
+{
+    "KPlugin": {
+        "Authors": [
+            {
+                "Name": "Luis Zuno (ansimuz)"
+            }
+        ],
+        "Description": "A haunted swamp forest, a face in its tree, in pixel art, black and white. From https://opengameart.org/content/gotthicvania-swamp (CC0-1.0)",
+        "Id": "Haunted-Swamp",
+        "License": "CC0-1.0",
+        "Name": "Haunted swamp"
+    }
+}
