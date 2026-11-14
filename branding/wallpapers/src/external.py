@@ -21,7 +21,6 @@ import json
 import os
 import sys
 import urllib.request
-import random
 import zipfile
 
 from PIL import Image, ImageOps
@@ -34,8 +33,6 @@ SOURCES = {
                          "https://opengameart.org/content/seamless-2d-graveyard-background", "CC0-1.0"),
     "gothicvania": ("https://opengameart.org/sites/default/files/gothicvania-cemetery-files_1.zip",
                     "Luis Zuno (ansimuz)", "https://opengameart.org/content/gothicvania-cemetery-pack", "CC0-1.0"),
-    "onebit": ("https://opengameart.org/sites/default/files/1-bit_pixel_art_graveyard_pack.zip", "Fava Beans",
-               "https://opengameart.org/content/1-bit-graveyard-pixel-art-asset-pack", "CC0-1.0"),
 }
 
 # SHA-256 of each download, as first fetched (inspect prints them)
@@ -43,7 +40,6 @@ PINS = {
     "larry-graveyard1": "515e293086c42dee344c3771f1505bf14ab2eadd0ae2c7f3fd284bf612bc8c8e",
     "larry-graveyard2": "017dd73f0a181f0a0c22875c474021292a53626f5d401875b03a17ed1c99c024",
     "gothicvania": "992f3792b49391da4d97c29da47c8f3d2f438ca10d7db03f9a3166d655600871",
-    "onebit": "b880c311d63dc3ecb6e506137efd347c655df9e26b4a5d0e0ebdaeaa016393ef",
 }
 
 
@@ -152,54 +148,9 @@ def gothic(work, gw, gh):
     return ImageOps.autocontrast(canvas.convert("L"), cutoff=0.5)
 
 
-def onebit(work, gw, gh, seed=7):
-    """The 1-bit pack's buildings and statues in a row on a night ground,
-    under a pixel moon and stars."""
-    rng = random.Random(seed)
-    c = Image.new("L", (gw, gh), 0)
-    px = c.load()
-    ground = int(gh * 0.80)
-    for _ in range(gw // 3):
-        x, y = rng.randrange(gw), rng.randrange(int(gh * 0.6))
-        px[x, y] = rng.choice((120, 180, 255))
-    r = gh // 9
-    mx, my = int(gw * 0.80), int(gh * 0.22)
-    for y in range(my - r, my + r + 1):
-        for x in range(mx - r, mx + r + 1):
-            if (x - mx) ** 2 + (y - my) ** 2 <= r * r:
-                px[x, y] = 235
-    for x in range(gw):
-        px[x, ground] = 255
-    names = ["GRAVE-Mausoleum_A.png", "NOTABLE-Angel Statue.png", "GRAVE-Mausoleum_C.png", "NOTABLE-Main Gate_A_Closed.png",
-             "NOTABLE-Skull Statue.png", "GRAVE-Mausoleum_E.png", "NOTABLE-Pavilion_A.png", "GRAVE-Mausoleum_B.png"]
-    n = max(3, min(len(names), gw // 72))
-    order = names[:n]
-    sp = gw // n
-    for i, name in enumerate(order):
-        im = grey(member(work, "onebit", "/" + name))
-        x = i * sp + (sp - im.width) // 2
-        c.paste(im.convert("L"), (x, ground - im.height + 1), im.getchannel("A"))
-    # in front, a row of the pack's small headstones and crosses
-    small = [(m, im) for m, im in pictures(fetch(work, "onebit"))
-             if "/Environment/" in m and im.width <= 32 and im.height <= 32
-             and "Gravestone" in m.rsplit("/", 1)[-1]]
-    if gw == 480:
-        print("   small headstones:", ", ".join(m.rsplit("/", 1)[-1] for m, _ in small) or "none")
-    if small:
-        y = ground + int(gh * 0.12)
-        x = 6
-        while x < gw - 20:
-            m, im = small[rng.randrange(len(small))]
-            g = grey(im)
-            c.paste(g.convert("L"), (x, y - im.height), g.getchannel("A"))
-            x += im.width + rng.randint(6, 14)
-    return c
-
-
 WALLPAPERS = {
     # name: (scene, title, description, sources)
     "Gothic-Cemetery": (gothic, "Gothic cemetery", "A moonlit graveyard in pixel art", ["gothicvania"]),
-    "One-Bit-Cemetery": (onebit, "One-bit cemetery", "Mausoleums, a gate and statues under the moon, in 1-bit pixel art", ["onebit"]),
 }
 GRIDS = {(480, 270): [(1920, 1080), (3840, 2160)], (320, 200): [(2560, 1600)]}
 

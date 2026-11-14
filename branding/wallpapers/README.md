@@ -40,9 +40,6 @@ by SHA-256, made black and white:
 - **Gothic Cemetery**: the three loopable layers of
   [GothicVania Cemetery](https://opengameart.org/content/gothicvania-cemetery-pack)
   by Luis Zuno (ansimuz), CC0
-- **One-Bit Cemetery**: mausoleums, a gate, statues and gravestones of the
-  [1-Bit Graveyard Pixel Art Asset Pack](https://opengameart.org/content/1-bit-graveyard-pixel-art-asset-pack)
-  by Fava Beans, CC0, under a pixel moon
 
 ## More wallpapers
 
