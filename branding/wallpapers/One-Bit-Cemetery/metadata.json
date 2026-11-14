@@ -1,0 +1,13 @@
+{
+    "KPlugin": {
+        "Authors": [
+            {
+                "Name": "Fava Beans"
+            }
+        ],
+        "Description": "Mausoleums, a gate and statues under the moon, in 1-bit pixel art, black and white. From https://opengameart.org/content/1-bit-graveyard-pixel-art-asset-pack (CC0-1.0)",
+        "Id": "One-Bit-Cemetery",
+        "License": "CC0-1.0",
+        "Name": "One-bit cemetery"
+    }
+}

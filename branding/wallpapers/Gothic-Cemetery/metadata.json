@@ -1,0 +1,13 @@
+{
+    "KPlugin": {
+        "Authors": [
+            {
+                "Name": "Luis Zuno (ansimuz)"
+            }
+        ],
+        "Description": "A moonlit graveyard in pixel art, black and white. From https://opengameart.org/content/gothicvania-cemetery-pack (CC0-1.0)",
+        "Id": "Gothic-Cemetery",
+        "License": "CC0-1.0",
+        "Name": "Gothic cemetery"
+    }
+}
