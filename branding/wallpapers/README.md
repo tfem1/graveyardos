@@ -31,6 +31,19 @@ python3 src/pixel.py .     # rewrites the two packages
 Drawn on a 480x270 grid (320x200 for 16:10) with ordered dithering, then
 enlarged without smoothing (PNG, 1920x1080, 2560x1600, 3840x2160).
 
+## From free pixel art (CC0)
+
+Found with Firecrawl on OpenGameArt, built in CI by `src/external.py` (the
+`wallpapers` workflow: `inspect`, `preview`, `build`), the downloads pinned
+by SHA-256, made black and white:
+
+- **Gothic Cemetery**: the three loopable layers of
+  [GothicVania Cemetery](https://opengameart.org/content/gothicvania-cemetery-pack)
+  by Luis Zuno (ansimuz), CC0
+- **One-Bit Cemetery**: mausoleums, a gate, statues and gravestones of the
+  [1-Bit Graveyard Pixel Art Asset Pack](https://opengameart.org/content/1-bit-graveyard-pixel-art-asset-pack)
+  by Fava Beans, CC0, under a pixel moon
+
 ## More wallpapers
 
 Every folder here with Plasma's layout is installed in both editions by
