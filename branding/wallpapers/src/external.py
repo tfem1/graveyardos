@@ -47,6 +47,9 @@ PINS = {
     "larry-graveyard1": "515e293086c42dee344c3771f1505bf14ab2eadd0ae2c7f3fd284bf612bc8c8e",
     "larry-graveyard2": "017dd73f0a181f0a0c22875c474021292a53626f5d401875b03a17ed1c99c024",
     "gothicvania": "992f3792b49391da4d97c29da47c8f3d2f438ca10d7db03f9a3166d655600871",
+    "church": "c4c78b80905022d3325212b58271044bdd4b92d1f7724fe94aee0107ba3c8169",
+    "town": "11c32d7416814e1832c502e76426623065792c3d95a8514be42e59fe6b0b0651",
+    "swamp": "a400c0a7393ca8ae73142adef9dd970d7cd561bb54852d18678843c3b2eef6a3",
 }
 
 
@@ -82,7 +85,7 @@ def sheet(images, width=1600):
     """Thumbnails in rows, each labelled by its index."""
     thumbs = []
     for im in images:
-        k = min(1.0, (840 if len(images) <= 2 else 300) / max(im.width, 1), (480 if len(images) <= 2 else 200) / max(im.height, 1))
+        k = min(1.0, (840 if len(images) <= 4 else 300) / max(im.width, 1), (480 if len(images) <= 4 else 200) / max(im.height, 1))
         t = im.resize((max(1, int(im.width * k)), max(1, int(im.height * k))), Image.NEAREST)
         bg = Image.new("RGBA", t.size, (255, 0, 255, 255))
         bg.alpha_composite(t)
@@ -157,9 +160,41 @@ def gothic(work, gw, gh):
     return ImageOps.autocontrast(canvas.convert("L"), cutoff=0.5)
 
 
+def layered(work, src, layers, gw, gh, sky=None):
+    """Loopable layers (zip members, back to front) tiled across the grid,
+    standing on its bottom edge, centred; above them the top colour of the
+    first. A layer may be a list of members, used in turn along the row."""
+    ims = [[grey(member(work, src, m)) for m in (l if isinstance(l, list) else [l])] for l in layers]
+    first = ims[0][0]
+    top = first.crop((0, 0, first.width, 1)).resize((1, 1), Image.BOX).getpixel((0, 0))[0] if sky is None else sky
+    canvas = Image.new("LA", (gw, gh), (top, 255))
+    for row in ims:
+        lw = row[0].width
+        x = (gw // 2 - lw // 2) % lw - lw
+        i = 0
+        while x < gw:
+            im = row[i % len(row)]
+            canvas.paste(im, (x, gh - im.height), im)
+            x += im.width
+            i += 1
+    return ImageOps.autocontrast(canvas.convert("L"), cutoff=0.5)
+
+
+def town(work, gw, gh):
+    env = "PNG/environment/layers/"
+    return layered(work, "town", [env + "background.png", env + "middleground.png"], gw, gh)
+
+
+def swamp(work, gw, gh):
+    env = "Evironment/"
+    return layered(work, "swamp", [[env + "mid-layer-01.png", env + "mid-layer-02.png"], env + "trees.png"], gw, gh)
+
+
 WALLPAPERS = {
     # name: (scene, title, description, sources)
-    "Gothic-Cemetery": (gothic, "Gothic cemetery", "A moonlit graveyard in pixel art", ["gothicvania"]),
+    "GraveyardOS-Cemetery": (gothic, "GraveyardOS cemetery", "A moonlit graveyard in pixel art", ["gothicvania"]),
+    "GraveyardOS-Town": (town, "GraveyardOS town", "An old town and its church under a cloudy sky, in pixel art", ["town"]),
+    "Haunted-Swamp": (swamp, "Haunted swamp", "A haunted swamp forest, a face in its tree, in pixel art", ["swamp"]),
 }
 GRIDS = {(480, 270): [(1920, 1080), (3840, 2160)], (320, 200): [(2560, 1600)]}
 

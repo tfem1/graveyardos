@@ -37,7 +37,7 @@ Found with Firecrawl on OpenGameArt, built in CI by `src/external.py` (the
 `wallpapers` workflow: `inspect`, `preview`, `build`), the downloads pinned
 by SHA-256, made black and white:
 
-- **Gothic Cemetery**: the three loopable layers of
+- **GraveyardOS Cemetery**: the three loopable layers of
   [GothicVania Cemetery](https://opengameart.org/content/gothicvania-cemetery-pack)
   by Luis Zuno (ansimuz), CC0
 
