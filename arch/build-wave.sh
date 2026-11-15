@@ -168,7 +168,13 @@ for r in "$HERE"/bootstrap/git "$HERE"/bootstrap/python-pyproject-hooks "$HERE"/
   fi
 done
 
-needs() { awk -F'\t' -v b="$1" '$1 == b { print $2 }' "$HERE/needs"; }
+# what a base needs built first, less what arch/drop leaves out of it
+needs() {
+  awk -F'\t' -v b="$1" '
+    FILENAME ~ /drop$/ { if ($0 !~ /^#/ && $1 == b) gone[$2] = 1; next }
+    $1 == b { n = split($2, d, " "); for (i = 1; i <= n; i++) if (!(d[i] in gone)) print d[i] }
+  ' "$HERE/drop" "$HERE/needs"
+}
 
 # GraveyardOS's own recipes (arch/extra), built as soon as what their
 # "# after:" line names is built; once per pass.
@@ -200,6 +206,7 @@ build_extras
 while read -r base; do
   [ -n "$base" ] || continue
   if grep -qx "$base" "$work/done"; then continue; fi
+  if grep -qx "$base" <(grep -v '^#' "$HERE/long" | cut -f1); then continue; fi # a build of its own
   # what the GraveyardOS base already is (glibc, gcc...): never rebuilt
   if grep -v '^#' "$HERE/base-names" | tr ' ' '\n' | grep -qx "$base"; then
     echo "$base" >> "$work/done"; continue

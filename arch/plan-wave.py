@@ -28,13 +28,18 @@ def lines(path):
 
 def main():
     work, shards, out = sys.argv[1], int(sys.argv[2]), sys.argv[3]
-    order = lines(os.path.join(HERE, "order"))
+    long = set(lines(os.path.join(HERE, "long")))
+    order = [b for b in lines(os.path.join(HERE, "order")) if b not in long]
     base = {n for l in open(os.path.join(HERE, "base-names")) for n in l.split("#")[0].split()}
     needs = {}
     for l in open(os.path.join(HERE, "needs")):
         if "\t" in l:
             b, deps = l.rstrip("\n").split("\t", 1)
             needs[b] = deps.split()
+    for l in open(os.path.join(HERE, "drop")):
+        f = l.rstrip("\n").split("\t")
+        if len(f) >= 2 and not l.startswith("#") and f[0] in needs:
+            needs[f[0]] = [d for d in needs[f[0]] if d != f[1]]
     done = set(lines(os.path.join(work, "done"))) | base
     failed = set() if "--retry-failed" in sys.argv else set(lines(os.path.join(work, "failed")))
     ready = [b for b in order if b not in done and b not in failed

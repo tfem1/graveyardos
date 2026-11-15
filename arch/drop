@@ -1,0 +1,7 @@
+# Dependencies left out of a package base: it is built without the optional
+# feature they bring, never waits for them and does not require them.
+# base<TAB>dependency<TAB>what is left out
+plasma-nm	qt6-webengine	the Cisco AnyConnect VPN sign-in page
+kdeplasma-addons	qt6-webengine	the dictionary and web browser applets
+plasma-desktop	kaccounts-integration	the OpenDesktop integration plugin
+purpose	kaccounts-integration	the Nextcloud and ownCloud sharing plugins

@@ -1,0 +1,4 @@
+# Arch packages left out of the desktop images although their group names
+# them (iso/desktop.sh).
+discover	KDE's software centre: it has no Yone backend
+plasma-bigscreen	the TV interface of Plasma

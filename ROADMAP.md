@@ -87,8 +87,32 @@ package base into Yone recipes (PKGBUILD evaluated by bash, makepkg's
 flags and steps, Arch's checksums checked, Git tags taken as their
 host's archives): 343 of the 381 bases of the Hyprland set convert as
 they are; the others use Git hosts or submodules it does not map yet.
-Next: a CI workflow that imports and builds them in waves, in the base
-system, with the checks of the base packages.
+The `arch-wave` workflow builds them in waves: each wave builds, in 20
+parallel jobs, every base whose dependencies are built, merges the
+repositories, and starts the next wave.
+
+### qt6-webengine (Chromium inside)
+
+It is the one build too long for a 6-hour job on 4 cores. The plan:
+
+1. **KDE without it (done).** It is only an optional feature for what the
+   images ship: `arch/drop` builds plasma-nm without the Cisco AnyConnect
+   sign-in page, kdeplasma-addons without the dictionary and web browser
+   applets, plasma-desktop and purpose without the online accounts
+   (kaccounts-integration, signon-*). `arch/exclude` keeps out of the images
+   what needs it outright (discover, which has no Yone backend anyway;
+   plasma-bigscreen). `arch/long` keeps it out of the waves.
+2. **The installer's window without it (done).** It shows the installer's
+   page with Qt WebEngine when the image has it, else with WebKitGTK
+   (`installer/window-gtk.py`, GTK 4 and WebKit 6.0: two more package bases,
+   a build of 2 to 3 hours), else in a browser.
+3. **Its own build, resumable.** A workflow that runs the build under a
+   time limit, keeps the build tree (Ninja's state and objects, compressed)
+   as an artifact when time runs out, and starts itself again from it until
+   Ninja has nothing left to do; then the package goes into the repository
+   like the others. Needs: Yone keeping a build's work directory between
+   runs (sources unpacked and patched once). Then the online accounts,
+   Falkon and the rest come back.
 
 ## Catalogue: 6000 packages and more (from Arch Linux's recipes)
 

@@ -1,0 +1,4 @@
+# Package bases too long for one 6-hour build job: the waves leave them out
+# (arch/plan-wave.py, arch/build-wave.sh); they get a build of their own that
+# resumes where the previous job stopped (ROADMAP.md, "qt6-webengine").
+qt6-webengine	Chromium inside: 6 to 9 hours on the runners' 4 cores

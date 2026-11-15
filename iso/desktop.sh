@@ -68,7 +68,8 @@ case $edition in kde) title="KDE edition" ;; hyprland) title="Hyprland edition" 
 mapfile -t wanted < <({ section "$title"; section both; } | tr ' ' '\n' | grep . |
   xargs python3 "$REPO/arch/closure.py" --expand |
   awk 'NR == FNR { if ($0 !~ /^#/ && NF == 2) map[$1] = $2; next } { print (($0 in map) ? map[$0] : $0) }' "$REPO/arch/names" - |
-  grep -vxF -f <(grep -v '^#' "$REPO/arch/base-provides" | tr ' ' '\n' | grep .) | sort -u)
+  grep -vxF -f <(grep -v '^#' "$REPO/arch/base-provides" | tr ' ' '\n' | grep .) |
+  grep -vxF -f <(grep -v '^#' "$REPO/arch/exclude" | cut -f1) | sort -u)
 mapfile -t offered < <(inroot yone --color never list | sed 's|^[^/]*/||; s| .*||')
 # GraveyardOS's own pieces the desktops need (arch/extra): logind sessions
 # through PAM, system users
@@ -224,6 +225,7 @@ ln -sfn ../graveyard-live-user.service "$live/etc/systemd/system/multi-user.targ
 # the installer: its window, on the desktop and in the menu
 install -m 755 "$REPO/installer/graveyard-installer-window" "$live/usr/bin/graveyard-installer-window"
 install -m 644 "$REPO/installer/window.qml" "$live/usr/lib/graveyard/installer/window.qml"
+install -m 644 "$REPO/installer/window-gtk.py" "$live/usr/lib/graveyard/installer/window-gtk.py"
 cat > "$live/usr/share/applications/graveyard-installer.desktop" << 'EOF'
 [Desktop Entry]
 Type=Application
