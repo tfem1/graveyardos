@@ -13,9 +13,23 @@ system's names and GraveyardOS's extras are left alone.
 import glob
 import os
 import re
+import subprocess
 import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
+
+
+INFO_DIR = "usr/share/info/dir"
+
+
+def listing(f):
+    """The paths a package installs: its manifest, else the archive's list."""
+    r = subprocess.run(["tar", "-I", "zstd", "-xOf", f, "--occurrence=1", ".YONEFILES"],
+                       capture_output=True, text=True)
+    if r.returncode == 0 and r.stdout:
+        return {p for l in r.stdout.splitlines() for p in l.split("\t")}  # the path is one of the fields
+    r = subprocess.run(["tar", "-I", "zstd", "-tf", f], capture_output=True, text=True)
+    return {l.rstrip("/") for l in r.stdout.splitlines()}
 
 
 def main():
@@ -30,6 +44,28 @@ def main():
         for l in open(y):
             if l.startswith("# replaces:"):
                 keep.update(l.split(":", 1)[1].split())
+    # Packages built before the makepkg tidy step carry usr/share/info/dir:
+    # the second one to be installed conflicts with the first (libgpg-error,
+    # libunistring, nettle... out of every system since). Out of the
+    # repository: their bases are built again, tidied.
+    checked_path = os.path.join(work, "repo-checked")
+    checked = set(open(checked_path).read().split()) if os.path.exists(checked_path) else set()
+    dropped = []
+    for f in sorted(glob.glob(os.path.join(work, "repo", "*.yon"))):
+        b = os.path.basename(f)
+        if b in checked:
+            continue
+        if INFO_DIR in listing(f):
+            os.remove(f)
+            if os.path.exists(f + ".sig"):
+                os.remove(f + ".sig")
+            dropped.append(b)
+        else:
+            checked.add(b)
+    with open(checked_path, "w") as out:
+        out.write("".join(c + "\n" for c in sorted(checked)))
+    if dropped:
+        print(f"with usr/share/info/dir, out of the repository: {len(dropped)}: {' '.join(dropped)}")
     # name-version-release-arch.yon
     names = {re.sub(r"-[^-]+-[^-]+-[^-]+\.yon$", "", os.path.basename(f))
              for f in glob.glob(os.path.join(work, "repo", "*.yon"))}
