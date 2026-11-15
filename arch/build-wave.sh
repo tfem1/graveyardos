@@ -151,10 +151,12 @@ build_dir() { # recipe dir (host path), log
 
 # The base system, declared to Yone: one package that provides every base
 # package's name, so packages depending on glibc, perl... install.
-if ! grep -qx graveyard-base-provides "$work/done"; then
+# Built again when arch/base-provides changes (its checksum in the version).
+bp_sum=$(grep -v '^#' "$HERE/base-provides" | cksum | cut -d' ' -f1)
+if ! grep -qx "graveyard-base-provides@$bp_sum" "$work/done"; then
   r=$work/recipes/graveyard-base-provides; mkdir -p "$r"
   {
-    echo "name = graveyard-base-provides"; echo "version = 2"; echo "release = 1"
+    echo "name = graveyard-base-provides"; echo "version = 2.$bp_sum"; echo "release = 1"
     echo "desc = The GraveyardOS base system, installed by the image itself"
     echo "provides = $(grep -v '^#' "$HERE/base-provides" | tr '\n' ' ' | tr -s ' ')"
     echo; echo "@package"; echo 'mkdir -p "$PKGDIR/usr/share/graveyard"; echo base > "$PKGDIR/usr/share/graveyard/base-provides"'
@@ -162,7 +164,7 @@ if ! grep -qx graveyard-base-provides "$work/done"; then
     echo 'mkdir -p "$PKGDIR/usr/bin"; ln -s python3 "$PKGDIR/usr/bin/python"'
   } > "$r/YONEBUILD"
   build_dir "$r" "$work/logs/graveyard-base-provides.log" || { tail -n 20 "$work/logs/graveyard-base-provides.log"; exit 1; }
-  echo graveyard-base-provides >> "$work/done"
+  echo "graveyard-base-provides@$bp_sum" >> "$work/done"
 fi
 
 # Tools Arch builds with themselves, from arch/bootstrap first.

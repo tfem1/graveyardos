@@ -7,3 +7,5 @@ grep bash libtool gdbm gperf expat inetutils less perl autoconf automake openssl
 python flit-core packaging wheel setuptools meson kmod coreutils diffutils findutils groff grub gzip iproute2 kbd
 libpipeline make patch tar texinfo vim markupsafe jinja2 systemd dbus man-db procps util-linux e2fsprogs sudo
 dosfstools
+# names Arch gives to parts of those: libtool's libltdl, util-linux's libraries
+libltdl util-linux-libs

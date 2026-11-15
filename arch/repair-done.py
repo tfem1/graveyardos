@@ -44,7 +44,8 @@ def main():
         for l in open(y):
             if l.startswith("# replaces:"):
                 keep.update(l.split(":", 1)[1].split())
-    # Packages built before the makepkg tidy step carry usr/share/info/dir:
+    # Packages built before the makepkg tidy step carry usr/share/info/dir
+    # (Perl's: perllocal.pod, .packlist):
     # the second one to be installed conflicts with the first (libgpg-error,
     # libunistring, nettle... out of every system since). Out of the
     # repository: their bases are built again, tidied.
@@ -55,7 +56,7 @@ def main():
         b = os.path.basename(f)
         if b in checked:
             continue
-        if INFO_DIR in listing(f):
+        if any(p == INFO_DIR or p.endswith("/perllocal.pod") or p.endswith("/.packlist") for p in listing(f)):
             os.remove(f)
             if os.path.exists(f + ".sig"):
                 os.remove(f + ".sig")
@@ -65,7 +66,7 @@ def main():
     with open(checked_path, "w") as out:
         out.write("".join(c + "\n" for c in sorted(checked)))
     if dropped:
-        print(f"with usr/share/info/dir, out of the repository: {len(dropped)}: {' '.join(dropped)}")
+        print(f"with usr/share/info/dir or perllocal.pod, out of the repository: {len(dropped)}: {' '.join(dropped)}")
         # a bootstrap among them is built again too
         boots = {os.path.basename(os.path.dirname(y)) for y in glob.glob(os.path.join(HERE, "bootstrap", "*", "YONEBUILD"))}
         again = {"bootstrap:" + re.sub(r"-[^-]+-[^-]+-[^-]+\.yon$", "", d) for d in dropped} & {"bootstrap:" + b for b in boots}
