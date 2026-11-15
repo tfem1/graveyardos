@@ -232,7 +232,7 @@ def eye(work, gw, gh):
     d.fontmode = "1"  # no smoothing: pixel letters
     d.text((gw // 2, 2), "GraveyardOS", font=font, fill=255, anchor="mt")
     # the eye on the moon (the moon layer stands on the bottom edge), the name above
-    ey = gh - 224 + 92 - e.height // 2
+    ey = gh - 224 + 40 - e.height // 2
     ty = max(4, ey - size - 10)
     stamp(c, text, 0, ty)
     stamp(c, e, gw // 2 - e.width // 2, ey)
