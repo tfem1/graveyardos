@@ -30,3 +30,7 @@ opencv	cuda	the CUDA modules
 opencv	cudnn	the CUDA modules (cuDNN for dnn)
 opencv	opencv-cuda	the CUDA build of OpenCV
 opencv	python-opencv-cuda	the CUDA build of OpenCV
+# qt6-webengine is built apart (arch/long); what needs it only for an extra
+pyside6	qt6-webengine	the QtWebEngine bindings (PySide builds the modules Qt has)
+pyside6	qt6-webview	the QtWebView bindings
+hspell	qt6-webengine	hunspell-he's dictionaries for Qt WebEngine (.bdic)

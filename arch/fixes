@@ -17,3 +17,4 @@ openmpi	eval "$(declare -f build | sed 's|--with-cuda=/opt/cuda --with-cuda-libd
 openimagedenoise	eval "$(declare -f build | sed 's/-DOIDN_DEVICE_CUDA=ON/-DOIDN_DEVICE_CUDA=OFF/; s/-DOIDN_DEVICE_HIP=ON/-DOIDN_DEVICE_HIP=OFF/')"; eval "$(declare -f package | sed 's|rm -r "\${pkgdir}"/build|rm -rf "${pkgdir}"/build|')"  # GPU compute is not built (arch/long, arch/drop); the build/ the GPU devices install may then be missing
 adios2	eval "$(declare -f build | sed 's/-DADIOS2_USE_CUDA=ON/-DADIOS2_USE_CUDA=OFF/')"  # GPU compute is not built (arch/long, arch/drop)
 opencv	eval "$(declare -f build | sed '/local cuda_archs=/d; /build-cuda/d')"  # the second, CUDA build (opencv-cuda, python-opencv-cuda: arch/drop) is not made
+hspell	eval "$(declare -f package_hunspell-he | sed "/qtwebengine/d; s/^\( *\)_filename=.*/\1: ;/")"  # no qt6-webengine (arch/long): hunspell-he without its Qt WebEngine dictionaries
