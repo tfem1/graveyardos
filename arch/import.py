@@ -41,16 +41,18 @@ export LDFLAGS="-Wl,-O1 -Wl,--sort-common -Wl,--as-needed -Wl,-z,relro -Wl,-z,no
 export LTOFLAGS="-flto=auto"
 export RUSTFLAGS="-Cforce-frame-pointers=yes"
 export DEBUG_CFLAGS="-g" DEBUG_CXXFLAGS="-g"
-# python -m build checks the build dependencies' versions against what is
+# python -m build without --no-isolation fetches the build dependencies from
+# PyPI (Arch builds with the network; this system has none): the installed
+# ones are used. It also checks the build dependencies' versions against what is
 # installed; Arch's packages are built against Arch's of the day, as these:
 # a newer flit-core must not stop python-mdurl (Arch's makepkg has the same
 # packages, built before the update)
 python() {
-  if [ "${1:-}" = -m ] && [ "${2:-}" = build ]; then shift 2; command python -m build --skip-dependency-check "$@"
+  if [ "${1:-}" = -m ] && [ "${2:-}" = build ]; then shift 2; command python -m build --skip-dependency-check --no-isolation "$@"
   else command python "$@"; fi
 }
 python3() {
-  if [ "${1:-}" = -m ] && [ "${2:-}" = build ]; then shift 2; command python3 -m build --skip-dependency-check "$@"
+  if [ "${1:-}" = -m ] && [ "${2:-}" = build ]; then shift 2; command python3 -m build --skip-dependency-check --no-isolation "$@"
   else command python3 "$@"; fi
 }
 # bsdtar (libarchive) is on every Arch build machine, not on GraveyardOS's
