@@ -1,0 +1,203 @@
+# The desktops' packages built in parallel: a wave plans what is ready from
+# the state of the last pass (arch/plan-wave.py), builds it on up to 20
+# runners at once (arch/build-wave.sh, one shard each), merges their
+# packages into one signed repository (the arch-repo artifact, the same as an
+# arch-build pass's), then starts the next wave while waves make progress.
+name: arch-wave
+
+on:
+  workflow_dispatch:
+    inputs:
+      base_run:
+        description: "Run id whose graveyard-base artifact is the system to build in"
+        required: true
+      prev_run:
+        description: "Run id of the last arch-build pass or arch-wave (its arch-repo artifact)"
+        required: true
+      shards:
+        description: "Runners at once (at most 20)"
+        default: "20"
+      budget:
+        description: "Seconds of building per shard"
+        default: "17400"
+      retry_failed:
+        description: "Try again the package bases that failed (after fixes)"
+        type: boolean
+        default: false
+      chain:
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+  actions: write   # download artifacts of other runs, start the next wave
+
+env:
+  LFS: /mnt/lfs
+
+concurrency:
+  group: arch-build
+
+jobs:
+  plan:
+    runs-on: ubuntu-24.04
+    outputs:
+      matrix: ${{ steps.plan.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: arch-repo
+          path: state
+          run-id: ${{ inputs.prev_run }}
+          github-token: ${{ github.token }}
+      - id: plan
+        run: |
+          python3 arch/plan-wave.py state "${{ inputs.shards }}" shards ${{ inputs.retry_failed && '--retry-failed' || '' }} > matrix.json 2> summary.txt
+          cat summary.txt | tee -a "$GITHUB_STEP_SUMMARY"
+          echo "matrix=$(cat matrix.json)" >> "$GITHUB_OUTPUT"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: wave-shards
+          path: shards
+          retention-days: 3
+
+  build:
+    needs: plan
+    if: ${{ fromJSON(needs.plan.outputs.matrix).shard[0] != null }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 350
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.plan.outputs.matrix) }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Free disk space
+        run: |
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL
+          sudo docker image prune --all --force > /dev/null 2>&1 || true
+      - uses: actions/download-artifact@v4
+        with:
+          name: graveyard-base
+          path: ${{ runner.temp }}
+          run-id: ${{ inputs.base_run }}
+          github-token: ${{ github.token }}
+      - name: The base system
+        run: |
+          sudo -E bash lfs/build.sh unpack "$RUNNER_TEMP"/graveyard-base.tar.zst
+          sudo rm -f "$RUNNER_TEMP"/graveyard-base.tar.zst
+          sudo mkdir -p /mnt/arch-work && sudo chown "$(id -u):$(id -g)" /mnt/arch-work
+      - uses: actions/download-artifact@v4
+        with:
+          name: arch-repo
+          path: /mnt/arch-work
+          run-id: ${{ inputs.prev_run }}
+          github-token: ${{ github.token }}
+      - uses: actions/download-artifact@v4
+        with:
+          name: wave-shards
+          path: ${{ runner.temp }}/shards
+      - name: Yone (static)
+        timeout-minutes: 20
+        working-directory: yone
+        run: |
+          rustup target add x86_64-unknown-linux-musl
+          sudo apt-get update -qq && sudo apt-get install -y -qq musl-tools > /dev/null
+          cargo build --release --target x86_64-unknown-linux-musl
+          echo "YONE=$PWD/target/x86_64-unknown-linux-musl/release/yone" >> "$GITHUB_ENV"
+      - name: Build shard ${{ matrix.shard }}
+        run: |
+          set -o pipefail
+          ls /mnt/arch-work/repo > "$RUNNER_TEMP/before.txt"
+          cp /mnt/arch-work/done "$RUNNER_TEMP/done.before"
+          sudo chown -R root:root /mnt/arch-work
+          sudo -E YONE="$YONE" ARCH_ONLY="$RUNNER_TEMP/shards/shard-${{ matrix.shard }}" \
+            bash arch/build-wave.sh "$LFS" /mnt/arch-work "${{ inputs.budget }}" | tee "$RUNNER_TEMP/shard.txt"
+          { echo "## Shard ${{ matrix.shard }}"; echo '```'; tail -n 3 "$RUNNER_TEMP/shard.txt"; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+      - name: What this shard made
+        if: always()
+        run: |
+          mkdir -p "$RUNNER_TEMP/out/repo" "$RUNNER_TEMP/out/logs"
+          for f in $(ls /mnt/arch-work/repo 2> /dev/null | grep -vxF -f "$RUNNER_TEMP/before.txt" | grep -v '\.index'); do
+            sudo cp "/mnt/arch-work/repo/$f" "$RUNNER_TEMP/out/repo/"
+          done
+          sudo cat /mnt/arch-work/done 2> /dev/null | grep -vxF -f "$RUNNER_TEMP/done.before" > "$RUNNER_TEMP/out/done" || true
+          sudo cp /mnt/arch-work/failed "$RUNNER_TEMP/out/failed" 2> /dev/null || touch "$RUNNER_TEMP/out/failed"
+          sudo cp -r /mnt/arch-work/logs/. "$RUNNER_TEMP/out/logs/" 2> /dev/null || true
+          sudo chown -R "$(id -u)" "$RUNNER_TEMP/out"
+          echo "new packages: $(ls "$RUNNER_TEMP/out/repo" | grep -c '\.yon$'), new done: $(grep -c . "$RUNNER_TEMP/out/done")"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: shard-${{ matrix.shard }}
+          path: ${{ runner.temp }}/out
+          retention-days: 3
+
+  merge:
+    needs: [plan, build]
+    if: always() && needs.plan.result == 'success'
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: arch-repo
+          path: state
+          run-id: ${{ inputs.prev_run }}
+          github-token: ${{ github.token }}
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: shard-*
+          path: shards
+      - name: Yone (static)
+        timeout-minutes: 20
+        working-directory: yone
+        run: |
+          rustup target add x86_64-unknown-linux-musl
+          sudo apt-get update -qq && sudo apt-get install -y -qq musl-tools > /dev/null
+          cargo build --release --target x86_64-unknown-linux-musl
+          echo "YONE=$PWD/target/x86_64-unknown-linux-musl/release/yone" >> "$GITHUB_ENV"
+      - name: Merge
+        run: |
+          # earlier failures stay failures (not tried again each wave), unless retried
+          ${{ inputs.retry_failed && ': > failed.wave' || 'cp state/failed failed.wave' }}
+          for d in shards/shard-*; do
+            [ -d "$d" ] || continue
+            cp -n "$d"/repo/* state/repo/ 2> /dev/null || true
+            cat "$d/done" >> state/done 2> /dev/null || true
+            cat "$d/failed" >> failed.wave 2> /dev/null || true
+            mkdir -p state/logs && cp -r "$d"/logs/. state/logs/ 2> /dev/null || true
+          done
+          awk '!seen[$0]++' state/done > state/done.new && mv state/done.new state/done
+          # a base built by one shard is no failure even if another tried it first
+          grep -vF -f <(sed 's/$/\t/' state/done) failed.wave | awk -F'\t' '!seen[$1]++' > state/failed || true
+          "$YONE" repo-index state/repo --name arch --sign state/archkey.key --color never
+          tar -C state -czf arch-logs.tar.gz logs 2> /dev/null && rm -rf state/logs || true
+          built=$(grep -cxF -f arch/order state/done || true)
+          echo "after this wave: $built of $(grep -c . arch/order) package bases built, $(grep -c . state/failed) failing, $(ls state/repo/*.yon | wc -l) packages" \
+            | tee -a "$GITHUB_STEP_SUMMARY"
+          echo "BUILT=$built" >> "$GITHUB_ENV"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: arch-repo
+          path: state
+          compression-level: 0
+          retention-days: 30
+      - uses: actions/upload-artifact@v4
+        with:
+          name: arch-logs
+          path: arch-logs.tar.gz
+          retention-days: 14
+          if-no-files-found: ignore
+      - name: Next wave
+        if: inputs.chain
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          new=0
+          for d in shards/shard-*; do new=$((new + $(grep -c . "$d/done" 2> /dev/null || echo 0))); done
+          echo "built in this wave: $new"
+          if [ "$new" -gt 0 ]; then
+            gh workflow run arch-wave.yml --ref "$GITHUB_REF_NAME" -f base_run="${{ inputs.base_run }}" \
+              -f prev_run="${{ github.run_id }}" -f shards="${{ inputs.shards }}" -f budget="${{ inputs.budget }}" -f chain=true
+          fi

@@ -10,6 +10,9 @@
 #   work    the state carried from pass to pass: repo/ (signed .yon files and
 #           index), archkey.*, done, failed; plus logs/ for this pass
 #
+# ARCH_ONLY=<file>: build only the package bases listed in it (one per line,
+# in that order), a shard of a parallel wave (arch-wave workflow).
+#
 # Each package base of arch/order is imported (arch/import.py), built with
 # Yone in a chroot, then installed. What fails is tried again by the next
 # pass (its build dependencies may be there by then). Exit status 0 when the
@@ -25,6 +28,9 @@ touch "$work/done" "$work/failed"
 # a package that failed may build now that more is built: every pass tries
 # again all that is not done
 mv "$work/failed" "$work/failed.before"; : > "$work/failed"
+# what the base provides counts as built (glibc, gcc...: arch/needs names them)
+{ cat "$work/done"; grep -v '^#' "$HERE/base-names" | tr ' ' '\n' | grep .; } | awk '!seen[$0]++' > "$work/done.new"
+mv "$work/done.new" "$work/done"
 : > "$work/logs/.keep"
 start=$SECONDS
 log() { printf '\033[1;35m==>\033[0m %s\n' "$*"; }
@@ -163,7 +169,7 @@ build_extras() {
   done
 }
 
-n=0 okn=0
+n=0 okn=0 waiting=0
 build_extras
 while read -r base; do
   [ -n "$base" ] || continue
@@ -173,6 +179,13 @@ while read -r base; do
     echo "$base" >> "$work/done"; continue
   fi
   if [ $((SECONDS - start)) -ge "$budget" ]; then log "time budget spent"; break; fi
+  # a base whose build or run dependencies are not built yet waits (it is
+  # not a failure: a later pass, or another shard's, builds them)
+  missing_need=
+  for d in $(needs "$base"); do
+    grep -qx "$d" "$work/done" || { missing_need=$d; break; }
+  done
+  if [ -n "$missing_need" ]; then waiting=$((waiting + 1)); continue; fi
   # twelve tries and nothing built: something general is wrong, not a package
   if [ "$n" -ge 12 ] && [ "$okn" -eq 0 ]; then
     log "the first $n packages all failed: stopping (see the logs)"
@@ -199,9 +212,10 @@ while read -r base; do
     printf '%s\t%s\n' "$base" "$(grep -v '^\s*$' "$lf" | tail -n 1 | cut -c1-200)" >> "$work/failed"
     printf 'FAIL %5ds\n' $((SECONDS - t0))
   fi
-done < "$HERE/order"
+done < "${ARCH_ONLY:-$HERE/order}"
 
 total=$(grep -c . "$HERE/order")
+[ -z "${ARCH_ONLY:-}" ] || echo "this shard: $(grep -c . "$ARCH_ONLY") package bases"
 echo
-echo "built this pass: $okn (of $n tried)"
-echo "overall: $(grep -c . "$work/done") done, $(grep -c . "$work/failed") failing, of $total package bases"
+echo "built this pass: $okn (of $n tried; $waiting waiting for their dependencies)"
+echo "overall: $(grep -cxF -f "$HERE/order" "$work/done") done, $(grep -c . "$work/failed") failing, of $total package bases"
