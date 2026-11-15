@@ -76,11 +76,13 @@ if ls "$work"/repo/*.yon > /dev/null 2>&1; then
   # bootstrap of the same name.
   left_out=() installed_now=0
   for p in "${built[@]}"; do
-    if inroot /usr/local/bin/yone --noconfirm --overwrite --color never install "$p" >> "$work/logs/reinstall.log" 2>&1; then
+    if inroot /usr/local/bin/yone --noconfirm --overwrite --color never install "$p" > "$work/logs/reinstall.one" 2>&1; then
       installed_now=$((installed_now + 1))
     else
       left_out+=("$p")
+      printf '   not installable: %s: %s\n' "$p" "$(grep -E 'error' "$work/logs/reinstall.one" | head -n 1 | cut -c1-200)"
     fi
+    cat "$work/logs/reinstall.one" >> "$work/logs/reinstall.log"
   done
   if [ "${#left_out[@]}" -gt 0 ]; then
     for p in "${left_out[@]}"; do

@@ -25,7 +25,7 @@ def main():
         return
     done = [l.rstrip("\n") for l in open(path) if l.strip()]
     order = {l.split("\t")[0].strip() for l in open(os.path.join(HERE, "order")) if l.strip() and not l.startswith("#")}
-    keep = set()
+    keep = {n for l in open(os.path.join(HERE, "base-names")) for n in l.split("#")[0].split()}
     for y in glob.glob(os.path.join(HERE, "bootstrap", "*", "YONEBUILD")):
         for l in open(y):
             if l.startswith("# replaces:"):
