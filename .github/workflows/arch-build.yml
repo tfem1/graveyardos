@@ -56,6 +56,9 @@ jobs:
           sudo -E bash lfs/build.sh unpack "$RUNNER_TEMP"/graveyard-base.tar.zst
           sudo rm -f "$RUNNER_TEMP"/graveyard-base.tar.zst
 
+      - name: A place for the state of earlier passes
+        run: sudo mkdir -p /mnt/arch-work && sudo chown "$(id -u):$(id -g)" /mnt/arch-work
+
       - name: What earlier passes built
         if: inputs.prev_run != ''
         uses: actions/download-artifact@v4

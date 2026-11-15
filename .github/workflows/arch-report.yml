@@ -1,0 +1,47 @@
+# What an arch-build pass left: the failures grouped by their last log line,
+# and the end of the logs of some packages (the artifacts, in the log).
+name: arch-report
+
+on:
+  workflow_dispatch:
+    inputs:
+      run:
+        description: "arch-build run id"
+        required: true
+      logs:
+        description: "packages whose log end to print (space separated)"
+        default: ""
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  report:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: arch-repo
+          path: work
+          run-id: ${{ inputs.run }}
+          github-token: ${{ github.token }}
+      - uses: actions/download-artifact@v4
+        with:
+          name: arch-logs
+          path: .
+          run-id: ${{ inputs.run }}
+          github-token: ${{ github.token }}
+      - name: Report
+        run: |
+          tar -xzf arch-logs.tar.gz
+          echo "done: $(grep -c . work/done)  failed: $(grep -c . work/failed)  packages: $(ls work/repo/*.yon 2> /dev/null | wc -l)"
+          echo "== failures by cause (normalised last line)"
+          cut -f2- work/failed | sed -E 's/[0-9a-f]{12,}//g; s/[0-9]+(\.[0-9]+)+/N/g; s/\/[^ :]*\//\/...\//g' \
+            | cut -c1-110 | sort | uniq -c | sort -rn | head -n 60
+          echo "== every failure"
+          cut -c1-220 work/failed
+          for p in ${{ inputs.logs }}; do
+            echo "== log of $p"
+            tail -n 40 "logs/$p.log" 2> /dev/null | cut -c1-220 || echo "(no log)"
+          done
