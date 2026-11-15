@@ -65,20 +65,33 @@ if ls "$work"/repo/*.yon > /dev/null 2>&1; then
   index
   inroot /usr/local/bin/yone --noconfirm --overwrite --color never refresh > /dev/null
   mapfile -t built < <(inroot /usr/local/bin/yone --color never list | sed 's|^[^/]*/||; s| .*||')
-  # A package built while one of its dependencies is not yet (it built all
-  # the same) cannot be installed: left out, and what needs it after it.
-  left_out=()
-  for _ in $(seq 1 200); do
-    [ "${#built[@]}" -gt 0 ] || break
-    if inroot /usr/local/bin/yone --noconfirm --overwrite --color never install "${built[@]}" > "$work/logs/reinstall.log" 2>&1; then
-      break
+  # One at a time: a package built while what it needs to run was not (it
+  # built all the same) cannot be installed yet; it leaves the repository
+  # (rebuilt when its base is tried again) so it shadows nothing, such as a
+  # bootstrap of the same name.
+  left_out=() installed_now=0
+  for p in "${built[@]}"; do
+    if inroot /usr/local/bin/yone --noconfirm --overwrite --color never install "$p" >> "$work/logs/reinstall.log" 2>&1; then
+      installed_now=$((installed_now + 1))
+    else
+      left_out+=("$p")
     fi
-    bad=$(sed -n "s/.*required by '\{0,1\}\([^' ]*\)'\{0,1\}.*/\1/p" "$work/logs/reinstall.log" | head -n 1)
-    [ -n "$bad" ] || { echo "reinstall failed:"; tail -n 20 "$work/logs/reinstall.log"; exit 1; }
-    left_out+=("$bad")
-    mapfile -t built < <(printf '%s\n' "${built[@]}" | grep -vxF "$bad")
   done
-  echo "   reinstalled ${#built[@]}; left out until their dependencies are built: ${left_out[*]:-none}"
+  if [ "${#left_out[@]}" -gt 0 ]; then
+    for p in "${left_out[@]}"; do
+      # the newest one is what failed; an older one (a bootstrap) stays
+      newest=$(ls "$work"/repo/"$p"-[0-9]*.yon 2> /dev/null | sort -V | tail -n 1)
+      [ -n "$newest" ] && rm -f "$newest" "$newest.sig"
+    done
+    index
+    inroot /usr/local/bin/yone --noconfirm --overwrite --color never refresh > /dev/null
+    # what was hidden behind them (bootstraps), installed now
+    for p in "${left_out[@]}"; do
+      inroot /usr/local/bin/yone --noconfirm --overwrite --color never install "$p" >> "$work/logs/reinstall.log" 2>&1 \
+        && installed_now=$((installed_now + 1)) || true
+    done
+  fi
+  echo "   reinstalled $installed_now of ${#built[@]}; out of the repository until their dependencies are built: ${left_out[*]:-none}"
 fi
 
 # build one recipe directory in the chroot and install what it made
@@ -105,13 +118,23 @@ build_dir() { # recipe dir (host path), log
     f=$(grep '^source = ' "$d/YONEBUILD" | sed -n "${i}p" | sed 's/^source = //'); f=${f%%::*}; f=$(basename "$f")
     sed -i "0,/^sha256 = TODO$/s//sha256 = $(sha256sum "$d/.yone-sources/$f" | cut -d' ' -f1)/" "$d/YONEBUILD"
   done
+  local before
+  before=$(ls "$work/repo")
   timeout --kill-after=1m "${ARCH_PACKAGE_TIMEOUT:-150m}" setsid --wait chroot "$sys" /usr/bin/env -i \
     HOME=/root TERM=xterm LC_ALL=C.UTF-8 PATH=/usr/bin:/usr/sbin:/usr/local/bin MAKEFLAGS="-j$(nproc)" \
     /usr/local/bin/yone build "/packages/recipes/$name" --out /packages/repo --sign /packages/key.key \
     --compress zstd --color never < /dev/null >> "$lf" 2>&1 || return 1
   index
-  inroot /usr/local/bin/yone --noconfirm --overwrite --color never refresh >> "$lf" 2>&1 &&
-    inroot /usr/local/bin/yone --noconfirm --overwrite --color never install "$name" >> "$lf" 2>&1
+  if inroot /usr/local/bin/yone --noconfirm --overwrite --color never refresh >> "$lf" 2>&1 &&
+    inroot /usr/local/bin/yone --noconfirm --overwrite --color never install "$name" >> "$lf" 2>&1; then
+    return 0
+  fi
+  # built but not installable (what it needs to run is not built yet): out of
+  # the repository, so it shadows nothing (a bootstrap of the same name...)
+  comm -13 <(echo "$before") <(ls "$work/repo") | grep -v '\.index' | sed "s|^|$work/repo/|" | xargs -r rm -f
+  index
+  inroot /usr/local/bin/yone --noconfirm --color never refresh > /dev/null 2>&1 || true
+  return 1
 }
 
 # The base system, declared to Yone: one package that provides every base
