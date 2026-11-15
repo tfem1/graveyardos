@@ -155,6 +155,7 @@ build_dir() { # recipe dir (host path), log
 bp_sum=$(grep -v '^#' "$HERE/base-provides" | cksum | cut -d' ' -f1)
 if ! grep -qx "graveyard-base-provides@$bp_sum" "$work/done"; then
   r=$work/recipes/graveyard-base-provides; mkdir -p "$r"
+  rm -f "$work"/repo/graveyard-base-provides-*.yon "$work"/repo/graveyard-base-provides-*.yon.sig  # the newest is the only one
   {
     echo "name = graveyard-base-provides"; echo "version = 2.$bp_sum"; echo "release = 1"
     echo "desc = The GraveyardOS base system, installed by the image itself"
