@@ -66,6 +66,7 @@ jobs:
           github-token: ${{ github.token }}
 
       - name: Yone (static)
+        timeout-minutes: 20   # a minute normally; a stuck runner must not eat the pass
         working-directory: yone
         run: |
           rustup target add x86_64-unknown-linux-musl
