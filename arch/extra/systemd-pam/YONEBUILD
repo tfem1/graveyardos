@@ -1,0 +1,63 @@
+# after: pam
+# The parts of systemd the desktops need and the base leaves out (LFS builds
+# systemd without Linux-PAM and without sysusers): pam_systemd.so, which
+# opens the logind session of a graphical login (SDDM), and systemd-sysusers,
+# which creates the system users Arch's packages declare (sddm, polkitd...).
+# The same systemd as the base, built again with both; only these installed.
+name = systemd-pam
+version = 261.2
+release = 1
+desc = systemd's PAM module and sysusers, for the desktops
+url = https://systemd.io
+license = LGPL-2.1-or-later
+depends = pam
+source = https://github.com/systemd/systemd/archive/v261.2/systemd-261.2.tar.gz
+sha256 = ed1059ff964f5df35b6056434cc17cc83f86dc913f10489948a0b19b6081c5ec
+
+@build
+cd systemd-261.2
+meson setup build --prefix=/usr --buildtype=release \
+  -D mode=release -D pam=enabled -D sysusers=true -D standalone-binaries=true \
+  -D homed=disabled -D man=disabled -D install-tests=false -D ukify=disabled \
+  -D sysupdate=disabled -D firstboot=false -D ldconfig=false -D rpmmacrosdir=no
+# only the two pieces; the whole build if meson names them differently
+meson compile -C build pam_systemd systemd-sysusers.standalone || meson compile -C build
+
+@package
+cd systemd-261.2/build
+install -Dm755 systemd-sysusers.standalone "$PKGDIR/usr/bin/systemd-sysusers"
+install -Dm755 "$(find . -name pam_systemd.so | head -n 1)" "$PKGDIR/usr/lib/security/pam_systemd.so"
+# the users at every start (systemd's own unit, without its update condition:
+# the image's /etc may predate a package's users)
+install -d "$PKGDIR/usr/lib/systemd/system/sysinit.target.wants"
+cat > "$PKGDIR/usr/lib/systemd/system/systemd-sysusers.service" << "UNIT"
+[Unit]
+Description=Create System Users
+Documentation=man:sysusers.d(5)
+DefaultDependencies=no
+After=systemd-remount-fs.service
+Before=systemd-tmpfiles-setup.service systemd-journald.service sysinit.target shutdown.target
+Conflicts=shutdown.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/bin/systemd-sysusers
+TimeoutSec=90s
+UNIT
+ln -s ../systemd-sysusers.service "$PKGDIR/usr/lib/systemd/system/sysinit.target.wants/systemd-sysusers.service"
+# and when packages bring users or runtime directories (Arch does this with
+# its systemd package's pacman hooks)
+install -d "$PKGDIR/usr/share/yone/hooks"
+cat > "$PKGDIR/usr/share/yone/hooks/20-sysusers.hook" << "HOOK"
+desc = Creating system users
+paths = usr/lib/sysusers.d/
+on = install upgrade
+run = /usr/bin/systemd-sysusers
+HOOK
+cat > "$PKGDIR/usr/share/yone/hooks/21-tmpfiles.hook" << "HOOK"
+desc = Creating runtime files and directories
+paths = usr/lib/tmpfiles.d/
+on = install upgrade
+run = /usr/bin/systemd-tmpfiles --create
+HOOK

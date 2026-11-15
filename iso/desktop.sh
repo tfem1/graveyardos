@@ -70,6 +70,9 @@ mapfile -t wanted < <({ section "$title"; section both; } | tr ' ' '\n' | grep .
   awk 'NR == FNR { if ($0 !~ /^#/ && NF == 2) map[$1] = $2; next } { print (($0 in map) ? map[$0] : $0) }' "$REPO/arch/names" - |
   grep -vxF -f <(grep -v '^#' "$REPO/arch/base-provides" | tr ' ' '\n' | grep .) | sort -u)
 mapfile -t offered < <(inroot yone --color never list | sed 's|^[^/]*/||; s| .*||')
+# GraveyardOS's own pieces the desktops need (arch/extra): logind sessions
+# through PAM, system users
+wanted+=(systemd-pam)
 names=() missing=()
 for n in "${wanted[@]}"; do
   if printf '%s\n' "${offered[@]}" | grep -qxF "$n"; then names+=("$n"); else missing+=("$n"); fi

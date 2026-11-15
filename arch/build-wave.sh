@@ -126,7 +126,33 @@ done
 
 needs() { awk -F'\t' -v b="$1" '$1 == b { print $2 }' "$HERE/needs"; }
 
+# GraveyardOS's own recipes (arch/extra), built as soon as what their
+# "# after:" line names is built; once per pass.
+extras_tried=" "
+build_extras() {
+  local r n after a ready
+  for r in "$HERE"/extra/*/; do
+    [ -f "$r/YONEBUILD" ] || continue
+    n=$(basename "$r")
+    grep -qx "$n" "$work/done" && continue
+    case $extras_tried in *" $n "*) continue ;; esac
+    after=$(sed -n 's/^# after: //p' "$r/YONEBUILD")
+    ready=1
+    for a in $after; do grep -qx "$a" "$work/done" || ready=0; done
+    [ "$ready" = 1 ] || continue
+    extras_tried="$extras_tried$n "
+    printf '   %-30s ' "$n (extra)"
+    if build_dir "$r" "$work/logs/$n.log"; then
+      echo "$n" >> "$work/done"; okn=$((okn + 1)); echo ok
+    else
+      printf '%s\t%s\n' "$n" "$(grep -v '^\s*$' "$work/logs/$n.log" | tail -n 1 | cut -c1-200)" >> "$work/failed"
+      echo FAIL
+    fi
+  done
+}
+
 n=0 okn=0
+build_extras
 while read -r base; do
   [ -n "$base" ] || continue
   if grep -qx "$base" "$work/done"; then continue; fi
@@ -152,6 +178,7 @@ while read -r base; do
   done
   if [ "$ok" = 1 ]; then
     echo "$base" >> "$work/done"; okn=$((okn + 1)); printf 'ok   %5ds\n' $((SECONDS - t0))
+    build_extras
   else
     printf '%s\t%s\n' "$base" "$(grep -v '^\s*$' "$lf" | tail -n 1 | cut -c1-200)" >> "$work/failed"
     printf 'FAIL %5ds\n' $((SECONDS - t0))
