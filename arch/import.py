@@ -74,9 +74,10 @@ command -v bsdtar > /dev/null 2>&1 || bsdtar() {
   esac
 }
 # Arch's meson wrapper (/usr/bin/arch-meson of its meson package), which
-# PKGBUILDs call instead of meson
+# PKGBUILDs call instead of meson; --libdir lib as meson picks on Arch, where
+# /usr/lib64 is a link
 arch-meson() {
-  meson setup --prefix /usr --libexecdir lib --sbindir bin --buildtype plain \
+  meson setup --prefix /usr --libdir lib --libexecdir lib --sbindir bin --buildtype plain \
     --auto-features enabled --wrap-mode nodownload -D b_pie=true -D python.bytecompile=1 "$@"
 }'''
 
@@ -109,7 +110,7 @@ TIDY = r'''graveyard_tidy() {
   case $opts in *" libtool "*) ;; *) find . -name '*.la' -type f -delete ;; esac
   case $opts in *" staticlibs "*) ;; *)
     find . -name '*.a' -type f | while read -r f; do
-      [ -e "${f%.a}.so" ] && rm -f "$f"
+      if [ -e "${f%.a}.so" ]; then rm -f "$f"; fi   # (a bare && ends set -e scripts)
     done ;;
   esac
   case $opts in *" !docs "*) rm -rf usr/share/doc usr/doc usr/share/gtk-doc ;; esac

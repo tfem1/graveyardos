@@ -62,6 +62,9 @@ siglevel = required
 [arch]
 server = file:///packages/repo
 EOF
+# CMake's GNUInstallDirs installs libraries in lib, not lib64, on a system
+# that says it is Arch: Arch's recipes expect /usr/lib
+touch "$sys/etc/arch-release"
 index() { inroot /usr/local/bin/yone repo-index /packages/repo --name arch --sign /packages/key.key --color never > /dev/null; }
 
 # What earlier passes built goes back into the system.
