@@ -106,13 +106,13 @@ It is the one build too long for a 6-hour job on 4 cores. The plan:
    page with Qt WebEngine when the image has it, else with WebKitGTK
    (`installer/window-gtk.py`, GTK 4 and WebKit 6.0: two more package bases,
    a build of 2 to 3 hours), else in a browser.
-3. **Its own build, resumable.** A workflow that runs the build under a
-   time limit, keeps the build tree (Ninja's state and objects, compressed)
-   as an artifact when time runs out, and starts itself again from it until
-   Ninja has nothing left to do; then the package goes into the repository
-   like the others. Needs: Yone keeping a build's work directory between
-   runs (sources unpacked and patched once). Then the online accounts,
-   Falkon and the rest come back.
+3. **Its own build, resumable (written; started once its dependencies
+   are built).** The `arch-long` workflow builds for a time limit, keeps the
+   build tree (Ninja's state and objects, zstd) as an artifact when time
+   runs out and starts itself again from it (`YONE_RESUME`: sources unpacked
+   and prepared once), ten rounds at most; the packages it makes go into the
+   repository at the next wave's merge. Then the online accounts, Falkon and
+   the rest come back (lines removed from `arch/drop` and `arch/exclude`).
 
 ## Catalogue: 6000 packages and more (from Arch Linux's recipes)
 

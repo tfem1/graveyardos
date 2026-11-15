@@ -161,6 +161,8 @@ jobs:
           cargo build --release --target x86_64-unknown-linux-musl
           echo "YONE=$PWD/target/x86_64-unknown-linux-musl/release/yone" >> "$GITHUB_ENV"
       - name: Merge
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           # earlier failures stay failures (not tried again each wave), unless retried
           ${{ inputs.retry_failed && ': > failed.wave' || 'cp state/failed failed.wave' }}
@@ -170,6 +172,12 @@ jobs:
             cat "$d/done" >> state/done 2> /dev/null || true
             cat "$d/failed" >> failed.wave 2> /dev/null || true
             mkdir -p state/logs && cp -r "$d"/logs/. state/logs/ 2> /dev/null || true
+          done
+          # what arch-long built (qt6-webengine...): its last successful run's packages
+          for id in $(gh run list --workflow arch-long.yml --status success -L 5 --json databaseId -q '.[].databaseId' 2> /dev/null); do
+            gh run download "$id" -n long-out -D "long-$id" 2> /dev/null || continue
+            cp -n "long-$id"/repo/* state/repo/ 2> /dev/null || true
+            cat "long-$id/done" >> state/done 2> /dev/null || true
           done
           awk '!seen[$0]++' state/done > state/done.new && mv state/done.new state/done
           # a base built by one shard is no failure even if another tried it first

@@ -12,6 +12,10 @@
 #
 # ARCH_ONLY=<file>: build only the package bases listed in it (one per line,
 # in that order), a shard of a parallel wave (arch-wave workflow).
+# ARCH_LONG=1: a base of arch/long, built over several jobs (arch-long
+# workflow): the work directory of the earlier job, in ARCH_LONG_WORK (same
+# file system as the system), goes back in place and the build resumes
+# (YONE_RESUME).
 #
 # Each package base of arch/order is imported (arch/import.py), built with
 # Yone in a chroot, then installed. What fails is tried again by the next
@@ -100,6 +104,10 @@ build_dir() { # recipe dir (host path), log
   name=$(sed -n 's/^name = //p' "$src/YONEBUILD")
   d=$sys/packages/recipes/$name
   rm -rf "$d"; mkdir -p "$d/.yone-sources"; cp -a "$src/." "$d/"
+  # ARCH_LONG: the work directory of the earlier job, where the build resumes
+  if [ -n "${ARCH_LONG:-}" ] && [ -d "${ARCH_LONG_WORK:-/nonexistent}/.yone-work" ]; then
+    mv "$ARCH_LONG_WORK/.yone-work" "$d/.yone-work"
+  fi
   # Every source where yone looks first: the system being built has no curl.
   # Downloaded here (the importer already fetched Arch's), pinned on first use
   # when the recipe says "sha256 = TODO" (bootstrap).
@@ -122,6 +130,7 @@ build_dir() { # recipe dir (host path), log
   before=$(ls "$work/repo")
   timeout --kill-after=1m "${ARCH_PACKAGE_TIMEOUT:-150m}" setsid --wait chroot "$sys" /usr/bin/env -i \
     HOME=/root TERM=xterm LC_ALL=C.UTF-8 PATH=/usr/bin:/usr/sbin:/usr/local/bin MAKEFLAGS="-j$(nproc)" \
+    ${ARCH_LONG:+YONE_RESUME=1} \
     /usr/local/bin/yone build "/packages/recipes/$name" --out /packages/repo --sign /packages/key.key \
     --compress zstd --color never < /dev/null >> "$lf" 2>&1 || return 1
   index
@@ -206,7 +215,8 @@ build_extras
 while read -r base; do
   [ -n "$base" ] || continue
   if grep -qx "$base" "$work/done"; then continue; fi
-  if grep -qx "$base" <(grep -v '^#' "$HERE/long" | cut -f1); then continue; fi # a build of its own
+  # a build of its own (arch-long), unless this is it
+  if [ -z "${ARCH_LONG:-}" ] && grep -qx "$base" <(grep -v '^#' "$HERE/long" | cut -f1); then continue; fi
   # what the GraveyardOS base already is (glibc, gcc...): never rebuilt
   if grep -v '^#' "$HERE/base-names" | tr ' ' '\n' | grep -qx "$base"; then
     echo "$base" >> "$work/done"; continue

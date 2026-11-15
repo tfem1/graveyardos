@@ -1,0 +1,150 @@
+# A package base too long for one 6-hour job (arch/long: qt6-webengine),
+# built over several jobs: each one builds for a time limit in the system of
+# the waves' packages (an arch-repo artifact), keeps the build tree (sources
+# unpacked and prepared, Ninja's objects and state) as an artifact when time
+# runs out, and starts the next one, which goes on from there (YONE_RESUME).
+# When the build is done, its packages are the long-out artifact, which the
+# next arch-wave merge adds to the repository.
+name: arch-long
+
+on:
+  workflow_dispatch:
+    inputs:
+      base_run:
+        description: "Run id whose graveyard-base artifact is the system to build in"
+        required: true
+      repo_run:
+        description: "Run id of an arch-wave with the base's dependencies built (its arch-repo artifact)"
+        required: true
+      base:
+        description: "Package base (one of arch/long)"
+        default: qt6-webengine
+      resume_run:
+        description: "Run id of the arch-long job to go on from (empty: start)"
+        default: ""
+      minutes:
+        description: "Minutes of building in this job"
+        default: "280"
+      round:
+        description: "This job's number (it stops after 10)"
+        default: "1"
+
+permissions:
+  contents: read
+  actions: write   # download artifacts of other runs, start the next job
+
+env:
+  LFS: /mnt/lfs
+
+concurrency:
+  group: arch-long-${{ inputs.base }}
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 355
+    steps:
+      - uses: actions/checkout@v4
+      - name: Free disk space
+        run: |
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL /usr/share/swift
+          sudo docker image prune --all --force > /dev/null 2>&1 || true
+          df -h / /mnt
+      - uses: actions/download-artifact@v4
+        with:
+          name: graveyard-base
+          path: ${{ runner.temp }}
+          run-id: ${{ inputs.base_run }}
+          github-token: ${{ github.token }}
+      - name: The base system
+        run: |
+          sudo -E bash lfs/build.sh unpack "$RUNNER_TEMP"/graveyard-base.tar.zst
+          sudo rm -f "$RUNNER_TEMP"/graveyard-base.tar.zst
+          sudo mkdir -p /mnt/arch-work && sudo chown "$(id -u):$(id -g)" /mnt/arch-work
+      - uses: actions/download-artifact@v4
+        with:
+          name: arch-repo
+          path: /mnt/arch-work
+          run-id: ${{ inputs.repo_run }}
+          github-token: ${{ github.token }}
+      - uses: actions/download-artifact@v4
+        if: inputs.resume_run != ''
+        with:
+          name: long-work
+          path: ${{ runner.temp }}/long-work
+          run-id: ${{ inputs.resume_run }}
+          github-token: ${{ github.token }}
+      - name: The build tree of the last job
+        if: inputs.resume_run != ''
+        run: |
+          d="$LFS/var/tmp/long-work"
+          sudo mkdir -p "$d"
+          sudo tar -C "$d" -I 'zstd -T0' -xf "$RUNNER_TEMP/long-work/work.tar.zst"
+          rm -rf "$RUNNER_TEMP/long-work"
+          sudo du -sh "$d/.yone-work"; df -h /mnt
+      - name: Yone (static)
+        timeout-minutes: 20
+        working-directory: yone
+        run: |
+          rustup target add x86_64-unknown-linux-musl
+          sudo apt-get update -qq && sudo apt-get install -y -qq musl-tools zstd > /dev/null
+          cargo build --release --target x86_64-unknown-linux-musl
+          echo "YONE=$PWD/target/x86_64-unknown-linux-musl/release/yone" >> "$GITHUB_ENV"
+      - name: Build ${{ inputs.base }} (round ${{ inputs.round }}, ${{ inputs.minutes }} minutes at most)
+        run: |
+          set -o pipefail
+          echo "${{ inputs.base }}" > "$RUNNER_TEMP/only"
+          ls /mnt/arch-work/repo > "$RUNNER_TEMP/before.txt"
+          sudo chown -R root:root /mnt/arch-work
+          t0=$SECONDS
+          sudo -E YONE="$YONE" ARCH_ONLY="$RUNNER_TEMP/only" ARCH_LONG=1 ARCH_LONG_WORK="$LFS/var/tmp/long-work" ARCH_PACKAGE_TIMEOUT="${{ inputs.minutes }}m" \
+            bash arch/build-wave.sh "$LFS" /mnt/arch-work 99999 | tee "$RUNNER_TEMP/long.txt" || true
+          echo "MINUTES=$(( (SECONDS - t0) / 60 ))" >> "$GITHUB_ENV"
+          sudo find /mnt/arch-work/logs -name '*.log' -exec tail -n 40 {} \; 2> /dev/null | tail -n 40
+      - name: Done, or the build tree for the next job
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          base="${{ inputs.base }}"
+          mkdir -p "$RUNNER_TEMP/out/repo"
+          if sudo grep -qx "$base" /mnt/arch-work/done; then
+            for f in $(ls /mnt/arch-work/repo | grep -vxF -f "$RUNNER_TEMP/before.txt" | grep -v '\.index'); do
+              sudo cp "/mnt/arch-work/repo/$f" "$RUNNER_TEMP/out/repo/"
+            done
+            echo "$base" > "$RUNNER_TEMP/out/done"
+            sudo chown -R "$(id -u)" "$RUNNER_TEMP/out"
+            echo "$base built in round ${{ inputs.round }}: $(ls "$RUNNER_TEMP/out/repo")" | tee -a "$GITHUB_STEP_SUMMARY"
+            echo "STATE=done" >> "$GITHUB_ENV"
+          elif [ "$MINUTES" -lt $(( ${{ inputs.minutes }} - 10 )) ]; then
+            echo "$base failed after $MINUTES minutes, before its time limit: a real failure, no next round" | tee -a "$GITHUB_STEP_SUMMARY"
+            exit 1
+          else
+            d="$LFS/packages/recipes/$base"
+            sudo tar -C "$d" -I 'zstd -T0 -3' -cf "$RUNNER_TEMP/work.tar.zst" .yone-work
+            sudo rm -rf "$d"
+            ls -lh "$RUNNER_TEMP/work.tar.zst"
+            echo "$base: time limit reached in round ${{ inputs.round }}, the build tree goes on ($(du -h "$RUNNER_TEMP/work.tar.zst" | cut -f1))" | tee -a "$GITHUB_STEP_SUMMARY"
+            echo "STATE=more" >> "$GITHUB_ENV"
+          fi
+      - uses: actions/upload-artifact@v4
+        if: env.STATE == 'done'
+        with:
+          name: long-out
+          path: ${{ runner.temp }}/out
+          retention-days: 30
+      - uses: actions/upload-artifact@v4
+        if: env.STATE == 'more'
+        with:
+          name: long-work
+          path: ${{ runner.temp }}/work.tar.zst
+          compression-level: 0
+          retention-days: 3
+      - name: Next round
+        if: env.STATE == 'more'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if [ "${{ inputs.round }}" -ge 10 ]; then echo "10 rounds and not done: stopping"; exit 1; fi
+          gh workflow run arch-long.yml --ref "$GITHUB_REF_NAME" -f base_run="${{ inputs.base_run }}" \
+            -f repo_run="${{ inputs.repo_run }}" -f base="${{ inputs.base }}" -f resume_run="${{ github.run_id }}" \
+            -f minutes="${{ inputs.minutes }}" -f round="$(( ${{ inputs.round }} + 1 ))"
