@@ -3,3 +3,9 @@ with themselves (cmake needs cmake's own build tools; python-build and
 python-installer need each other). A recipe's "# replaces:" line names the
 Arch package bases it stands for: build-wave.sh counts them as done.
 "sha256 = TODO" is filled in from the downloaded file on first use.
+
+rust is the Rust project's binary release before Arch's version: Rust is
+only built with Rust (Arch builds it with its previous rust). It has no
+"# replaces:" line, so Arch's rust is still built from source and replaces
+it as an upgrade; "bootstrap:<name>" in the done list keeps it from being
+built again meanwhile.

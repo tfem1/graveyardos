@@ -1,0 +1,20 @@
+# Rust builds only with Rust: Arch's rust (built from source by the chain)
+# needs a compiler to start from, Arch's own previous one. This is the Rust
+# project's binary release before Arch's version (1.100.0), installed as
+# "rust" at a lower version so that the rust built from source replaces it
+# as an upgrade. No "# replaces:" line: the rust package base is still built.
+name = rust
+version = 1.99.0
+release = 0
+desc = Rust compiler and Cargo, upstream binaries (bootstrap for building rust from source)
+url = https://www.rust-lang.org
+license = MIT Apache-2.0
+source = https://static.rust-lang.org/dist/rust-1.99.0-x86_64-unknown-linux-gnu.tar.xz
+sha256 = TODO
+
+@package
+cd rust-1.99.0-x86_64-unknown-linux-gnu
+./install.sh --prefix=/usr --destdir="$PKGDIR" --disable-ldconfig \
+  --components=rustc,cargo,rust-std-x86_64-unknown-linux-gnu
+rm -f "$PKGDIR/usr/lib/rustlib/install.log" "$PKGDIR/usr/lib/rustlib/uninstall.sh" \
+  "$PKGDIR"/usr/lib/rustlib/manifest-* "$PKGDIR/usr/lib/rustlib/components" "$PKGDIR/usr/lib/rustlib/rust-installer-version"

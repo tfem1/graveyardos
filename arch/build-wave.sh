@@ -131,12 +131,15 @@ if ! grep -qx graveyard-base-provides "$work/done"; then
 fi
 
 # Tools Arch builds with themselves, from arch/bootstrap first.
-for r in "$HERE"/bootstrap/git "$HERE"/bootstrap/python-pyproject-hooks "$HERE"/bootstrap/python-installer "$HERE"/bootstrap/python-build "$HERE"/bootstrap/cmake; do
+for r in "$HERE"/bootstrap/git "$HERE"/bootstrap/python-pyproject-hooks "$HERE"/bootstrap/python-installer "$HERE"/bootstrap/python-build "$HERE"/bootstrap/cmake "$HERE"/bootstrap/rust; do
   b=$(basename "$r")
   grep -qx "$b" "$work/done" && continue
+  grep -qx "bootstrap:$b" "$work/done" && continue
   printf '   %-30s ' "$b (bootstrap)"
   if build_dir "$r" "$work/logs/$b.log"; then
-    sed -n 's/^# replaces: //p' "$r/YONEBUILD" | tr ' ' '\n' | grep . >> "$work/done"; echo ok
+    sed -n 's/^# replaces: //p' "$r/YONEBUILD" | tr ' ' '\n' | grep . >> "$work/done"
+    # without "# replaces:", the base is still built from source later
+    echo "bootstrap:$b" >> "$work/done"; echo ok
   else
     echo FAIL; tail -n 15 "$work/logs/$b.log"
   fi
