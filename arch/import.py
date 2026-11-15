@@ -124,10 +124,13 @@ TIDY = r'''graveyard_tidy() {
   case $opts in *" !strip "*) ;; *)
     find . -type f -perm -u+w | while read -r f; do
       [ "$(head -c 4 "$f" 2> /dev/null | od -An -c | tr -d ' ')" = '177ELF' ] || continue
+      # a file strip does not know (guile's compiled .go: ELF of no
+      # machine) is left as it is, as makepkg does; under set -e a failed
+      # strip would end the build with no message
       case $f in
-        *.so | *.so.*) strip --strip-unneeded "$f" 2> /dev/null ;;
-        *.a | *.o) strip --strip-debug "$f" 2> /dev/null ;;
-        *) strip --strip-all "$f" 2> /dev/null ;;
+        *.so | *.so.*) strip --strip-unneeded "$f" 2> /dev/null || true ;;
+        *.a | *.o) strip --strip-debug "$f" 2> /dev/null || true ;;
+        *) strip --strip-all "$f" 2> /dev/null || true ;;
       esac
     done ;;
   esac

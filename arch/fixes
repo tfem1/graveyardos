@@ -3,3 +3,7 @@
 # base<TAB>line
 unifdef	CFLAGS+=" -std=gnu17"  # its own "constexpr" variable: a keyword in C23, gcc's default
 simdjson	CXXFLAGS+=" -Wno-error -Wno-free-nonheap-object"  # its tests are built with -Werror, which a newer gcc's warnings break
+go	eval "graveyard_$(declare -f package)"; package() { graveyard_package; rm "$pkgdir/usr/lib/go/doc"; }  # Arch's /usr/lib/go/doc -> /usr/share/doc/go link: a directory in the bootstrap go it upgrades (Yone: "is a directory on disk")
+python-babel	sed -i -e "s/^FILENAME = .*/FILENAME = 'cldr-common-$_core.0.zip'/" -e "s/if digest != FILESUM:/if False:  # the PKGBUILD pins the CLDR it gives/" "$srcdir/babel-$pkgver/scripts/download_import_cldr.py"  # make import-cldr downloads CLDR 47 unless given it; the PKGBUILD gives 46 (Arch downloads at build time)
+mercurial	sed -i -e "s/^if not ssl.HAS_TLSv1_2:/if not (ssl.HAS_TLSv1_2 or ssl.HAS_TLSv1_3):/" "$srcdir/mercurial-$pkgver/setup.py"; sed -i -e "s/^if getattr(ssl, .HAS_TLSv1_2., hasattr(ssl, .PROTOCOL_TLSv1_2.)):/if True:/" "$srcdir/mercurial-$pkgver/mercurial/sslutil.py"  # Python against OpenSSL 4 (no TLSv1_2_method) says HAS_TLSv1_2 False, though TLS 1.2 works
+libdv	echo 'AC_DEFUN([AM_PATH_SDL], [m4_default([$3], [:])])' > "$srcdir/libdv-$pkgver/acinclude.m4"  # SDL 1.2's sdl.m4 is not built (makedepends sdl); --enable-sdl is off, autoreconf only needs the macro defined (libdv has no acinclude.m4)

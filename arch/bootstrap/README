@@ -13,3 +13,7 @@ built again meanwhile.
 go is the same for Go: Arch's go is built with a Go tree in /usr/lib/go
 (GOROOT_BOOTSTRAP); the Go project's binary release, older than Arch's,
 gives it one, and the go built from source replaces it.
+
+gengetopt is the same for gengetopt: Arch's is built from Git, which has
+not the option parser gengetopt generates for itself (makedepends
+gengetopt); the GNU release before Arch's version has it generated.
