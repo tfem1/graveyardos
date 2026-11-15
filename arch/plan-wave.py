@@ -50,6 +50,28 @@ def main():
     for i in range(n):
         with open(os.path.join(out, f"shard-{i}"), "w") as f:
             f.write("".join(b + "\n" for b in ready[i::n] + blocked[i::n]))
+    # What holds the waiting bases back: their dependencies that cannot be
+    # built now (failed, set aside in arch/long, or named nowhere), by how
+    # many waiting bases need them, directly or through others
+    # arch/extra recipes are built at the start of every shard (build-wave.sh)
+    orderset = set(order) | set(os.listdir(os.path.join(HERE, "extra")))
+    stuck = {b for b in failed} | long | {d for b in blocked for d in needs.get(b, [])
+                                          if d not in done and d not in orderset}
+    count = {}
+    for b in blocked:
+        seen, todo = set(), [b]
+        while todo:
+            x = todo.pop()
+            for d in needs.get(x, []):
+                if d in done or d in seen:
+                    continue
+                seen.add(d)
+                if d not in stuck:
+                    todo.append(d)
+        for d in seen & stuck:
+            count[d] = count.get(d, 0) + 1
+    top = sorted(count.items(), key=lambda kv: -kv[1])[:25]
+    print("held back by: " + ", ".join(f"{d} ({c})" for d, c in top), file=sys.stderr)
     print(json.dumps({"shard": list(range(n)) if ready else []}))
     print(f"done {len(done & set(order))}, failed {len(failed)}, ready {len(ready)} in {n if ready else 0} shards, "
           f"waiting for dependencies {len(blocked)}, of {len(order)}", file=sys.stderr)
