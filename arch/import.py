@@ -28,7 +28,8 @@ import re
 import shutil
 import subprocess
 import sys
-import urllib.request
+import tarfile
+import time
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 GIT = "https://gitlab.archlinux.org/archlinux/packaging/packages/{}.git"
@@ -198,22 +199,97 @@ def map_deps(deps, nmap, own):
     return out
 
 
+def gitlab_path(pkgbase):
+    """The packaging repository's name on gitlab.archlinux.org, as Arch's
+    devtools make it (gitlab_project_name_to_path): crypto++ is
+    cryptoplusplus, libsigc++ libsigc-plus-plus... and tree, a name GitLab
+    reserves, unix-tree."""
+    n = re.sub(r"([a-zA-Z0-9])\+([a-zA-Z])", r"\1-\2", pkgbase)
+    n = n.replace("+", "plus")
+    n = re.sub(r"[^a-zA-Z0-9_\-.]", "-", n)
+    n = re.sub(r"[_\-]{2,}", "-", n)
+    return "unix-tree" if n == "tree" else n
+
+
 def fetch_repo(pkgbase, cache):
     path = os.path.join(cache, pkgbase)
     if os.path.isdir(os.path.join(path, ".git")):
         return path
-    run(["git", "clone", "-q", "--depth", "1", GIT.format(pkgbase), path])
+    run(["git", "clone", "-q", "--depth", "1", GIT.format(gitlab_path(pkgbase)), path])
     return path
 
 
 def download(url, dest):
+    """makepkg's download agent (curl, with its retries: timeouts, 429, 5xx)."""
     if os.path.exists(dest):
         return dest
-    req = urllib.request.Request(url, headers={"User-Agent": "graveyardos-import"})
-    with urllib.request.urlopen(req, timeout=300) as r, open(dest + ".part", "wb") as f:
-        shutil.copyfileobj(r, f)
+    run(["curl", "-qgb", "", "-fLsS", "--retry", "4", "--retry-delay", "10", "--connect-timeout", "60",
+         "--speed-limit", "1", "--speed-time", "300", "-o", dest + ".part", url])
     os.replace(dest + ".part", dest)
     return dest
+
+
+# Arch's source packages (makepkg --allsource of each release): every source
+# as Arch built it, for upstream files since changed (GitHub, cgit and Forgejo
+# patches and archives made again), gone (404) or on hosts that are down
+SRCPKG = "https://sources.archlinux.org/sources/{}/{}.src.tar.gz"
+_srcpkgs = {}
+
+
+def arch_srcpkg(info, sources_dir):
+    """This release's source package from sources.archlinux.org, or None."""
+    base = info["pkgbase"] or info["pkgname"][0]
+    ver = f"{info['pkgver']}-{info['pkgrel']}"
+    names = ([f"{base}-{info['epoch']}:{ver}"] if info["epoch"] else []) + [f"{base}-{ver}"]
+    key = names[-1]
+    if key not in _srcpkgs:
+        _srcpkgs[key] = None
+        d = os.path.join(sources_dir, "arch-src")
+        os.makedirs(d, exist_ok=True)
+        for repo in ("extra", "core", "multilib"):
+            for n in names:
+                try:
+                    _srcpkgs[key] = download(SRCPKG.format(repo, n), os.path.join(d, n + ".src.tar.gz"))
+                    break
+                except subprocess.CalledProcessError:
+                    pass
+            if _srcpkgs[key]:
+                break
+    return _srcpkgs[key]
+
+
+def from_srcpkg(info, sources_dir, member, dest):
+    """Take <pkgbase>/<member> (a file, or a VCS source's bare repository)
+    out of Arch's source package to dest; dest, or None."""
+    pkg = arch_srcpkg(info, sources_dir)
+    if not pkg:
+        return None
+    base = info["pkgbase"] or info["pkgname"][0]
+    name = f"{base}/{member}"
+    with tarfile.open(pkg) as t:
+        found = [m for m in t.getmembers() if m.name == name or m.name.startswith(name + "/")]
+        if not found:
+            return None
+        tmp = dest + ".srcpkg"
+        shutil.rmtree(tmp, ignore_errors=True)
+        t.extractall(tmp, members=found, filter="data")
+    if os.path.isdir(dest):
+        shutil.rmtree(dest)
+    os.replace(os.path.join(tmp, name), dest)
+    shutil.rmtree(tmp, ignore_errors=True)
+    return dest
+
+
+def mirrors():
+    """arch/mirrors: URL prefix, and where the same repositories or files are."""
+    out = []
+    path = os.path.join(HERE, "mirrors")
+    if os.path.exists(path):
+        for l in open(path):
+            f = l.split("#")[0].split()
+            if len(f) == 2:
+                out.append((f[0], f[1]))
+    return out
 
 
 def checksum(path, algo):
@@ -224,6 +300,17 @@ def checksum(path, algo):
     return h.hexdigest()
 
 
+def wrong_sum(path, sums, i):
+    """Why the file is not the PKGBUILD's i-th source, or None."""
+    for algo, vals in sums.items():
+        if vals[i] != "SKIP" and checksum(path, algo) != vals[i]:
+            with open(path, "rb") as f:
+                head = f.read(512).lstrip().lower()
+            page = ", a web page" if head.startswith((b"<!doctype html", b"<html")) else ""
+            return f"{algo} does not match the PKGBUILD ({os.path.getsize(path)} bytes{page})"
+    return None
+
+
 def url_repo_name(src):
     """The directory a Git source is cloned into: name:: or the repo's name."""
     if "::" in src:
@@ -232,7 +319,30 @@ def url_repo_name(src):
     return u.rsplit("/", 1)[-1]
 
 
-def git_snapshot(src, dirname, sources_dir):
+def git_mirror(base, mirror, dirname, info, sources_dir):
+    """A bare clone of base at mirror. A host that is down or limits its
+    clients (dev.gnupg.org's 429) is tried again, then the same repository
+    elsewhere (arch/mirrors), then the clone in Arch's source package."""
+    err = None
+    for wait in (0, 20, 60):
+        time.sleep(wait)
+        r = run(["git", "clone", "-q", "--mirror", base, mirror], check=False)
+        if r.returncode == 0:
+            return
+        err = r
+        shutil.rmtree(mirror, ignore_errors=True)
+    for prefix, alt in mirrors():
+        if base.startswith(prefix):
+            r = run(["git", "clone", "-q", "--mirror", alt + base[len(prefix):], mirror], check=False)
+            if r.returncode == 0:
+                return
+            shutil.rmtree(mirror, ignore_errors=True)
+    if info and from_srcpkg(info, sources_dir, dirname, mirror) and os.path.isdir(mirror):
+        return
+    raise subprocess.CalledProcessError(err.returncode, err.args, err.stdout, err.stderr)
+
+
+def git_snapshot(src, dirname, sources_dir, info=None):
     """A Git source as makepkg would check it out ($srcdir/<dirname>, with
     its .git: PKGBUILDs cherry-pick, apply and describe), packed in a tarball
     Yone unpacks. Cloned on this host: the build system has no network."""
@@ -243,9 +353,10 @@ def git_snapshot(src, dirname, sources_dir):
     kind, _, ref = frag.partition("=")
     mirror = os.path.join(sources_dir, "git", re.sub(r"[^A-Za-z0-9._-]", "_", base))
     if os.path.isdir(mirror):
-        run(["git", "-C", mirror, "fetch", "-q", "--tags", "--force", "origin", "+refs/heads/*:refs/heads/*"])
+        # (a host down: the mirror as it is, which has the tag or commit)
+        run(["git", "-C", mirror, "fetch", "-q", "--tags", "--force", "origin", "+refs/heads/*:refs/heads/*"], check=False)
     else:
-        run(["git", "clone", "-q", "--mirror", base, mirror])
+        git_mirror(base, mirror, dirname, info, sources_dir)
     tag = re.sub(r"[^A-Za-z0-9._-]", "_", f"{kind}-{ref}" if ref else "HEAD")
     out = os.path.join(sources_dir, f"{dirname}-git-{tag}.tar.gz")
     out = out.replace(".tar.gz", "-sm.tar.gz")  # snapshots with their submodules
@@ -301,7 +412,7 @@ def convert(pkgbase, cache, out, sources_dir, nmap, no_download=False):
             if no_download:
                 fname, sha = f"{dirname}-git.tar.gz", "TODO"
             else:
-                path = git_snapshot(s, dirname, sources_dir)
+                path = git_snapshot(s, dirname, sources_dir, info)
                 fname, sha = os.path.basename(path), checksum(path, "sha256")
             lines_src.append((f"{fname}::{url}", sha))
             continue
@@ -318,10 +429,18 @@ def convert(pkgbase, cache, out, sources_dir, nmap, no_download=False):
             known = sums.get("sha256", [None] * len(srcs))[i]
             sha = known if known and known != "SKIP" else "TODO"
         else:
-            path = download(url, os.path.join(sources_dir, fname))
-            for algo, vals in sums.items():
-                if vals[i] != "SKIP" and checksum(path, algo) != vals[i]:
-                    raise SystemExit(f"{pkgbase}: {fname}: {algo} does not match the PKGBUILD")
+            path = os.path.join(sources_dir, fname)
+            try:
+                if os.path.exists(path) and wrong_sum(path, sums, i):
+                    os.remove(path)  # another base's file of that name
+                err = wrong_sum(download(url, path), sums, i)
+            except subprocess.CalledProcessError as e:
+                err = ((e.stderr or "").strip().splitlines() or [str(e)])[-1]
+            if err:
+                # what Arch built with: its source package (the sums still checked)
+                if not (from_srcpkg(info, sources_dir, fname, path + ".arch") and not wrong_sum(path + ".arch", sums, i)):
+                    raise SystemExit(f"{pkgbase}: {fname}: {err} (nor in Arch's source package)")
+                os.replace(path + ".arch", path)
             sha = checksum(path, "sha256")
         lines_src.append((f"{fname}::{url}" if name else url, sha))
     funcs = run(["bash", "-c", 'cd "$1"; CARCH=x86_64; source ./PKGBUILD >/dev/null; declare -f', "-", repo]).stdout
@@ -364,8 +483,12 @@ def convert(pkgbase, cache, out, sources_dir, nmap, no_download=False):
             y.append("backup = " + " ".join(info["backup"]))
         for s, sha in lines_src:
             y += [f"source = {s}", f"sha256 = {sha}"]
-        if info["noextract"]:
-            y.append("noextract = " + " ".join(info["noextract"]))
+        # makepkg passes over a noextract name that is no source's
+        # (archlinux-appstream-data's core.xml.gz-<ver>); Yone refuses it
+        srcnames = {s.split("::", 1)[0] if "::" in s else s.rsplit("/", 1)[-1] for s, _ in lines_src}
+        noextract = [n for n in info["noextract"] if n in srcnames]
+        if noextract:
+            y.append("noextract = " + " ".join(noextract))
         body = [
             "@package",
             "# --- makepkg's environment",

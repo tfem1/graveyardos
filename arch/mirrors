@@ -1,0 +1,3 @@
+# A host that is down or limits its clients, and where the same Git
+# repositories are (arch/import.py tries it after the host itself).
+https://dev.gnupg.org/source/	https://github.com/gpg/
