@@ -1,7 +1,32 @@
 # Dependencies left out of a package base: it is built without the optional
 # feature they bring, never waits for them and does not require them.
 # base<TAB>dependency<TAB>what is left out
+# The dependency is an Arch package name (the recipe's depends) or a package
+# base (arch/needs), each given where they differ (hip-runtime-amd of
+# hip-runtime). A package of the base itself named here is not made.
 plasma-nm	qt6-webengine	the Cisco AnyConnect VPN sign-in page
 kdeplasma-addons	qt6-webengine	the dictionary and web browser applets
 plasma-desktop	kaccounts-integration	the OpenDesktop integration plugin
 purpose	kaccounts-integration	the Nextcloud and ownCloud sharing plugins
+# GPU compute (CUDA, ROCm/HIP: arch/long), built without; arch/fixes turns it off
+openucx	cuda	the CUDA transports
+openucx	rocm-language-runtime	the ROCm transports
+openucx	rocm-hip-sdk	the ROCm transports (rocm-language-runtime's base)
+openucc	cuda	the CUDA execution engine and transport
+openucc	nccl	the NCCL transport
+openucc	hip-runtime-amd	the ROCm execution engine
+openucc	hip-runtime	the ROCm execution engine (hip-runtime-amd's base)
+openucc	rocm-llvm	the ROCm execution engine (its HIP compiler)
+openucc	rccl	the RCCL transport
+openmpi	cuda	CUDA-aware MPI
+openmpi	nvidia-utils	nothing more: it was there for CUDA's libcuda.so
+openmpi	hip-runtime-amd	ROCm-aware MPI
+openmpi	hip-runtime	ROCm-aware MPI (hip-runtime-amd's base)
+openimagedenoise	cuda	the CUDA device (NVIDIA GPUs)
+openimagedenoise	hip-runtime-amd	the HIP device (AMD GPUs)
+openimagedenoise	hip-runtime	the HIP device (hip-runtime-amd's base)
+adios2	cuda	CUDA buffers
+opencv	cuda	the CUDA modules
+opencv	cudnn	the CUDA modules (cuDNN for dnn)
+opencv	opencv-cuda	the CUDA build of OpenCV
+opencv	python-opencv-cuda	the CUDA build of OpenCV

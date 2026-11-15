@@ -458,7 +458,10 @@ def convert(pkgbase, cache, out, sources_dir, nmap, no_download=False):
     funcs = run(["bash", "-c", 'cd "$1"; CARCH=x86_64; source ./PKGBUILD >/dev/null; declare -f', "-", repo]).stdout
     # the PKGBUILD's own variables (minus arrays already handled), for its functions
     pkgbuild = open(os.path.join(repo, "PKGBUILD")).read()
-    names = info["pkgname"]
+    gone = drops(pkgbase)
+    # a package of the base itself that arch/drop names is not made (opencv's
+    # opencv-cuda), nor run before the others as a split package
+    names = [n for n in info["pkgname"] if n not in gone]
     version = info["pkgver"]
     made = []
     for name in names:
@@ -477,7 +480,6 @@ def convert(pkgbase, cache, out, sources_dir, nmap, no_download=False):
             if inner:
                 deps = map_deps(re.findall(r"[^\s'\"]+", inner.group(1)), nmap, names)
         mk = map_deps(info["makedepends"], nmap, names)
-        gone = drops(pkgbase)
         deps = [d for d in deps if bare(d) not in gone]
         mk = [d for d in mk if bare(d) not in gone]
         y = [f"# Converted from Arch Linux's {pkgbase} (arch/import.py); PKGBUILD 0BSD.",

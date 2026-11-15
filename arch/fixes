@@ -11,3 +11,9 @@ libsonic	CFLAGS+=" -fPIC"  # Arch's ldflags.patch drops the Makefile's -fPIC, an
 fast_float	eval "$(declare -f build | sed 's/-DFASTFLOAT_TEST=ON/-DFASTFLOAT_TEST=OFF/')"  # its tests fetch supplemental_test_files from GitHub at configure time (no network here), and check() is not run
 anari-sdk	eval "$(declare -f build | sed 's|-DCMAKE_INSTALL_PREFIX=/usr|& -DBUILD_HELIDE_DEVICE=OFF|')"  # the example "helide" device downloads Embree 4.3.3 at configure time (no network here)
 libdicom	eval "$(declare -f build | sed 's/arch-meson build "\$pkgname"/& -D tests=false/')"  # the tests need check (a check dependency, not built), and meson stops without it
+openucx	eval "$(declare -f build | sed 's|--with-cuda=/opt/cuda|--without-cuda|; s|--with-rocm=/opt/rocm|--without-rocm|')"  # GPU compute is not built (arch/long, arch/drop)
+openucc	eval "$(declare -f build | sed 's|--with-cuda=/opt/cuda|--without-cuda --without-nccl|; s|--with-rocm=/opt/rocm|--without-rocm --without-rccl|')"  # GPU compute is not built (arch/long, arch/drop)
+openmpi	eval "$(declare -f build | sed 's|--with-cuda=/opt/cuda --with-cuda-libdir=/usr/lib|--without-cuda|; s|--with-rocm=/opt/rocm|--without-rocm|')"  # GPU compute is not built (arch/long, arch/drop)
+openimagedenoise	eval "$(declare -f build | sed 's/-DOIDN_DEVICE_CUDA=ON/-DOIDN_DEVICE_CUDA=OFF/; s/-DOIDN_DEVICE_HIP=ON/-DOIDN_DEVICE_HIP=OFF/')"; eval "$(declare -f package | sed 's|rm -r "\${pkgdir}"/build|rm -rf "${pkgdir}"/build|')"  # GPU compute is not built (arch/long, arch/drop); the build/ the GPU devices install may then be missing
+adios2	eval "$(declare -f build | sed 's/-DADIOS2_USE_CUDA=ON/-DADIOS2_USE_CUDA=OFF/')"  # GPU compute is not built (arch/long, arch/drop)
+opencv	eval "$(declare -f build | sed '/local cuda_archs=/d; /build-cuda/d')"  # the second, CUDA build (opencv-cuda, python-opencv-cuda: arch/drop) is not made
