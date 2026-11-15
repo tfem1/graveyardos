@@ -115,8 +115,8 @@ def shq(s):
     return "'" + s.replace("'", "'\\''") + "'"
 
 
-def run(cmd, **kw):
-    return subprocess.run(cmd, check=True, capture_output=True, text=True, **kw)
+def run(cmd, check=True, **kw):
+    return subprocess.run(cmd, check=check, capture_output=True, text=True, **kw)
 
 
 def names_map():
@@ -232,6 +232,10 @@ def git_snapshot(src, dirname, sources_dir):
     run(["git", "clone", "-q", "--no-checkout", mirror, co])
     run(["git", "-C", co, "remote", "set-url", "origin", base])
     target = {"tag": f"refs/tags/{ref}", "commit": ref, "branch": f"origin/{ref}"}.get(kind, "HEAD")
+    # makepkg checks a tag out by its value: a tag name, or the hash of the
+    # tag object (#tag=26254ee9...), which no refs/tags/ name matches
+    if kind == "tag" and run(["git", "-C", co, "rev-parse", "-q", "--verify", f"refs/tags/{ref}"], check=False).returncode:
+        target = ref
     run(["git", "-C", co, "-c", "advice.detachedHead=false", "checkout", "-q", target])
     if kind == "branch":
         run(["git", "-C", co, "checkout", "-q", "-B", ref])

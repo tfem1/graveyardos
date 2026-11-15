@@ -8,6 +8,7 @@ libgomp gcc
 libatomic gcc
 libquadmath gcc
 systemd-libs systemd
+util-linux-libs util-linux
 libudev systemd
 systemd-sysvcompat systemd
 procps-ng procps
