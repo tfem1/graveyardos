@@ -144,7 +144,8 @@ with zipfile.ZipFile(sys.argv[1]) as z:
 
 fn is_archive(name: &str) -> bool {
     [
-        ".tar", ".tar.gz", ".tgz", ".tar.xz", ".txz", ".tar.zst", ".tar.bz2", ".tbz2",
+        ".tar", ".tar.gz", ".tgz", ".tar.xz", ".txz", ".tar.zst", ".tar.bz2", ".tbz2", ".tbz",
+        ".tar.lzma", ".tlz", ".tar.lz", ".tar.Z",
     ]
     .iter()
     .any(|s| name.ends_with(s))
@@ -519,6 +520,13 @@ pub fn build(dir: &Path, o: &BuildOpts, ui: &Ui) -> Result<PathBuf> {
             }
         } else {
             fs::copy(path, srcdir.join(fname))?;
+            continue;
+        }
+        // makepkg leaves every source in $srcdir, archives too (as links):
+        // PKGBUILDs copy or unpack some again themselves
+        let link = srcdir.join(fname);
+        if fs::symlink_metadata(&link).is_err() {
+            std::os::unix::fs::symlink(path, &link)?;
         }
     }
     if !resume {

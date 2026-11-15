@@ -29,6 +29,7 @@ yone=${YONE:?a static yone binary (YONE=...)}
 mkdir -p "$work" && work=$(realpath "$work")
 mkdir -p "$work/repo" "$work/logs" "$work/recipes" "$work/arch-repos" "$work/sources"
 touch "$work/done" "$work/failed"
+python3 "$HERE/repair-done.py" "$work"   # bases whose packages left the repository
 # a package that failed may build now that more is built: every pass tries
 # again all that is not done
 mv "$work/failed" "$work/failed.before"; : > "$work/failed"

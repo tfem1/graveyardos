@@ -53,6 +53,26 @@ python3() {
   if [ "${1:-}" = -m ] && [ "${2:-}" = build ]; then shift 2; command python3 -m build --skip-dependency-check "$@"
   else command python3 "$@"; fi
 }
+# bsdtar (libarchive) is on every Arch build machine, not on GraveyardOS's
+# base: extraction (-x) of tar archives with GNU tar, of zip with Python
+command -v bsdtar > /dev/null 2>&1 || bsdtar() {
+  local f="" C="" a x=0
+  local -a rest=()
+  while [ $# -gt 0 ]; do
+    case $1 in
+      -x|-xf|-xvf|-xpf) x=1; [ "$1" = -x ] || { f=$2; shift; } ;;
+      -f) f=$2; shift ;;
+      -C) C=$2; shift ;;
+      *) rest+=("$1") ;;
+    esac
+    shift
+  done
+  [ "$x" = 1 ] || { echo "bsdtar: only extraction is offered here" >&2; return 1; }
+  case $f in
+    *.zip) python3 -c 'import sys, zipfile; zipfile.ZipFile(sys.argv[1]).extractall(sys.argv[2])' "$f" "${C:-.}" ;;
+    *) tar -xf "$f" ${C:+-C "$C"} "${rest[@]}" ;;
+  esac
+}
 # Arch's meson wrapper (/usr/bin/arch-meson of its meson package), which
 # PKGBUILDs call instead of meson
 arch-meson() {
@@ -263,7 +283,7 @@ def convert(pkgbase, cache, out, sources_dir, nmap, no_download=False):
         v = info[keys[0]] + info[keys[1]]
         if len(v) == len(srcs):
             sums[algo] = v
-    lines_src, local = [], []
+    lines_src, local, gitdirs = [], [], []
     for i, s in enumerate(srcs):
         name, _, url = s.rpartition("::") if "::" in s else ("", "", s)
         if re.match(r"^(svn|hg|bzr)(\+|://)", url):
@@ -271,6 +291,7 @@ def convert(pkgbase, cache, out, sources_dir, nmap, no_download=False):
         if re.match(r"^git(\+|://)", url):
             # makepkg: the name up to the first ".git" (notofonts.github.io: notofonts)
             dirname = name or re.sub(r"\.git.*$", "", url_repo_name(srcs[i]))
+            gitdirs.append(dirname)
             if no_download:
                 fname, sha = f"{dirname}-git.tar.gz", "TODO"
             else:
@@ -347,6 +368,9 @@ def convert(pkgbase, cache, out, sources_dir, nmap, no_download=False):
             # are in $startdir too (patches read as ../file)
             'srcdir="$SRCDIR"; pkgdir="$PKGDIR"; startdir="${SRCDIR%/*}"; CARCH=x86_64',
             *[f'cp -n "$srcdir"/{shq(f)} "$startdir"/' for f in local],
+            # the Git snapshots' index, written on another machine, out of
+            # date once unpacked: git apply --index and cherry-pick refuse it
+            *[f'git -C "$srcdir"/{shq(g)} update-index -q --refresh > /dev/null 2>&1 || true' for g in gitdirs],
             "# --- the PKGBUILD, as Arch publishes it",
             "set +u",
             pkgbuild.replace("\r", ""),

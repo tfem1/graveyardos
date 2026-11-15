@@ -64,6 +64,7 @@ jobs:
           [ "$prev_sha" = "$GITHUB_SHA" ] || retry=true
           echo "retry=$retry" >> "$GITHUB_OUTPUT"
           echo "failures tried again: $retry" | tee -a "$GITHUB_STEP_SUMMARY"
+          python3 arch/repair-done.py state | tee -a "$GITHUB_STEP_SUMMARY"
           python3 arch/plan-wave.py state "${{ inputs.shards }}" shards $([ "$retry" = true ] && echo --retry-failed) > matrix.json 2> summary.txt
           cat summary.txt | tee -a "$GITHUB_STEP_SUMMARY"
           echo "matrix=$(cat matrix.json)" >> "$GITHUB_OUTPUT"
@@ -174,6 +175,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
+          python3 arch/repair-done.py state
           # earlier failures stay failures (not tried again each wave), unless retried
           ${{ needs.plan.outputs.retry == 'true' && ': > failed.wave' || 'cp state/failed failed.wave' }}
           for d in shards/shard-*; do
