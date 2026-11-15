@@ -34,8 +34,8 @@ book's own commands rather than a rewrite of them:
    one script per section to `lfs/book/` (test suites, interactive commands
    and placeholders stay visible but commented out, with the reason);
    `lfs/fetch-sources.sh` downloads every source, checks the book's MD5 and
-   records SHA-256s. The result is pushed to the branch
-   `lfs-book/<version>`, reviewed, then merged.
+   records SHA-256s. The result is committed to main in one commit, whose
+   diff is the review (the project keeps no branches besides main).
 2. `lfs` workflow (manual): `lfs/build.sh` runs chapters 5-7 (job
    `toolchain`) then chapter 8 (job `system`), each section in the context
    the book expects (user `lfs`, root on the host, or the chroot).

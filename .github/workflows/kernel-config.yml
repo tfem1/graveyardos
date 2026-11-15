@@ -1,5 +1,5 @@
 # Fetches the base kernel configuration (Arch Linux's, same kernel series as
-# the book) and pushes it to the review branch kernel-config/<version>.
+# the book) and commits it to main (one commit: its diff is what to review).
 # Builds only ever use the committed kernel/base.config.
 name: kernel-config
 
@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write  # push the kernel-config/<version> review branch
+  contents: write  # commit the configuration to main
 
 jobs:
   fetch:
@@ -21,14 +21,12 @@ jobs:
           echo "VERSION=$version" >> "$GITHUB_ENV"
           bash kernel/fetch-base-config.sh "$version" | tee -a "$GITHUB_STEP_SUMMARY"
 
-      - name: Push the result to a review branch
+      - name: Commit the result to main (its diff is the review)
         run: |
-          branch="kernel-config/$VERSION"
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git checkout -B "$branch"
-          git add kernel/base.config kernel/base.config.source
+                    git add kernel/base.config kernel/base.config.source
           git commit -m "kernel: base configuration for Linux $VERSION" \
             -m "Fetched by the kernel-config workflow, run ${{ github.run_id }}."
-          git push -f origin "$branch"
-          echo "pushed to $branch" >> "$GITHUB_STEP_SUMMARY"
+          git push origin HEAD:main
+          echo "committed to main: $(git rev-parse --short HEAD)" >> "$GITHUB_STEP_SUMMARY"

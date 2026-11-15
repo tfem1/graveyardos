@@ -1,0 +1,34 @@
+# The project keeps one branch, main (like Arch's repositories). This deletes
+# every other branch whose content is already on main (each file it changed is
+# the same on main); a branch with work main lacks is listed and kept.
+name: branches
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  prune:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Delete the branches main already holds
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          for b in $(gh api "repos/$REPO/branches" --paginate --jq '.[].name'); do
+            [ "$b" = main ] && continue
+            kept=0
+            for f in $(gh api "repos/$REPO/compare/main...$b" --jq '.files[]?.filename'); do
+              a=$(gh api "repos/$REPO/contents/$f?ref=$b" --jq .sha 2> /dev/null || echo none)
+              m=$(gh api "repos/$REPO/contents/$f?ref=main" --jq .sha 2> /dev/null || echo none)
+              [ "$a" = "$m" ] || { kept=1; echo "$b: $f differs from main"; }
+            done
+            if [ "$kept" = 0 ]; then
+              gh api -X DELETE "repos/$REPO/git/refs/heads/$b" && echo "deleted $b" | tee -a "$GITHUB_STEP_SUMMARY"
+            else
+              echo "kept $b (work main lacks)" | tee -a "$GITHUB_STEP_SUMMARY"
+            fi
+          done
