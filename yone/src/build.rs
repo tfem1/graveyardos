@@ -426,7 +426,17 @@ pub fn build(dir: &Path, o: &BuildOpts, ui: &Ui) -> Result<PathBuf> {
     let work = dir.join(".yone-work");
     let srcdir = work.join("src");
     let pkgdir = work.join("pkg");
-    let _ = fs::remove_dir_all(&work);
+    // YONE_RESUME: a build cut short (a time limit) goes on where it stopped,
+    // when its sources were unpacked and prepared (the recipe leaves
+    // $SRCDIR/.prepared after prepare()): the build tree is kept, so make or
+    // Ninja only build what is left. Only the staging directory starts empty.
+    let resume = std::env::var_os("YONE_RESUME").is_some() && srcdir.join(".prepared").exists();
+    if resume {
+        ui.info("resuming: sources unpacked and prepared by an earlier run");
+        let _ = fs::remove_dir_all(&pkgdir);
+    } else {
+        let _ = fs::remove_dir_all(&work);
+    }
     fs::create_dir_all(&srcdir)?;
     fs::create_dir_all(&pkgdir)?;
     let cache = dir.join(".yone-sources");
@@ -460,6 +470,9 @@ pub fn build(dir: &Path, o: &BuildOpts, ui: &Ui) -> Result<PathBuf> {
         fetch_all(jobs, 4, ui)?;
     }
     for ((fname, path, remote), want) in local.iter().zip(&r.sha256) {
+        if resume {
+            break;
+        }
         if want == "SKIP" {
             if *remote {
                 bail!("{fname}: SKIP is not allowed for downloaded sources");
@@ -485,7 +498,9 @@ pub fn build(dir: &Path, o: &BuildOpts, ui: &Ui) -> Result<PathBuf> {
             fs::copy(path, srcdir.join(fname))?;
         }
     }
-    ui.info(&format!("{} source(s) verified", local.len()));
+    if !resume {
+        ui.info(&format!("{} source(s) verified", local.len()));
+    }
 
     let epoch = std::env::var("SOURCE_DATE_EPOCH")
         .ok()
