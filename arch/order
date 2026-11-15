@@ -790,6 +790,8 @@ libvpl
 libvpx
 libxdamage
 mjpegtools
+libcue
+libreplaygain
 musepack
 neon
 cudnn

@@ -77,6 +77,15 @@ command -v bsdtar > /dev/null 2>&1 || bsdtar() {
     *) tar -xf "$f" ${C:+-C "$C"} "${rest[@]}" ;;
   esac
 }
+# c89 and c99, POSIX's names for the C compiler: scripts of Arch's gcc
+# package, not of LFS's (libfreeaptx's Makefile compiles with c99)
+for _cc in c89 c99; do
+  command -v $_cc > /dev/null 2>&1 && continue
+  mkdir -p "${SRCDIR%/*}/graveyard-bin"
+  printf '#!/bin/sh\nexec gcc -std=%s "$@"\n' $_cc > "${SRCDIR%/*}/graveyard-bin/$_cc"
+  chmod 755 "${SRCDIR%/*}/graveyard-bin/$_cc"
+  case :$PATH: in *":${SRCDIR%/*}/graveyard-bin:"*) ;; *) PATH="${SRCDIR%/*}/graveyard-bin:$PATH" ;; esac
+done
 # Arch's meson wrapper (/usr/bin/arch-meson of its meson package), which
 # PKGBUILDs call instead of meson; --libdir lib as meson picks on Arch, where
 # /usr/lib64 is a link; --auto-features auto, not enabled: features of the
@@ -511,6 +520,9 @@ def convert(pkgbase, cache, out, sources_dir, nmap, no_download=False):
             "# makepkg: pkgbase is the first name when the PKGBUILD has none;",
             "# pkgname stays the PKGBUILD's list for prepare() and build()",
             'pkgbase=${pkgbase:-${pkgname[0]}}',
+            "# makepkg: options=(!makeflags) builds without MAKEFLAGS (-jN): the",
+            "# Makefiles of cdparanoia, ffcall and catdoc are not safe in parallel",
+            'case " ${options[*]-} " in *" !makeflags "*) unset MAKEFLAGS ;; esac',
             *(["# --- GraveyardOS's fixes (arch/fixes)"] + fixes(pkgbase) if fixes(pkgbase) else []),
             "# --- what makepkg runs",
             "# prepare() once: a build resumed (YONE_RESUME) finds it done",

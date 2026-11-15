@@ -1,0 +1,26 @@
+# minizip, zlib's contrib/minizip (libfreexl needs it): Arch builds it in its
+# zlib package base, which the GraveyardOS base stands in for with LFS's zlib,
+# built without it. The same zlib as the base's.
+name = minizip
+version = 1.3.2
+release = 1
+desc = Mini zip and unzip based on zlib
+url = https://www.zlib.net/
+license = Zlib
+depends = zlib
+source = https://zlib.net/fossils/zlib-1.3.2.tar.gz
+sha256 = bb329a0a2cd0274d05519d61c667c062e06990d72e125ee2dfa8de64f0119d16
+
+@build
+cd zlib-1.3.2/contrib/minizip
+autoreconf -fi
+./configure --prefix=/usr --enable-static=no
+make
+
+@package
+cd zlib-1.3.2/contrib/minizip
+make DESTDIR="$PKGDIR" install
+rm -f "$PKGDIR"/usr/lib/libminizip.la
+# Arch's: https://github.com/madler/zlib/pull/229
+rm -f "$PKGDIR"/usr/include/minizip/crypt.h
+install -Dm644 ../../LICENSE "$PKGDIR"/usr/share/licenses/minizip/LICENSE

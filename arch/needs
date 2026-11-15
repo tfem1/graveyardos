@@ -790,7 +790,9 @@ libvpl	cmake
 libvpx	git nasm
 libxdamage	libx11 libxfixes xorgproto
 mjpegtools	libdv libjpeg-turbo libpng
-musepack	
+libcue	cmake
+libreplaygain	cmake
+musepack	libcue libreplaygain
 neon	ca-certificates docbook-xsl git krb5 xmlto
 cudnn	cuda
 doctest	cmake
@@ -949,7 +951,7 @@ blosc	cmake git snappy
 cfitsio	cmake curl git
 crypto++	git unzip
 geos	cmake
-libfreexl	zlib
+libfreexl	minizip zlib
 proj	cmake curl git gtest libtiff sqlite
 libgeotiff	libjpeg-turbo libtiff proj
 librttopo	geos
