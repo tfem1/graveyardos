@@ -20,6 +20,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 
 
 INFO_DIR = "usr/share/info/dir"
+RULES = 2  # info dir, perllocal.pod/.packlist, usr/lib64
 
 
 def listing(f):
@@ -50,7 +51,8 @@ def main():
     # the second one to be installed conflicts with the first (libgpg-error,
     # libunistring, nettle... out of every system since). Out of the
     # repository: their bases are built again, tidied.
-    checked_path = os.path.join(work, "repo-checked")
+    # the cache of clean files holds for one set of rules: a new rule checks them all again
+    checked_path = os.path.join(work, f"repo-checked-{RULES}")
     checked = set(open(checked_path).read().split()) if os.path.exists(checked_path) else set()
     dropped = []
     for f in sorted(glob.glob(os.path.join(work, "repo", "*.yon"))):
