@@ -44,6 +44,7 @@ jobs:
     outputs:
       matrix: ${{ steps.plan.outputs.matrix }}
       count: ${{ steps.plan.outputs.count }}
+      retry: ${{ steps.plan.outputs.retry }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/download-artifact@v4
@@ -53,8 +54,17 @@ jobs:
           run-id: ${{ inputs.prev_run }}
           github-token: ${{ github.token }}
       - id: plan
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
-          python3 arch/plan-wave.py state "${{ inputs.shards }}" shards ${{ inputs.retry_failed && '--retry-failed' || '' }} > matrix.json 2> summary.txt
+          # the failures are tried again when asked, or when the recipes and
+          # scripts changed since the last wave (fixes)
+          retry=${{ inputs.retry_failed }}
+          prev_sha=$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/${{ inputs.prev_run }}" -q .head_sha || echo "$GITHUB_SHA")
+          [ "$prev_sha" = "$GITHUB_SHA" ] || retry=true
+          echo "retry=$retry" >> "$GITHUB_OUTPUT"
+          echo "failures tried again: $retry" | tee -a "$GITHUB_STEP_SUMMARY"
+          python3 arch/plan-wave.py state "${{ inputs.shards }}" shards $([ "$retry" = true ] && echo --retry-failed) > matrix.json 2> summary.txt
           cat summary.txt | tee -a "$GITHUB_STEP_SUMMARY"
           echo "matrix=$(cat matrix.json)" >> "$GITHUB_OUTPUT"
           echo "count=$(python3 -c 'import json,sys; print(len(json.load(open("matrix.json"))["shard"]))')" >> "$GITHUB_OUTPUT"
@@ -165,7 +175,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           # earlier failures stay failures (not tried again each wave), unless retried
-          ${{ inputs.retry_failed && ': > failed.wave' || 'cp state/failed failed.wave' }}
+          ${{ needs.plan.outputs.retry == 'true' && ': > failed.wave' || 'cp state/failed failed.wave' }}
           for d in shards/shard-*; do
             [ -d "$d" ] || continue
             cp -n "$d"/repo/* state/repo/ 2> /dev/null || true
@@ -208,12 +218,9 @@ jobs:
           new=0
           for d in shards/shard-*; do new=$((new + $(grep -c . "$d/done" 2> /dev/null || echo 0))); done
           echo "built in this wave: $new"
-          # fixes pushed since this wave started: its failures are tried again
+          # fixes pushed since this wave started: the next one tries its failures again
           latest=$(gh api "repos/$GITHUB_REPOSITORY/commits/$GITHUB_REF_NAME" -q .sha || echo "$GITHUB_SHA")
-          retry=false; [ "$latest" = "$GITHUB_SHA" ] || retry=true
-          echo "new commits since this wave: $retry"
-          if [ "$new" -gt 0 ] || [ "$retry" = true ]; then
+          if [ "$new" -gt 0 ] || [ "$latest" != "$GITHUB_SHA" ]; then
             gh workflow run arch-wave.yml --ref "$GITHUB_REF_NAME" -f base_run="${{ inputs.base_run }}" \
-              -f prev_run="${{ github.run_id }}" -f shards="${{ inputs.shards }}" -f budget="${{ inputs.budget }}" \
-              -f retry_failed="$retry" -f chain=true
+              -f prev_run="${{ github.run_id }}" -f shards="${{ inputs.shards }}" -f budget="${{ inputs.budget }}" -f chain=true
           fi
