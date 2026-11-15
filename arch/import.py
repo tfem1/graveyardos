@@ -40,7 +40,13 @@ export CXXFLAGS="$CFLAGS -Wp,-D_GLIBCXX_ASSERTIONS"
 export LDFLAGS="-Wl,-O1 -Wl,--sort-common -Wl,--as-needed -Wl,-z,relro -Wl,-z,now -Wl,-z,pack-relative-relocs"
 export LTOFLAGS="-flto=auto"
 export RUSTFLAGS="-Cforce-frame-pointers=yes"
-export DEBUG_CFLAGS="-g" DEBUG_CXXFLAGS="-g"'''
+export DEBUG_CFLAGS="-g" DEBUG_CXXFLAGS="-g"
+# Arch's meson wrapper (/usr/bin/arch-meson of its meson package), which
+# PKGBUILDs call instead of meson
+arch-meson() {
+  meson setup --prefix /usr --libexecdir lib --sbindir bin --buildtype plain \
+    --auto-features enabled --wrap-mode nodownload -D b_pie=true -D python.bytecompile=1 "$@"
+}'''
 
 # Evaluate a PKGBUILD: its variables as JSON, its functions as text.
 EVAL = r'''
