@@ -211,6 +211,7 @@ def git_snapshot(src, dirname, sources_dir):
         run(["git", "clone", "-q", "--mirror", base, mirror])
     tag = re.sub(r"[^A-Za-z0-9._-]", "_", f"{kind}-{ref}" if ref else "HEAD")
     out = os.path.join(sources_dir, f"{dirname}-git-{tag}.tar.gz")
+    out = out.replace(".tar.gz", "-sm.tar.gz")  # snapshots with their submodules
     if os.path.exists(out) and ref and kind in ("tag", "commit"):
         return out  # a tag or commit does not move
     work = out + ".d"
@@ -223,6 +224,11 @@ def git_snapshot(src, dirname, sources_dir):
     run(["git", "-C", co, "-c", "advice.detachedHead=false", "checkout", "-q", target])
     if kind == "branch":
         run(["git", "-C", co, "checkout", "-q", "-B", ref])
+    # submodules fetched here, at the commits the checkout names: a
+    # PKGBUILD's "git submodule update" in the build system (no network)
+    # then finds them in place
+    if os.path.exists(os.path.join(co, ".gitmodules")):
+        run(["git", "-C", co, "submodule", "update", "--init", "--recursive", "-q"])
     run(["tar", "-C", work, "--sort=name", "--owner=0", "--group=0", "--numeric-owner",
          "-czf", out + ".part", dirname])
     os.replace(out + ".part", out)
