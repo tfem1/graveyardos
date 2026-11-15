@@ -9,3 +9,7 @@ only built with Rust (Arch builds it with its previous rust). It has no
 "# replaces:" line, so Arch's rust is still built from source and replaces
 it as an upgrade; "bootstrap:<name>" in the done list keeps it from being
 built again meanwhile.
+
+go is the same for Go: Arch's go is built with a Go tree in /usr/lib/go
+(GOROOT_BOOTSTRAP); the Go project's binary release, older than Arch's,
+gives it one, and the go built from source replaces it.

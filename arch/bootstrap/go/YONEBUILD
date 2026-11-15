@@ -1,0 +1,19 @@
+# Go builds only with Go: Arch's go (built from source by the chain) needs a
+# Go tree to start from in /usr/lib/go (GOROOT_BOOTSTRAP). This is the Go
+# project's binary release, older than Arch's version (1.27.4), installed as
+# "go" at a lower version so that the go built from source replaces it as
+# an upgrade. No "# replaces:" line: the go package base is still built.
+name = go
+version = 1.27.0
+release = 0
+desc = The Go toolchain, upstream binaries (bootstrap for building go from source)
+url = https://go.dev
+license = BSD-3-Clause
+source = https://go.dev/dl/go1.27.0.linux-amd64.tar.gz
+sha256 = TODO
+
+@package
+mkdir -p "$PKGDIR/usr/lib" "$PKGDIR/usr/bin"
+cp -a go "$PKGDIR/usr/lib/go"
+ln -s ../lib/go/bin/go "$PKGDIR/usr/bin/go"
+ln -s ../lib/go/bin/gofmt "$PKGDIR/usr/bin/gofmt"
