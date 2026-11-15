@@ -160,7 +160,7 @@ for r in "$HERE"/bootstrap/git "$HERE"/bootstrap/python-pyproject-hooks "$HERE"/
   grep -qx "bootstrap:$b" "$work/done" && continue
   printf '   %-30s ' "$b (bootstrap)"
   if build_dir "$r" "$work/logs/$b.log"; then
-    sed -n 's/^# replaces: //p' "$r/YONEBUILD" | tr ' ' '\n' | grep . >> "$work/done"
+    sed -n 's/^# replaces: //p' "$r/YONEBUILD" | tr ' ' '\n' | { grep . || true; } >> "$work/done"
     # without "# replaces:", the base is still built from source later
     echo "bootstrap:$b" >> "$work/done"; echo ok
   else
