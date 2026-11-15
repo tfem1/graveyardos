@@ -220,20 +220,22 @@ def stamp(canvas, mask, x, y, ink=255, outline=0):
 
 
 def eye(work, gw, gh):
-    """GraveyardOS Cemetery with the Eye of Horus where the moon is, and the
-    name under it, in pixels."""
+    """GraveyardOS Cemetery with the Eye of Horus on the moon, and the name
+    above it, in pixels."""
     from PIL import ImageDraw, ImageFont
     c = gothic(work, gw, gh)
     e = eye_bitmap()
-    ex, ey = gw // 2 - e.width // 2, int(gh * 0.30) - e.height // 2 + (0 if gh >= 270 else 6)
-    stamp(c, e, ex, ey)
-    font = ImageFont.truetype(os.path.join(REPO, "branding", "sddm", "graveyard", "fonts", "Rubik-800.ttf"),
-                              22 if gh >= 270 else 18)
-    text = Image.new("L", (gw, 40), 0)
+    size = 22 if gh >= 270 else 18
+    font = ImageFont.truetype(os.path.join(REPO, "branding", "sddm", "graveyard", "fonts", "Rubik-800.ttf"), size)
+    text = Image.new("L", (gw, size + 8), 0)
     d = ImageDraw.Draw(text)
     d.fontmode = "1"  # no smoothing: pixel letters
     d.text((gw // 2, 2), "GraveyardOS", font=font, fill=255, anchor="mt")
-    stamp(c, text, 0, ey + e.height + 4)
+    # the eye on the moon (the moon layer stands on the bottom edge), the name above
+    ey = gh - 224 + 92 - e.height // 2
+    ty = max(4, ey - size - 10)
+    stamp(c, text, 0, ty)
+    stamp(c, e, gw // 2 - e.width // 2, ey)
     return c
 
 
@@ -241,7 +243,7 @@ WALLPAPERS = {
     # name: (scene, title, description, sources)
     "GraveyardOS-Cemetery": (gothic, "GraveyardOS cemetery", "A moonlit graveyard in pixel art", ["gothicvania"]),
     "GraveyardOS-Town": (town, "GraveyardOS town", "An old town and its church under a cloudy sky, in pixel art", ["town"]),
-    "GraveyardOS-Eye": (eye, "GraveyardOS eye", "The Eye of Horus over the cemetery, and the name, in pixel art",
+    "GraveyardOS-Eye": (eye, "GraveyardOS eye", "The GraveyardOS name over the Eye of Horus on the moon of a cemetery, in pixel art",
                         ["gothicvania"]),
     "Haunted-Swamp": (swamp, "Haunted swamp", "A haunted swamp forest, a face in its tree, in pixel art", ["swamp"]),
 }
