@@ -219,23 +219,67 @@ def stamp(canvas, mask, x, y, ink=255, outline=0):
     canvas.paste(ink, (x, y), mask)
 
 
+def engraved(text, size, tracking=2, fill=118, light=168, shade=62):
+    """Pixel letters cut in stone: a grey face, a light top edge, a dark
+    bottom edge (the mask of the letters, and their shading)."""
+    from PIL import ImageDraw, ImageFont
+    font = ImageFont.truetype(os.path.join(REPO, "branding", "sddm", "graveyard", "fonts", "Rubik-800.ttf"), size)
+    w = int(sum(font.getlength(ch) for ch in text) + tracking * (len(text) - 1)) + 4
+    mask = Image.new("L", (w, size + 8), 0)
+    d = ImageDraw.Draw(mask)
+    d.fontmode = "1"  # no smoothing: pixel letters
+    x = 2
+    for ch in text:
+        d.text((x, 2), ch, font=font, fill=255)
+        x += font.getlength(ch) + tracking
+    m = mask.load()
+    face = Image.new("L", mask.size, fill)
+    f = face.load()
+    for y in range(mask.height):
+        for x in range(mask.width):
+            if m[x, y]:
+                if y == 0 or not m[x, y - 1]:
+                    f[x, y] = light
+                elif y == mask.height - 1 or not m[x, y + 1]:
+                    f[x, y] = shade
+    return mask, face
+
+
+def stamp_face(canvas, mask, face, x, y, outline=0):
+    from PIL import ImageFilter
+    canvas.paste(outline, (x, y), mask.filter(ImageFilter.MaxFilter(3)))
+    canvas.paste(face, (x, y), mask)
+
+
 def eye(work, gw, gh):
     """GraveyardOS Cemetery with the Eye of Horus on the moon, and the name
-    above it, in pixels."""
-    from PIL import ImageDraw, ImageFont
+    above it, engraved; both in a dark grey."""
     c = gothic(work, gw, gh)
     e = eye_bitmap()
-    size = 22 if gh >= 270 else 18
-    font = ImageFont.truetype(os.path.join(REPO, "branding", "sddm", "graveyard", "fonts", "Rubik-800.ttf"), size)
-    text = Image.new("L", (gw, size + 8), 0)
-    d = ImageDraw.Draw(text)
-    d.fontmode = "1"  # no smoothing: pixel letters
-    d.text((gw // 2, 2), "GraveyardOS", font=font, fill=255, anchor="mt")
-    # the eye on the moon (the moon layer stands on the bottom edge), the name above
     ey = gh - 224 + 40 - e.height // 2
-    ty = max(4, ey - size - 10)
-    stamp(c, text, 0, ty)
-    stamp(c, e, gw // 2 - e.width // 2, ey)
+    # the eye: dark grey with a black outline, on the bright moon
+    stamp(c, e, gw // 2 - e.width // 2, ey, ink=96)
+    # the name, engraved, between two rules ending in a diamond
+    size = 24 if gh >= 270 else 19
+    mask, face = engraved("GraveyardOS", size)
+    tx, ty = gw // 2 - mask.width // 2, max(3, ey - mask.height - 4)
+    stamp_face(c, mask, face, tx, ty)
+    px = c.load()
+    cy = ty + mask.height // 2 + 1
+    rule = min(40, (gw - mask.width) // 2 - 16)
+    for side in (-1, 1):
+        x0 = tx - 8 if side < 0 else tx + mask.width + 7
+        for i in range(rule):
+            x = x0 + side * i
+            if 0 <= x < gw:
+                px[x, cy - 1] = 0
+                px[x, cy] = 110
+                px[x, cy + 1] = 0
+        xd = x0 + side * (rule + 2)
+        for dx, dy in ((0, -2), (-1, -1), (0, -1), (1, -1), (-2, 0), (-1, 0), (0, 0), (1, 0), (2, 0),
+                       (-1, 1), (0, 1), (1, 1), (0, 2)):
+            if 0 <= xd + dx < gw:
+                px[xd + dx, cy + dy] = 140 if abs(dx) + abs(dy) <= 1 else 0
     return c
 
 
