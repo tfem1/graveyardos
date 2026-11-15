@@ -377,7 +377,7 @@ def convert(pkgbase, cache, out, sources_dir, nmap, no_download=False):
             "# --- the PKGBUILD, as Arch publishes it",
             "# makepkg runs it with errexit but without pipefail: a pipeline's",
             "# status is its last command's (waf's head | tail | sed)",
-            "set +u +o pipefail",
+            "set +u +o pipefail; shopt -s extglob  # makepkg has extglob on",
             pkgbuild.replace("\r", ""),
             f"pkgname={name}",
             *(["# --- GraveyardOS's fixes (arch/fixes)"] + fixes(pkgbase) if fixes(pkgbase) else []),
