@@ -1,6 +1,7 @@
 # replaces: git
 # Git for the recipes that cherry-pick, apply or describe in prepare(); built
 # without curl (sources are cloned on the build host, never in the chroot)
+# nor Rust (git 2.56 builds part of itself with cargo when it can; no cargo yet)
 name = git
 version = 2.56.1
 release = 0
@@ -12,9 +13,9 @@ sha256 = TODO
 
 @build
 cd git-2.56.1
-make prefix=/usr gitexecdir=/usr/lib/git-core NO_TCLTK=1 NO_CURL=1 NO_PYTHON=1 NO_GETTEXT=1 INSTALL_SYMLINKS=1 all
+make prefix=/usr gitexecdir=/usr/lib/git-core NO_TCLTK=1 NO_CURL=1 NO_PYTHON=1 NO_GETTEXT=1 NO_RUST=1 INSTALL_SYMLINKS=1 all
 
 @package
 cd git-2.56.1
-make prefix=/usr gitexecdir=/usr/lib/git-core NO_TCLTK=1 NO_CURL=1 NO_PYTHON=1 NO_GETTEXT=1 INSTALL_SYMLINKS=1 \
+make prefix=/usr gitexecdir=/usr/lib/git-core NO_TCLTK=1 NO_CURL=1 NO_PYTHON=1 NO_GETTEXT=1 NO_RUST=1 INSTALL_SYMLINKS=1 \
   DESTDIR="$PKGDIR" install

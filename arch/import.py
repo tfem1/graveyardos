@@ -62,6 +62,34 @@ done
 printf '"_": null}\n'
 '''
 
+TIDY = r'''graveyard_tidy() {
+  local opts=" ${options[*]-} " f
+  cd "$pkgdir" || return
+  rm -f usr/share/info/dir usr/info/dir
+  find . -name .packlist -delete
+  find . -name '*.pod' -path '*/perl*' -delete
+  case $opts in *" libtool "*) ;; *) find . -name '*.la' -type f -delete ;; esac
+  case $opts in *" staticlibs "*) ;; *)
+    find . -name '*.a' -type f | while read -r f; do
+      [ -e "${f%.a}.so" ] && rm -f "$f"
+    done ;;
+  esac
+  case $opts in *" !docs "*) rm -rf usr/share/doc usr/doc usr/share/gtk-doc ;; esac
+  case $opts in *" !emptydirs "*) find . -depth -type d -empty -delete ;; esac
+  case $opts in *" !strip "*) ;; *)
+    find . -type f -perm -u+w | while read -r f; do
+      [ "$(head -c 4 "$f" 2> /dev/null | od -An -c | tr -d ' ')" = '177ELF' ] || continue
+      case $f in
+        *.so | *.so.*) strip --strip-unneeded "$f" 2> /dev/null ;;
+        *.a | *.o) strip --strip-debug "$f" 2> /dev/null ;;
+        *) strip --strip-all "$f" 2> /dev/null ;;
+      esac
+    done ;;
+  esac
+  cd "$srcdir" || return
+}
+graveyard_tidy'''
+
 SONAME = re.compile(r"\.so(=|$)")
 
 
@@ -144,7 +172,8 @@ def git_snapshot(src, dirname, sources_dir):
     its .git: PKGBUILDs cherry-pick, apply and describe), packed in a tarball
     Yone unpacks. Cloned on this host: the build system has no network."""
     u = re.sub(r"^git\+", "", src.split("::", 1)[-1])
-    frag = u.split("#", 1)[1] if "#" in u else ""
+    # "#tag=v1.2?signed": the signature check is the packager's, not a ref
+    frag = (u.split("#", 1)[1] if "#" in u else "").split("?", 1)[0]
     base = u.split("#")[0].split("?")[0]
     kind, _, ref = frag.partition("=")
     mirror = os.path.join(sources_dir, "git", re.sub(r"[^A-Za-z0-9._-]", "_", base))
@@ -273,6 +302,9 @@ def convert(pkgbase, cache, out, sources_dir, nmap, no_download=False):
             'cd "$srcdir"; if declare -F prepare >/dev/null; then prepare; fi',
             'cd "$srcdir"; if declare -F build >/dev/null; then build; fi',
             f'cd "$srcdir"; {pfunc}',
+            "# --- what makepkg does after package() (makepkg.conf: strip docs !libtool",
+            "# !staticlibs emptydirs zipman purge), as the PKGBUILD's options= allow",
+            TIDY,
         ]
         open(os.path.join(d, "YONEBUILD"), "w").write("\n".join(y) + "\n\n" + "\n".join(body) + "\n")
         made.append(name)

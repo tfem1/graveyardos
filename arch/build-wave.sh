@@ -156,6 +156,10 @@ build_extras
 while read -r base; do
   [ -n "$base" ] || continue
   if grep -qx "$base" "$work/done"; then continue; fi
+  # what the GraveyardOS base already is (glibc, gcc...): never rebuilt
+  if grep -v '^#' "$HERE/base-names" | tr ' ' '\n' | grep -qx "$base"; then
+    echo "$base" >> "$work/done"; continue
+  fi
   if [ $((SECONDS - start)) -ge "$budget" ]; then log "time budget spent"; break; fi
   # twelve tries and nothing built: something general is wrong, not a package
   if [ "$n" -ge 12 ] && [ "$okn" -eq 0 ]; then
