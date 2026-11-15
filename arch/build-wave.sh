@@ -187,11 +187,14 @@ for r in "$HERE"/bootstrap/git "$HERE"/bootstrap/python-pyproject-hooks "$HERE"/
 done
 
 # what a base needs built first, less what arch/drop leaves out of it
+# (and less its back edges: dependencies later in arch/order, cycles the order broke)
 needs() {
   awk -F'\t' -v b="$1" '
+    FILENAME ~ /order$/ { if ($0 !~ /^#/ && $1 != "") idx[$1] = FNR; next }
     FILENAME ~ /drop$/ { if ($0 !~ /^#/ && $1 == b) gone[$2] = 1; next }
-    $1 == b { n = split($2, d, " "); for (i = 1; i <= n; i++) if (!(d[i] in gone)) print d[i] }
-  ' "$HERE/drop" "$HERE/needs"
+    $1 == b { n = split($2, d, " "); for (i = 1; i <= n; i++)
+      if (!(d[i] in gone) && !((d[i] in idx) && (b in idx) && idx[d[i]] > idx[b])) print d[i] }
+  ' "$HERE/order" "$HERE/drop" "$HERE/needs"
 }
 
 # GraveyardOS's own recipes (arch/extra), built as soon as what their

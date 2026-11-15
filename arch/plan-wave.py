@@ -40,6 +40,14 @@ def main():
         f = l.rstrip("\n").split("\t")
         if len(f) >= 2 and not l.startswith("#") and f[0] in needs:
             needs[f[0]] = [d for d in needs[f[0]] if d != f[1]]
+    # A dependency later in the order than the base is a back edge of a
+    # dependency cycle, which the order broke there: the base does not wait
+    # for it (built with what there is, as Arch builds a cycle on its
+    # previous packages)
+    idx = {b: i for i, b in enumerate(order)}
+    for b in needs:
+        if b in idx:
+            needs[b] = [d for d in needs[b] if not (d in idx and idx[d] > idx[b])]
     done = set(lines(os.path.join(work, "done"))) | base
     failed = set() if "--retry-failed" in sys.argv else set(lines(os.path.join(work, "failed")))
     ready = [b for b in order if b not in done and b not in failed
