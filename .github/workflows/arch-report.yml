@@ -11,6 +11,9 @@ on:
       logs:
         description: "packages whose log end to print (space separated)"
         default: ""
+      grep:
+        description: "a pattern to look for in every log (with 3 lines around)"
+        default: ""
       shard:
         description: "arch-wave: read this shard's artifact instead (its new packages, failures and logs)"
         default: ""
@@ -58,6 +61,10 @@ jobs:
             | cut -c1-110 | sort | uniq -c | sort -rn | head -n 60
           echo "== every failure"
           cut -c1-220 work/failed
+          if [ -n "${{ inputs.grep }}" ]; then
+            echo "== logs matching ${{ inputs.grep }}"
+            grep -n -B3 -A3 -E "${{ inputs.grep }}" logs/*.log | cut -c1-220 | head -n 150 || true
+          fi
           for p in ${{ inputs.logs }}; do
             echo "== log of $p"
             tail -n 40 "logs/$p.log" 2> /dev/null | cut -c1-220 || echo "(no log)"
