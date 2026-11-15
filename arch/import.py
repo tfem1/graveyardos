@@ -381,6 +381,12 @@ def convert(pkgbase, cache, out, sources_dir, nmap, no_download=False):
             "# prepare() once: a build resumed (YONE_RESUME) finds it done",
             'cd "$srcdir"; if [ ! -e .prepared ]; then if declare -F prepare >/dev/null; then prepare; fi; cd "$srcdir"; touch .prepared; fi',
             'cd "$srcdir"; if declare -F build >/dev/null; then build; fi',
+            # split packages: makepkg runs every package_*() in turn in the
+            # same $srcdir, and one may leave files there for a later one
+            # (sqlite's moves its Tcl extension out for sqlite-tcl); the
+            # ones before this package run first, into throwaway directories
+            *[f'(pkgdir="$srcdir/.split/{e}"; mkdir -p "$pkgdir"; cd "$srcdir"; package_{e})'
+              for e in names[:names.index(name)] if pfunc != "package" and f"package_{e}" in funcs],
             f'cd "$srcdir"; {pfunc}',
             "# --- what makepkg does after package() (makepkg.conf: strip docs !libtool",
             "# !staticlibs emptydirs zipman purge), as the PKGBUILD's options= allow",
