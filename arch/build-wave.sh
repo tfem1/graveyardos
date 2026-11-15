@@ -59,8 +59,20 @@ if ls "$work"/repo/*.yon > /dev/null 2>&1; then
   index
   inroot /usr/local/bin/yone --noconfirm --overwrite --color never refresh > /dev/null
   mapfile -t built < <(inroot /usr/local/bin/yone --color never list | sed 's|^[^/]*/||; s| .*||')
-  inroot /usr/local/bin/yone --noconfirm --overwrite --color never install "${built[@]}" > "$work/logs/reinstall.log" 2>&1 \
-    || { echo "reinstall failed:"; tail -n 20 "$work/logs/reinstall.log"; exit 1; }
+  # A package built while one of its dependencies is not yet (it built all
+  # the same) cannot be installed: left out, and what needs it after it.
+  left_out=()
+  for _ in $(seq 1 200); do
+    [ "${#built[@]}" -gt 0 ] || break
+    if inroot /usr/local/bin/yone --noconfirm --overwrite --color never install "${built[@]}" > "$work/logs/reinstall.log" 2>&1; then
+      break
+    fi
+    bad=$(sed -n "s/.*required by '\{0,1\}\([^' ]*\)'\{0,1\}.*/\1/p" "$work/logs/reinstall.log" | head -n 1)
+    [ -n "$bad" ] || { echo "reinstall failed:"; tail -n 20 "$work/logs/reinstall.log"; exit 1; }
+    left_out+=("$bad")
+    mapfile -t built < <(printf '%s\n' "${built[@]}" | grep -vxF "$bad")
+  done
+  echo "   reinstalled ${#built[@]}; left out until their dependencies are built: ${left_out[*]:-none}"
 fi
 
 # build one recipe directory in the chroot and install what it made
