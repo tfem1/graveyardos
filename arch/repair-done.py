@@ -66,6 +66,14 @@ def main():
         out.write("".join(c + "\n" for c in sorted(checked)))
     if dropped:
         print(f"with usr/share/info/dir, out of the repository: {len(dropped)}: {' '.join(dropped)}")
+        # a bootstrap among them is built again too
+        boots = {os.path.basename(os.path.dirname(y)) for y in glob.glob(os.path.join(HERE, "bootstrap", "*", "YONEBUILD"))}
+        again = {"bootstrap:" + re.sub(r"-[^-]+-[^-]+-[^-]+\.yon$", "", d) for d in dropped} & {"bootstrap:" + b for b in boots}
+        if again:
+            done = [b for b in done if b not in again]
+            with open(path + ".new", "w") as f:
+                f.write("".join(b + "\n" for b in done))
+            os.replace(path + ".new", path)
     # name-version-release-arch.yon
     names = {re.sub(r"-[^-]+-[^-]+-[^-]+\.yon$", "", os.path.basename(f))
              for f in glob.glob(os.path.join(work, "repo", "*.yon"))}
