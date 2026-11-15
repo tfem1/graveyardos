@@ -165,6 +165,13 @@ class Summary(unittest.TestCase):
         self.assertNotIn("/run/graveyard/nvidia", s)
         self.assertNotIn("blacklist=nouveau", s)
 
+    def test_boot_menu_takes_the_medium_s_theme(self):
+        s = script(yi.plan(CHOICES, FACTS))
+        self.assertIn("cp -a /run/graveyard/medium/boot/grub/themes/graveyard /mnt/graveyard-target/boot/grub/themes/", s)
+        self.assertIn("set theme=/boot/grub/themes/graveyard/theme.txt", s)
+        enc = yi.plan(dict(copy.deepcopy(CHOICES), encrypt=True), FACTS)
+        self.assertIn("set theme=/grub/themes/graveyard/theme.txt", script(enc))  # separate /boot
+
     def test_manual_keeps_windows_efi_not_danger(self):
         c = dict(CHOICES, disk={"mode": "manual", "root": "/dev/nvme0n1p3", "efi": "/dev/nvme0n1p1"})
         rows = yi.summary(c, FACTS)

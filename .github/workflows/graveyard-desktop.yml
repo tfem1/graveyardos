@@ -64,10 +64,10 @@ jobs:
           sudo bash lfs/graveyard/fetch-sources.sh "$LFS/sources"
           sudo ln -sf bash /bin/sh
 
-      # the live session's files as this commit has them (installer...),
-      # before the desktop adds its own
+      # the system's configuration and the live session's files as this
+      # commit has them (os-release, installer...), before the desktop adds its own
       - name: Initramfs section again
-        run: sudo -E GRAVEYARD_REDO=graveyard-initramfs bash lfs/build.sh run ch09 ch10
+        run: sudo -E GRAVEYARD_REDO="graveyard-base-files graveyard-initramfs" bash lfs/build.sh run ch09 ch10
 
       - uses: actions/download-artifact@v4
         with:

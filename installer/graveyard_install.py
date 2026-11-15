@@ -19,6 +19,7 @@ import time
 TARGET = "/mnt/graveyard-target"
 LIVE_SYSTEM = "/run/graveyard/system"   # the live medium's read-only system image
 LIVE_NVIDIA = "/run/graveyard/nvidia"   # its NVIDIA driver layer, when it has one
+LIVE_MEDIUM = "/run/graveyard/medium"   # the medium itself (its boot menu's theme)
 MIN_DISK = 16 * 1024 ** 3          # bytes
 EFI_SIZE = "1GiB"
 BOOT_SIZE = "1GiB"                 # separate /boot when the root is encrypted
@@ -354,10 +355,24 @@ def plan(c, f):
     cmdline = f"root=UUID=$ROOT_UUID rw quiet" if not enc else "root=/dev/mapper/graveyard-root rw quiet"
     if c.get("nvidia"):
         cmdline += " modprobe.blacklist=nouveau nvidia-drm.modeset=1"
+    theme = f"{kpath}/grub/themes/graveyard"
     grub_cfg = "\n".join([
         "set timeout=3",
         "set default=0",
         "search --no-floppy --fs-uuid --set=root $BOOT_UUID",
+        # the medium's look (branding/grub), when a graphics mode is there
+        "insmod all_video",
+        "if [ -f " + theme + "/theme.txt ]; then",
+        "  insmod gfxterm",
+        "  insmod png",
+        "  set gfxmode=auto",
+        "  loadfont " + theme + "/rubik-16.pf2",
+        "  if terminal_output gfxterm; then",
+        "    loadfont " + theme + "/rubik-24.pf2",
+        "    loadfont " + theme + "/rubik-bold-40.pf2",
+        "    set theme=" + theme + "/theme.txt",
+        "  fi",
+        "fi",
         'menuentry "GraveyardOS" {',
         f"  linux {kpath}/vmlinuz-{kernel} {cmdline}",
         f"  initrd {kpath}/initramfs-{kernel}.img",
@@ -372,6 +387,8 @@ def plan(c, f):
         f"ROOT_UUID=$(uuid {q(root_dev)})",
         f"BOOT_UUID=$(uuid {q(boot or root_dev)})",
         f"install -d {T}/boot/grub",
+        f"if [ -d {LIVE_MEDIUM}/boot/grub/themes/graveyard ]; then install -d {T}/boot/grub/themes && "
+        f"cp -a {LIVE_MEDIUM}/boot/grub/themes/graveyard {T}/boot/grub/themes/; fi",
         # unquoted delimiter: the UUIDs are filled in now
         f"cat > {T}/boot/grub/grub.cfg << GRAVEYARD_EOF\n{grub_cfg}\nGRAVEYARD_EOF",
     ]
