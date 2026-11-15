@@ -15,3 +15,12 @@ ch-system-libffi	s|--with-gcc-arch=native|--with-gcc-arch=x86-64|
 # with `bash -e`, so the errors of that last loop (and only that one) are
 # tolerated explicitly.
 ch-system-stripping	s/(\* \) strip --strip-unneeded \$i)$/\1 || true/
+#
+# OpenSSL 4 (Python-*-openssl_4-1.patch, CPython gh-146207) defines
+# OPENSSL_NO_TLS1, _TLS1_1 and _TLS1_2 in _ssl.c, so ssl.HAS_TLSv1_2 is False and
+# TLSVersion.MINIMUM_SUPPORTED is TLS 1.3, although OpenSSL 4 still speaks
+# TLS 1.0-1.2 through TLS_method(); only the TLSv1*_method() functions are gone.
+# Mercurial refuses to build on that. The upstream fix (CPython gh-159387,
+# GH-159388, in 3.15, not in 3.14): drop those three defines and offer the
+# PROTOCOL_TLSv1* constants only when their method exists.
+ch-system-Python	/^patch -Np1 -i \.\.\/Python-[0-9.]+-openssl_4-1\.patch$/a sed -E -i -e '/^#  define OPENSSL_NO_TLS1(_1|_2)?$/d' -e '/^#ifndef OPENSSL_NO_TLS1$/c #if !defined(OPENSSL_NO_TLS1) && !defined(OPENSSL_NO_TLS1_METHOD)' -e '/^#ifndef OPENSSL_NO_TLS1_1$/c #if !defined(OPENSSL_NO_TLS1_1) && !defined(OPENSSL_NO_TLS1_1_METHOD)' -e '/^#ifndef OPENSSL_NO_TLS1_2$/c #if !defined(OPENSSL_NO_TLS1_2) && !defined(OPENSSL_NO_TLS1_2_METHOD)' Modules/_ssl.c; grep -q '^#if !defined(OPENSSL_NO_TLS1_2) && !defined(OPENSSL_NO_TLS1_2_METHOD)$' Modules/_ssl.c
