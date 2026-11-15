@@ -1,0 +1,13 @@
+{
+    "KPlugin": {
+        "Authors": [
+            {
+                "Name": "Luis Zuno (ansimuz)"
+            }
+        ],
+        "Description": "The GraveyardOS name over the Eye of Horus on the moon of a cemetery, in pixel art, black and white. From https://opengameart.org/content/gothicvania-cemetery-pack (CC0-1.0)",
+        "Id": "GraveyardOS-Eye",
+        "License": "CC0-1.0",
+        "Name": "GraveyardOS eye"
+    }
+}
