@@ -11,6 +11,9 @@ on:
       logs:
         description: "packages whose log end to print (space separated)"
         default: ""
+      shard:
+        description: "arch-wave: read this shard's artifact instead (its new packages, failures and logs)"
+        default: ""
 
 permissions:
   contents: read
@@ -21,20 +24,34 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/download-artifact@v4
+        if: inputs.shard == ''
         with:
           name: arch-repo
           path: work
           run-id: ${{ inputs.run }}
           github-token: ${{ github.token }}
       - uses: actions/download-artifact@v4
+        if: inputs.shard == ''
         with:
           name: arch-logs
           path: .
           run-id: ${{ inputs.run }}
           github-token: ${{ github.token }}
+      - uses: actions/download-artifact@v4
+        if: inputs.shard != ''
+        with:
+          name: shard-${{ inputs.shard }}
+          path: work
+          run-id: ${{ inputs.run }}
+          github-token: ${{ github.token }}
+      - name: A shard's layout
+        if: inputs.shard != ''
+        run: |
+          mkdir -p work/repo && cp -r work/logs . && tar -czf arch-logs.tar.gz logs && touch work/done
       - name: Report
         run: |
           tar -xzf arch-logs.tar.gz
+          ls logs | head -50
           echo "done: $(grep -c . work/done)  failed: $(grep -c . work/failed)  packages: $(ls work/repo/*.yon 2> /dev/null | wc -l)"
           echo "== failures by cause (normalised last line)"
           cut -f2- work/failed | sed -E 's/[0-9a-f]{12,}//g; s/[0-9]+(\.[0-9]+)+/N/g; s/\/[^ :]*\//\/...\//g' \
