@@ -122,6 +122,9 @@ jobs:
       - name: Build shard ${{ matrix.shard }}
         run: |
           set -o pipefail
+          # repaired first (as build-wave.sh does), so a base built again
+          # here counts as new in this shard's done
+          python3 arch/repair-done.py /mnt/arch-work > /dev/null
           ls /mnt/arch-work/repo > "$RUNNER_TEMP/before.txt"
           cp /mnt/arch-work/done "$RUNNER_TEMP/done.before"
           sudo chown -R root:root /mnt/arch-work
