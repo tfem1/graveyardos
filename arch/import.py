@@ -60,6 +60,7 @@ python3() {
 command -v bsdtar > /dev/null 2>&1 || bsdtar() {
   local f="" C="" a x=0
   local -a rest=()
+  case ${1:-} in -*|"") ;; *x*f*) x=1; f=$2; shift 2 ;; *x*) x=1; shift ;; esac  # bsdtar xf FILE
   while [ $# -gt 0 ]; do
     case $1 in
       -x|-xf|-xvf|-xpf) x=1; [ "$1" = -x ] || { f=$2; shift; } ;;
@@ -77,10 +78,12 @@ command -v bsdtar > /dev/null 2>&1 || bsdtar() {
 }
 # Arch's meson wrapper (/usr/bin/arch-meson of its meson package), which
 # PKGBUILDs call instead of meson; --libdir lib as meson picks on Arch, where
-# /usr/lib64 is a link
+# /usr/lib64 is a link; --auto-features auto, not enabled: features of the
+# check dependencies, which are not built here (libdrm's cairo tests), are
+# left out instead of failing
 arch-meson() {
   meson setup --prefix /usr --libdir lib --libexecdir lib --sbindir bin --buildtype plain \
-    --auto-features enabled --wrap-mode nodownload -D b_pie=true -D python.bytecompile=1 "$@"
+    --auto-features auto --wrap-mode nodownload -D b_pie=true -D python.bytecompile=1 "$@"
 }'''
 
 # Evaluate a PKGBUILD: its variables as JSON, its functions as text.
@@ -379,7 +382,9 @@ def convert(pkgbase, cache, out, sources_dir, nmap, no_download=False):
             "# status is its last command's (waf's head | tail | sed)",
             "set +u +o pipefail; shopt -s extglob  # makepkg has extglob on",
             pkgbuild.replace("\r", ""),
-            f"pkgname={name}",
+            "# makepkg: pkgbase is the first name when the PKGBUILD has none;",
+            "# pkgname stays the PKGBUILD's list for prepare() and build()",
+            'pkgbase=${pkgbase:-${pkgname[0]}}',
             *(["# --- GraveyardOS's fixes (arch/fixes)"] + fixes(pkgbase) if fixes(pkgbase) else []),
             "# --- what makepkg runs",
             "# prepare() once: a build resumed (YONE_RESUME) finds it done",
@@ -389,9 +394,10 @@ def convert(pkgbase, cache, out, sources_dir, nmap, no_download=False):
             # same $srcdir, and one may leave files there for a later one
             # (sqlite's moves its Tcl extension out for sqlite-tcl); the
             # ones before this package run first, into throwaway directories
-            *[f'(pkgdir="$srcdir/.split/{e}"; mkdir -p "$pkgdir"; cd "$srcdir"; package_{e})'
+            *[f'(pkgname={e}; pkgdir="$srcdir/.split/{e}"; mkdir -p "$pkgdir"; cd "$srcdir"; package_{e})'
               for e in names[:names.index(name)] if pfunc != "package" and f"package_{e}" in funcs],
-            f'cd "$srcdir"; {pfunc}',
+            # makepkg sets pkgname to the package being made for its package_*()
+            f'pkgname={name}; cd "$srcdir"; {pfunc}',
             "# --- what makepkg does after package() (makepkg.conf: strip docs !libtool",
             "# !staticlibs emptydirs zipman purge), as the PKGBUILD's options= allow",
             TIDY,

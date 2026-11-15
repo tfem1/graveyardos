@@ -2,4 +2,4 @@
 # for what Arch's build of the day does not meet here.
 # base<TAB>line
 unifdef	CFLAGS+=" -std=gnu17"  # its own "constexpr" variable: a keyword in C23, gcc's default
-simdjson	CXXFLAGS+=" -Wno-error"  # its tests are built with -Werror, which a newer gcc's warnings break
+simdjson	CXXFLAGS+=" -Wno-error -Wno-free-nonheap-object"  # its tests are built with -Werror, which a newer gcc's warnings break
