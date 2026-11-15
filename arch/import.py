@@ -375,7 +375,9 @@ def convert(pkgbase, cache, out, sources_dir, nmap, no_download=False):
             # date once unpacked: git apply --index and cherry-pick refuse it
             *[f'git -C "$srcdir"/{shq(g)} update-index -q --refresh > /dev/null 2>&1 || true' for g in gitdirs],
             "# --- the PKGBUILD, as Arch publishes it",
-            "set +u",
+            "# makepkg runs it with errexit but without pipefail: a pipeline's",
+            "# status is its last command's (waf's head | tail | sed)",
+            "set +u +o pipefail",
             pkgbuild.replace("\r", ""),
             f"pkgname={name}",
             *(["# --- GraveyardOS's fixes (arch/fixes)"] + fixes(pkgbase) if fixes(pkgbase) else []),
