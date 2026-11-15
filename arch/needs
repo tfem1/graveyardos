@@ -167,6 +167,7 @@ keyutils	git
 lmdb	git
 chrpath	git
 cccl	cmake
+dkms	git
 cbindgen	git rust
 directx-headers	git
 libarchive	git libxml2
@@ -208,6 +209,38 @@ wasm-tools	rust
 wit-bindgen	git rust
 wasi-libc	cmake git llvm wasm-component-ld wasm-pkg-tools wasm-tools wit-bindgen
 llvm	cmake curl gcc libedit libxml2 python-build python-installer python-myst-parser python-psutil python-sphinx spirv-llvm-translator swig wasi-libc wasm-component-ld
+perl-capture-tiny	
+perl-devel-checklib	perl-capture-tiny
+perl-class-inspector	
+perl-file-sharedir	perl-class-inspector
+perl-file-sharedir-install	
+perl-encode-locale	
+perl-timedate	
+perl-http-date	perl-timedate
+perl-file-listing	perl-http-date
+perl-html-tagset	
+perl-clone	
+perl-io-html	
+perl-lwp-mediatypes	
+perl-mime-base32	
+perl-uri	perl-mime-base32
+perl-http-message	perl-clone perl-encode-locale perl-http-date perl-io-html perl-lwp-mediatypes perl-uri
+perl-html-parser	perl-html-tagset perl-http-message perl-uri
+perl-http-cookiejar	perl-http-date
+perl-http-cookies	perl-http-date perl-http-message
+perl-extutils-config	
+perl-cpan-requirements-dynamic	perl-extutils-config
+perl-extutils-helpers	
+perl-extutils-installpaths	perl-extutils-config
+perl-module-build-tiny	perl-cpan-requirements-dynamic perl-extutils-config perl-extutils-helpers perl-extutils-installpaths
+perl-http-daemon	perl-http-date perl-http-message perl-lwp-mediatypes perl-module-build-tiny
+perl-http-negotiate	perl-http-message
+perl-net-http	
+perl-try-tiny	
+perl-www-robotrules	perl-uri
+perl-libwww	perl-encode-locale perl-file-listing perl-html-parser perl-http-cookiejar perl-http-cookies perl-http-daemon perl-http-date perl-http-negotiate perl-lwp-mediatypes perl-net-http perl-try-tiny perl-uri perl-www-robotrules
+perl-xml-parser	git perl-devel-checklib perl-file-sharedir perl-file-sharedir-install perl-libwww
+intltool	perl-xml-parser
 lua51	
 help2man	perl-locale-gettext
 fribidi	git help2man
@@ -478,6 +511,8 @@ pcsclite	git polkit
 hidapi	cmake libusb
 libcbor	cmake cmocka
 libfido2	cmake hidapi libcbor
+mkinitcpio-busybox	
+mkinitcpio	asciidoctor git libarchive mkinitcpio-busybox
 suitesparse	cmake gcc git lapack
 eigen	cmake fftw freeglut gcc git suitesparse
 python-iniconfig	git python-build python-installer python-setuptools-scm
@@ -500,7 +535,7 @@ qhull	cmake
 python-matplotlib	freetype2 git meson-python pybind11 python-build python-certifi python-contourpy python-cycler python-dateutil python-fonttools python-installer python-kiwisolver python-numpy python-pillow python-pyparsing python-setuptools-scm qhull
 pahole	cmake git python-matplotlib
 rust-bindgen	llvm rust
-linux	cpio graphviz imagemagick pahole python-sphinx python-yaml rust rust-bindgen texlive-texmf xxhash
+linux	cpio graphviz imagemagick mkinitcpio pahole python-sphinx python-yaml rust rust-bindgen texlive-texmf xxhash
 openssh	krb5 libedit libfido2 linux pam
 gcr	cairo dconf gdk-pixbuf2 gi-docgen git glib2 gobject-introspection gtk3 hicolor-icon-theme libgcrypt libsecret libxslt openssh p11-kit pango vala
 gtk2-compat	git gtk3
@@ -563,7 +598,7 @@ libxkbcommon	bash-completion doxygen git graphviz libxcb libxml2 wayland wayland
 md4c	cmake git
 libasyncns	git lynx
 graphene	git glib2 gobject-introspection gtk-doc
-libdbusmenu	at-spi2-core gdk-pixbuf2 glib2 gobject-introspection gtk3 pango vala intltool
+libdbusmenu	at-spi2-core gdk-pixbuf2 glib2 gobject-introspection gtk3 intltool pango vala
 libnotify	docbook-xsl gdk-pixbuf2 gi-docgen git glib2 gobject-introspection xmlto
 unicode-character-database	
 unicode-cldr	
@@ -571,6 +606,7 @@ unicode-emoji	unicode-character-database
 ibus	at-spi2-core cairo dconf gdk-pixbuf2 git glib2 gobject-introspection graphene gtk-doc gtk3 gtk4 hicolor-icon-theme libdbusmenu libnotify libx11 libxfixes libxi libxkbcommon pango pygobject qt5-base unicode-character-database unicode-cldr unicode-emoji vala wayland wayland-protocols
 libdecor	cmake gtk3 pango wayland wayland-protocols
 libxcursor	default-cursors libx11 libxfixes libxrender xorg-util-macros xorgproto
+libevent	cmake doxygen
 libyuv	cmake git libjpeg-turbo
 python-ply	git python-build python-installer
 python-hatch-fancy-pypi-readme	git python-build python-hatchling python-installer
@@ -583,7 +619,7 @@ python-sphinx-theme-builder	python-build python-installer python-nodeenv python-
 python-pydata-sphinx-theme	git python-accessible-pygments python-babel python-beautifulsoup4 python-build python-docutils python-installer python-pygments python-requests python-sphinx python-sphinx-theme-builder python-typing_extensions
 python-sphinx-book-theme	python-build python-docutils python-installer python-pydata-sphinx-theme python-sphinx python-sphinx-theme-builder
 python-sphinxcontrib-doxylink	python-build python-dateutil python-docutils python-installer python-poetry-core python-pyparsing python-requests python-sphinx
-libcamera	cmake doxygen git glib2 gnutls graphviz gstreamer gtest libdrm libglvnd libjpeg-turbo libtiff libunwind libyaml libyuv pybind11 python-ply python-sphinx python-sphinx-book-theme python-sphinxcontrib-doxylink python-yaml qt6-base qt6-tools sdl2-compat texlive-texmf
+libcamera	cmake doxygen git glib2 gnutls graphviz gstreamer gtest libdrm libevent libglvnd libjpeg-turbo libtiff libunwind libyaml libyuv pybind11 python-ply python-sphinx python-sphinx-book-theme python-sphinxcontrib-doxylink python-yaml qt6-base qt6-tools sdl2-compat texlive-texmf
 libvorbis	git libogg
 sound-theme-freedesktop	intltool
 tdb	docbook-xsl libxslt
@@ -618,9 +654,9 @@ serd	doxygen mandoc python-sphinx python-sphinxygen
 python-sphinx-lv2-theme	python-build python-installer python-sphinx
 zix	doxygen python-sphinx python-sphinx-lv2-theme python-sphinxygen
 sord	doxygen pcre2 python-sphinx serd zix
-lv2	asciidoc codespell doxygen python-black python-lxml python-markdown python-pygments python-pylint python-rdflib serd sord
+lv2	asciidoc codespell doxygen pipewire python-black python-lxml python-markdown python-pygments python-pylint python-rdflib serd sord
 sratom	doxygen lv2 python-sphinx python-sphinx-lv2-theme python-sphinxygen serd sord
-lilv	doxygen libsndfile lv2 python-sphinx python-sphinx-lv2-theme python-sphinxygen serd sord sratom swig zix
+lilv	doxygen libsndfile lv2 python-numpy python-sphinx python-sphinx-lv2-theme python-sphinxygen serd sord sratom swig zix
 opus	doxygen
 cpputest	cmake
 gengen	git
@@ -700,7 +736,7 @@ libsonic
 pcaudiolib	alsa-lib pulseaudio
 espeak-ng	cmake git libsonic pcaudiolib ruby-ronn-ng
 pyxdg	git python-build python-installer
-speech-dispatcher	dotconf espeak-ng glib2 libao pipewire pulseaudio pyxdg intltool
+speech-dispatcher	dotconf espeak-ng glib2 intltool libao pipewire pulseaudio pyxdg
 qt5-speech	flite git qt5-multimedia speech-dispatcher
 qt5-svg	git qt5-base
 qt5-x11extras	git qt5-base
@@ -709,7 +745,7 @@ pyqt5	dbus-python pyopengl pyqt-builder python-pyqt5-sip qt5-base qt5-declarativ
 libffado	alsa-lib dbus-c++ dbus-python glibmm hicolor-icon-theme jack2 libconfig libiec61883 libraw1394 libxml++ pyqt5 scons
 libsamplerate	alsa-lib cmake libsndfile opus
 waf	git unzip
-jack2	alsa-lib db5.3 doxygen git libffado libsamplerate opus waf
+jack2	alsa-lib db5.3 dbus-python doxygen git libffado libsamplerate opus waf
 ladspa	libsndfile
 fluidsynth	alsa-lib cmake doxygen gcc jack2 ladspa libsndfile pipewire portaudio pulseaudio sdl3
 imath	boost cmake git python-numpy
@@ -771,11 +807,45 @@ uv	cmake git jemalloc maturin python-installer rust
 python-dnspython	python-build python-installer uv
 tevent	cmocka talloc
 samba	cifs-utils cups dateutils docbook-xsl glusterfs gnutls gpgme icu jansson krb5 libarchive libbsd libnsl libtirpc liburing lmdb openldap pam perl-json perl-parse-yapp popt python-dnspython python-markdown rpcsvc-proto talloc tdb tevent
+hwloc	cairo libpciaccess libx11 libxml2
+python-attrs	git python-build python-hatch-fancy-pypi-readme python-hatch-vcs python-hatchling python-installer
+python-pycparser	git python-build python-installer
+python-cffi	git python-build python-installer python-pycparser
+python-cryptography	git llvm maturin python-build python-cffi python-installer
+python-filelock	git python-build python-hatch-vcs python-hatchling python-installer
+python-sphinx-copybutton	git python-build python-installer python-sphinx
+python-sphinx-inline-tabs	git python-build python-installer python-sphinx
+python-sphinx-issues	python-build python-installer python-sphinx
+python-pip	python-attrs python-build python-cryptography python-filelock python-installer python-myst-parser python-sphinx python-sphinx-copybutton python-sphinx-inline-tabs python-sphinx-issues
+onetbb	cmake hwloc python-pip swig
+b3sum	cmake git onetbb rust
 itstool	docbook-xml git libxml2
+libfyaml	cmake git libyaml
+cfitsio	cmake curl git
+libcgif	
+libaec	cmake
+hdf5	cmake gcc git java-openjdk libaec openmpi time
+libmatio	git hdf5
+libraw	gcc git lcms2 libjpeg-turbo
+openjph	cmake doxygen git libtiff
+openexr	cmake git imath libdeflate openjph pybind11
+uthash	
+libdicom	git uthash
+openslide	cairo doxygen git glib2 libdicom libjpeg-turbo libpng libtiff libxml2 openjpeg2 sqlite
+libvips	cairo cfitsio doxygen fftw fontconfig gi-docgen glib2 gobject-introspection graphviz highway imagemagick lcms2 libarchive libcgif libexif libheif libimagequant libjpeg-turbo libjxl libmatio libpng libraw librsvg libtiff libwebp openexr openjpeg2 openslide pango poppler vala
+snowball	git
+libxmlb	git glib2 gobject-introspection gtk-doc snowball
+appstream	b3sum bash-completion cairo curl fontconfig freetype2 gi-docgen git glib2 gobject-introspection itstool libfyaml libvips libxml2 libxmlb pango qt6-base qt6-tools snowball vala xmlto
+ministream	appstream git glib2 gobject-introspection
+libsass	
+sassc	libsass
+libadwaita	fribidi gi-docgen git glib2 gobject-introspection graphene gtk4 hicolor-icon-theme ministream pango sassc vala
+libdex	gcc gi-docgen git glib2 gobject-introspection libsoup3 liburing pygobject sysprof vala
+libpanel	cairo gi-docgen git glib2 gobject-introspection graphene gtk4 hicolor-icon-theme libadwaita vala
 mallard-ducktype	git python-build python-installer
 yelp-xsl	git itstool libxslt
 yelp-tools	docbook-xsl git itstool libxml2 mallard-ducktype python-lxml yelp-xsl
-sysprof	git glib2 yelp-tools
+sysprof	cairo git glib2 graphene gtk4 hicolor-icon-theme json-glib libadwaita libdex libpanel libunwind pango polkit yelp-tools
 libsoup3	brotli gi-docgen git glib-networking glib2 gobject-introspection krb5 libnghttp2 libpsl python-quart samba sqlite sysprof vala
 gssdp	gi-docgen git glib2 gobject-introspection gtk4 libsoup3 pandoc-cli vala
 gupnp	gi-docgen git glib2 gobject-introspection gssdp libsoup3 libxml2 vala
@@ -813,21 +883,7 @@ mkdocstrings	mkdocs mkdocs-autorefs python-build python-installer python-markdow
 python-regex	python-build python-installer
 fmt	cmake doxygen git mkdocs mkdocs-material mkdocstrings npm python-pymdown-extensions python-regex
 glew	glu libglvnd libx11
-libaec	cmake
-hdf5	cmake gcc git java-openjdk libaec openmpi time
-hwloc	cairo libpciaccess libx11 libxml2
-python-attrs	git python-build python-hatch-fancy-pypi-readme python-hatch-vcs python-hatchling python-installer
-python-pycparser	git python-build python-installer
-python-cffi	git python-build python-installer python-pycparser
-python-cryptography	git llvm maturin python-build python-cffi python-installer
-python-filelock	git python-build python-hatch-vcs python-hatchling python-installer
-python-sphinx-copybutton	git python-build python-installer python-sphinx
-python-sphinx-inline-tabs	git python-build python-installer python-sphinx
-python-sphinx-issues	python-build python-installer python-sphinx
-python-pip	python-attrs python-build python-cryptography python-filelock python-installer python-myst-parser python-sphinx python-sphinx-copybutton python-sphinx-inline-tabs python-sphinx-issues
-onetbb	cmake hwloc python-pip swig
-openjph	cmake doxygen git libtiff
-openexr	cmake git imath libdeflate openjph pybind11
+jsoncpp	doxygen graphviz
 bazelisk	git go
 ruby-rspec-support	git ruby ruby-rdoc
 ruby-rspec-core	git ruby-erb ruby-rdoc ruby-rspec-support
@@ -841,7 +897,7 @@ ruby-webrick	ruby ruby-erb ruby-rdoc
 ruby-yard	ruby ruby-irb ruby-rake ruby-rdoc ruby-samus ruby-webrick
 ruby-rubygems-tasks	git ruby-irb ruby-rake ruby-yard
 ruby-ffi-compiler	git ruby-ffi ruby-rake ruby-rdoc ruby-rspec ruby-rubygems-tasks
-protobuf	abseil-cpp bazelisk cmake git gtest python-build python-installer ruby ruby-erb ruby-ffi-compiler ruby-rake ruby-rake-compiler
+protobuf	abseil-cpp bazelisk cmake git gtest python-build python-installer ruby ruby-bigdecimal ruby-erb ruby-ffi-compiler ruby-rake ruby-rake-compiler
 pugixml	cmake
 qt6-languageserver	cmake git qt6-base
 qt6-shadertools	cmake git qt6-base
@@ -860,24 +916,68 @@ mgard	abseil-cpp catch2 cmake gcc protobuf
 robin-map	cmake
 nanobind	cmake eigen git python-build python-installer python-scikit-build-core robin-map
 rdma-core	cmake cython git libdrm libnl pandoc-cli python-docutils valgrind
+python-cppheaderparser	python-build python-installer python-ply
 python-wcwidth	git python-build python-installer
 python-prettytable	git python-build python-hatch-vcs python-hatchling python-installer python-wcwidth
 python-pyaml	git python-build python-installer python-yaml
 python-pyelftools	python-build python-installer
 rocm-core	cmake python-prettytable python-pyaml python-pyelftools
 rocm-cmake	cmake rocm-core
-rocm-llvm	cmake git libedit libxml2 patchelf rocm-cmake rocm-core
+rocm-llvm	cmake git libedit libxml2 llvm patchelf rocm-cmake rocm-core
 gflags	cmake
 google-glog	cmake gflags git
 rocprofiler-register	cmake fmt google-glog rocm-cmake rocm-core
 hsa-rocr	cmake libdrm numactl pciutils rocm-core rocm-llvm rocprofiler-register
-rocm-hip-sdk	hsa-rocr rocm-core rocm-llvm
+rocminfo	cmake hsa-rocr pciutils rocm-cmake rocm-core
+hip-runtime	cmake cuda git mesa numactl python-cppheaderparser rocm-core rocm-llvm rocminfo rocprofiler-register
+hipblas-common	cmake hip-runtime rocm-cmake rocm-core
+libmnl	
+amdsmi	cmake libdrm libmnl libnl python-build python-installer python-yaml rocm-core
+msgpack-cxx	boost cmake doxygen graphviz
+perl-file-which	
+python-cloudpickle	python-build python-installer
+python-joblib	python-build python-cloudpickle python-installer
+python-msgpack	cython python-build python-installer
+python-tensile	cmake git python-build python-installer python-joblib python-msgpack python-pyaml
+rocm-toolchain	git
+roctracer	cmake hip-runtime hsa-rocr python-cppheaderparser python-ply rocm-core rocm-llvm
+rocblas	amdsmi cmake gcc git gtest hip-runtime lapack llvm msgpack-cxx perl-file-which python-joblib python-msgpack python-pyaml python-tensile rocm-cmake rocm-core rocm-llvm rocm-toolchain roctracer
+rocprim	cmake hip-runtime rocm-cmake rocm-core rocm-llvm rocm-toolchain
+rocsparse	cmake gcc hip-runtime rocblas rocm-cmake rocm-core rocm-llvm rocm-toolchain rocprim roctracer
+rocsolver	cmake fmt hip-runtime rocblas rocm-cmake rocm-core rocm-llvm rocm-toolchain rocprim rocsparse
+hipblas	cmake gcc git hip-runtime hipblas-common rocblas rocm-cmake rocm-core rocsolver
+hipcub	cmake hip-runtime rocm-cmake rocm-core rocm-llvm rocm-toolchain rocprim
+rocfft	cmake hip-runtime rocm-cmake rocm-core rocm-llvm rocm-toolchain sqlite
+hipfft	cmake hip-runtime rocfft rocm-cmake rocm-core rocm-llvm
+rocrand	cmake hip-runtime rocm-cmake rocm-core rocm-llvm rocm-toolchain
+hiprand	cmake gcc hip-runtime rocm-cmake rocm-core rocrand
+hipsolver	cmake gcc hip-runtime lapack rocblas rocm-cmake rocm-core rocm-llvm rocsolver rocsparse suitesparse
+hipsparse	cmake gcc git gtest hip-runtime rocm-cmake rocm-core rocsparse
+composable-kernel	cmake git hip-runtime llvm rocm-cmake rocm-core rocm-llvm rocm-toolchain
+functional-plus	cmake
+python-orjson	maturin python-installer rust
+python-simplejson	python-build python-installer
+python-ujson	python-build python-installer python-setuptools-scm
+rocm-openmp	cmake git hsa-rocr libxml2 rocm-cmake rocm-core rocm-llvm
+spdlog	catch2 cmake fmt
+yaml-cpp	cmake git
+hipblaslt	amdsmi cmake fmt gcc git gtest hip-runtime hipblas-common lapack msgpack-cxx python-joblib python-msgpack python-orjson python-pyaml python-simplejson python-ujson python-yaml rocm-cmake rocm-core rocm-llvm rocm-openmp rocm-toolchain roctracer spdlog yaml-cpp
+lbzip2	
+miopen-hip	cmake composable-kernel eigen functional-plus git hip-runtime hipblas hipblaslt lbzip2 nlohmann-json rocblas rocm-cmake rocm-core rocm-llvm rocm-toolchain rocrand roctracer sqlite
+hipify-clang	cmake cuda rocm-llvm
+rocm-smi-lib	cmake hsa-rocr rocm-core
+rccl	cmake git hip-runtime hipify-clang rocm-cmake rocm-core rocm-llvm rocm-smi-lib
+rocalution	cmake hip-runtime llvm openmpi rocblas rocm-cmake rocm-core rocm-llvm rocm-toolchain rocprim rocrand rocsolver rocsparse
+opencl-headers	cmake
+ocl-icd	asciidoc mesa opencl-headers ruby xmlto
+rocm-opencl-runtime	git hsa-rocr mesa numactl ocl-icd opencl-headers rocm-cmake rocm-core rocm-llvm
+rocthrust	cmake hip-runtime rocm-cmake rocm-core rocm-llvm rocm-toolchain rocprim
+rocm-hip-sdk	hip-runtime hipblas hipcub hipfft hiprand hipsolver hipsparse hsa-rocr miopen-hip rccl rocalution rocblas rocfft rocm-cmake rocm-core rocm-llvm rocm-opencl-runtime rocminfo rocprim rocrand rocsolver rocsparse rocthrust
 openucx	cuda gcc rdma-core rocm-hip-sdk
 paraview-catalyst	cmake conduit-llnl gcc gtest openmpi python-numpy
 python-mpi4py	cython openmpi python-build python-installer
 gsl	lapack
 sz	cmake gcc gsl gtest hdf5
-yaml-cpp	cmake git
 libpgm	git
 zeromq	asciidoc cmake git gnutls libpgm libsodium xmlto
 adios2	blosc2 cmake conduit-llnl cuda curl gcc gtest hdf5 libfabric libpng libsodium mgard nanobind nlohmann-json openmpi openucx paraview-catalyst pugixml python-mpi4py python-numpy sqlite sz yaml-cpp zeromq zfp
@@ -906,7 +1006,6 @@ benchmark	cmake
 argon2	
 aspell	git
 hunspell	
-jsoncpp	doxygen graphviz
 libepoxy	doxygen git graphviz libglvnd libx11 mesa
 libxcomposite	libx11 libxfixes xorg-util-macros xorgproto
 libpfm	git
@@ -923,7 +1022,7 @@ qt6-webchannel	cmake git qt6-base qt6-declarative
 qt6-websockets	cmake git qt6-base qt6-declarative
 re2	abseil-cpp cmake git
 zlib	
-qt6-webengine	alsa-lib cmake ffmpeg fontconfig freetype2 git glib2 harfbuzz icu jsoncpp lcms2 libepoxy libglvnd libjpeg-turbo libpng libtiff libva libwebp libx11 libxcb libxcomposite libxcursor libxdamage libxext libxfixes libxkbcommon libxkbfile libxml2 libxrandr libxslt libxtst linux-tools mesa nodejs noto-fonts nspr nss openh264 openjpeg2 opus pipewire pulseaudio python-html5lib qt6-base qt6-declarative qt6-positioning qt6-tools qt6-webchannel qt6-websockets re2 snappy zlib
+qt6-webengine	alsa-lib cmake ffmpeg fontconfig freetype2 git glib2 harfbuzz icu jsoncpp lcms2 libepoxy libglvnd libjpeg-turbo libpng libtiff libva libwebp libx11 libxcb libxcomposite libxcursor libxdamage libxext libxfixes libxkbcommon libxkbfile libxml2 libxrandr libxslt libxtst linux-tools mesa minizip nodejs noto-fonts nspr nss openh264 openjpeg2 opus pipewire pulseaudio python-html5lib qt6-base qt6-declarative qt6-positioning qt6-tools qt6-webchannel qt6-websockets re2 snappy zlib
 hspell	hunspell qt6-webengine
 libvoikko	
 nuspell	cmake doxygen icu pandoc-cli
@@ -943,35 +1042,31 @@ simdjson	cmake
 libotf	freetype2 libxaw
 tree-sitter	cmake git llvm rust
 emacs	fontconfig freetype2 gcc gdk-pixbuf2 giflib glib2 gnutls gtk3 harfbuzz hicolor-icon-theme lcms2 libotf libpng libxml2 tree-sitter
-libevent	cmake doxygen
 thrift	boost cmake emacs git glib2 libevent python-build python-installer qt5-base
 uriparser	cmake
 arrow	abseil-cpp apache-orc aws-crt-cpp aws-sdk-cpp boost brotli cmake flatbuffers git google-glog grpc gtest libutf8proc protobuf rapidjson re2 simdjson snappy thrift uriparser xsimd
 blosc	cmake git snappy
-cfitsio	cmake curl git
 crypto++	git unzip
 geos	cmake
 libfreexl	minizip zlib
 proj	cmake curl git gtest libtiff sqlite
 libgeotiff	libjpeg-turbo libtiff proj
 librttopo	geos
-libspatialite	geos libfreexl librttopo libxml2 proj sqlite zlib
+libspatialite	geos libfreexl librttopo libxml2 minizip proj sqlite zlib
 muparser	cmake gcc
 netcdf	blosc cmake curl git hdf5 libaec libxml2 libzip
-opencl-headers	cmake
-ocl-icd	asciidoc mesa opencl-headers ruby xmlto
 libidn	
 podofo	cmake fontconfig freetype2 libidn libjpeg-turbo libpng libtiff libxml2 lua
+python-fsspec	git python-build python-hatch-vcs python-hatchling python-installer
+python-libcst	python-build python-installer python-setuptools-rust python-setuptools-scm python-yaml
+python-pyarrow	arrow cmake cython git python-build python-cffi python-installer python-libcst python-numpy python-pandas python-scikit-build-core python-setuptools-scm
 xerces-c	curl icu libnsl
-gdal	arrow blosc cfitsio cmake crypto++ curl gcc geos giflib hdf5 json-c libaec libarchive libdeflate libfreexl libgeotiff libheif libjpeg-turbo libjxl libpng libspatialite libtiff libwebp libxml2 mariadb muparser netcdf ocl-icd opencl-headers openexr openjpeg2 pcre2 podofo poppler postgresql proj python-numpy qhull sqlite swig unixodbc xerces-c
+gdal	arrow blosc cfitsio cmake crypto++ curl gcc geos giflib hdf5 json-c libaec libarchive libdeflate libfreexl libgeotiff libheif libjpeg-turbo libjxl libpng libspatialite libtiff libwebp libxml2 mariadb muparser netcdf ocl-icd opencl-headers openexr openjpeg2 pcre2 podofo poppler postgresql proj python-fsspec python-numpy python-pyarrow python-simplejson qhull sqlite swig unixodbc xerces-c
 gl2ps	cmake git libglvnd libpng texlive-texmf
 libharu	cmake libpng
 laszip2	
 liblas	boost cmake gdal git laszip2 libgeotiff proj
 opencascade	cmake eigen fast_float fontconfig freetype2 git libglvnd libx11 libxcursor nlohmann-json rapidjson tk vtk
-python-cppheaderparser	python-build python-installer python-ply
-rocminfo	cmake hsa-rocr pciutils rocm-cmake rocm-core
-hip-runtime	cmake cuda git mesa numactl python-cppheaderparser rocm-core rocm-llvm rocminfo rocprofiler-register
 level-zero	cmake git opencl-headers
 vc-intrinsics	cmake git llvm
 ispc	cmake git glibc level-zero llvm onetbb spirv-llvm-translator vc-intrinsics
@@ -991,7 +1086,7 @@ pdal	cmake gdal jsoncpp libgeotiff postgresql python-numpy
 utf8cpp	cmake
 viskores	cmake gcc onetbb openmpi
 vtk	adios2 alembic anari-sdk boost cgns cli11 cmake eigen fast_float ffmpeg fmt fontconfig freetype2 gcc gdal git gl2ps hdf5 imath java-openjdk jsoncpp libarchive libharu libjpeg-turbo liblas libogg libpng libtheora libtiff libx11 libxcursor libxml2 mariadb netcdf nlohmann-json onetbb opencascade openimagedenoise openmpi openvdb openvr openxr ospray paraview-catalyst pdal postgresql proj pugixml python-matplotlib python-mpi4py qt6-base qt6-declarative qt6-tools sqlite tk unixodbc utf8cpp verdict viskores
-opencv	abseil-cpp ant cmake cuda cudnn eigen fast_float ffmpeg fmt freetype2 git glew glib2 gstreamer harfbuzz hdf5 java-openjdk lapack libdc1394 libglvnd libjpeg-turbo libjxl libpng libtiff libwebp mesa nlohmann-json onetbb openexr openjpeg2 openmpi protobuf pugixml python-numpy qt6-5compat verdict vtk
+opencv	abseil-cpp ant cmake cuda cudnn eigen fast_float ffmpeg fmt freetype2 git glew glib2 gstreamer harfbuzz hdf5 java-openjdk jsoncpp lapack libdc1394 libglvnd libjpeg-turbo libjxl libpng libtiff libwebp mesa nlohmann-json onetbb openexr openjpeg2 openmpi protobuf pugixml python-numpy qt6-5compat qt6-base verdict vtk
 python-aaf2	python-build python-installer
 opentimelineio	cmake git imath pybind11 python-aaf2 python-build python-installer
 python-cairo	cairo python-sphinx python-sphinx_rtd_theme
@@ -1024,9 +1119,9 @@ zvbi	git libpng libx11
 assimp	cmake
 qt6-quicktimeline	cmake git qt6-base qt6-declarative
 qt6-quick3d	assimp cmake git libglvnd openxr qt6-base qt6-declarative qt6-quicktimeline qt6-shadertools vulkan-headers
-qt6-multimedia	cmake ffmpeg git gstreamer libxrandr pipewire pulseaudio qt6-base qt6-declarative qt6-quick3d qt6-shadertools vulkan-headers
+qt6-multimedia	cmake ffmpeg git glib2 gstreamer libglvnd libva libx11 libxext libxrandr pipewire pulseaudio qt6-base qt6-declarative qt6-quick3d qt6-shadertools vulkan-headers
 stb	git
-zint	cmake git libpng qt6-svg qt6-tools
+zint	cmake git libpng qt6-base qt6-svg qt6-tools
 zxing-cpp	cmake git libpng opencv qt6-base qt6-declarative qt6-multimedia stb zint
 gstreamer	a52dec aalib alsa-lib aom bash-completion bluez cairo cdparanoia chromaprint curl faac faad2 ffmpeg flac fluidsynth gdk-pixbuf2 git glib2 gobject-introspection graphene gsm gtk3 hicolor-icon-theme imath iso-codes jack2 json-glib ladspa lame lcms2 libass libavc1394 libavtp libbs2b libcaca libcdio libdc1394 libdca libde265 libdrm libdv libdvdnav libdvdread libfdk-aac libfreeaptx libglvnd libgme libgudev libiec61883 libjpeg-turbo liblc3 libldac liblrdf libltc libmicrodns libmodplug libmpeg2 libnice libogg libopenmpt libpng libraw1394 librsvg libshout libsndfile libsoup3 libsrtp libtheora libunwind libusb libva libvorbis libvpl libvpx libwebp libx11 libxcb libxdamage libxext libxfixes libxi libxkbcommon libxml2 libxrandr libxtst libxv lilv lv2 mesa mjpegtools mpg123 musepack nasm neon nettle openal opencore-amr opencv openexr openh264 openjpeg2 opentimelineio opus orc pango pulseaudio pygobject python-cairo python-commonmark python-lxml python-typing_extensions qrencode qt5-base qt5-declarative qt5-tools qt5-wayland qt5-x11extras qt6-base qt6-declarative qt6-shadertools qt6-tools rtmpdump rust sbc sdl2-compat shaderc soundtouch spandsp speex srt svt-av1 svt-hevc taglib twolame v4l-utils valgrind vmaf vulkan-headers vulkan-icd-loader vulkan-validation-layers wavpack wayland wayland-protocols webrtc-audio-processing-1 wildmidi wpewebkit x264 x265 zbar zvbi zxing-cpp
 libb2	git
@@ -1070,31 +1165,16 @@ sane	autoconf-archive avahi cairo curl glib2 libgphoto2 libieee1284 libjpeg-turb
 colord	argyllcms bash-completion dconf docbook-xsl git glib2 gobject-introspection gtk-doc lcms2 libgudev libgusb polkit sane shared-mime-info sqlite vala
 desktop-file-utils	git glib2
 libcloudproviders	gi-docgen git glib2 gobject-introspection vala
-libsass	
-sassc	libsass
 python-more-itertools	git python-build python-installer
 python-tappy	python-babel python-build python-hatchling python-installer python-more-itertools python-pyaml
-snowball	git
 tinysparql	asciidoc avahi bash-completion dbus-python gi-docgen git glib2 gobject-introspection icu json-glib libsoup3 libxml2 pygobject python-tappy snowball sqlite vala
-b3sum	cmake git onetbb rust
-libfyaml	cmake git libyaml
-libcgif	
-libmatio	git hdf5
-libraw	gcc git lcms2 libjpeg-turbo
-uthash	
-libdicom	git uthash
-openslide	cairo doxygen git glib2 libdicom libjpeg-turbo libpng libtiff libxml2 openjpeg2 sqlite
-libvips	cairo cfitsio doxygen fftw fontconfig gi-docgen glib2 gobject-introspection graphviz highway imagemagick lcms2 libarchive libcgif libexif libheif libimagequant libjpeg-turbo libjxl libmatio libpng libraw librsvg libtiff libwebp openexr openjpeg2 openslide pango poppler vala
-libxmlb	git glib2 gobject-introspection gtk-doc snowball
-appstream	b3sum bash-completion cairo curl fontconfig freetype2 gi-docgen git glib2 gobject-introspection itstool libfyaml libvips libxml2 libxmlb pango qt6-base qt6-tools snowball vala xmlto
 accountsservice	docbook-xsl git glib2 gobject-introspection gtk-doc json-c polkit vala xmlto
 gnome-desktop	bubblewrap cairo gdk-pixbuf2 git glib2 gobject-introspection gsettings-desktop-schemas gtk-doc gtk3 gtk4 iso-codes libseccomp libxkbcommon xkeyboard-config yelp-tools
 libglib-testing	git glib2 gtk-doc
-malcontent	accountsservice gi-docgen git glib2 gnome-desktop gobject-introspection libglib-testing yelp-tools
+libgsystemservice	git glib2 gtk-doc polkit
+malcontent	accountsservice appstream flatpak gi-docgen git glib2 gnome-desktop gobject-introspection graphene gtk4 hicolor-icon-theme json-glib libadwaita libglib-testing libgsystemservice libsoup3 pam pango polkit pygobject yelp-tools
 go-md2man	go
 composefs	fuse3 go-md2man
-mkinitcpio-busybox	
-mkinitcpio	asciidoctor git libarchive mkinitcpio-busybox
 ostree	avahi composefs curl fuse3 git glib2 gobject-introspection gpgme gtk-doc libarchive libgpg-error libsodium libsoup3 libxslt mkinitcpio which
 flatpak	appstream bubblewrap curl dconf docbook-xsl fuse3 gdk-pixbuf2 git glib2 gobject-introspection gpgme gtk-doc json-glib libarchive libseccomp libxau libxml2 malcontent ostree polkit pygobject python-pyparsing wayland wayland-protocols xdg-dbus-proxy xdg-desktop-portal xdg-utils xmlto
 libinih	git
@@ -1280,7 +1360,8 @@ haskell-isocline	ghc uusi
 haskell-hslua-repl	ghc haskell-hslua-core haskell-isocline haskell-lua uusi
 lua52	
 lua53	
-luarocks	curl lua unzip zip
+lua-compat53	lua51 lua52 luarocks
+luarocks	curl lua lua-compat53 unzip zip
 lpeg	lua lua51 lua52 lua53 lua54 luarocks
 haskell-lpeg	ghc haskell-lua haskell-tasty haskell-tasty-hunit lpeg uusi
 haskell-pandoc-lua-marshal	ghc haskell-aeson haskell-hslua haskell-hslua-list haskell-hslua-marshalling haskell-pandoc-types haskell-quickcheck haskell-safe haskell-tasty haskell-tasty-hunit haskell-tasty-lua haskell-tasty-quickcheck uusi
@@ -1336,7 +1417,7 @@ libssh	cmake cmocka doxygen openssh
 libvdpau	git libx11 libxext xorgproto
 rav1e	cargo-c git nasm rust
 vamp-plugin-sdk	libsndfile
-rubberband	boost fftw java-openjdk ladspa libsamplerate libsndfile lv2 vamp-plugin-sdk
+rubberband	boost fftw java-openjdk ladspa libsamplerate libsndfile lv2 pipewire vamp-plugin-sdk
 zimg	git
 vapoursynth	cython git meson-python python-build python-installer zimg
 vid.stab	cmake gcc git
@@ -1346,7 +1427,7 @@ libheif	aom cmake dav1d ffmpeg git libde265 libjpeg-turbo libpng libtiff libwebp
 chafa	git gtk-doc libavif libheif libjxl librsvg libwebp libxslt
 harfbuzz	cairo chafa freetype2 git glew glfw glib2 gobject-introspection graphite gtk-doc help2man icu libglvnd libpng ragel
 pango	cairo fontconfig freetype2 fribidi gi-docgen git glib2 gobject-introspection harfbuzz help2man libthai libx11 libxft libxrender python-docutils sysprof
-rrdtool	git libxml2 lua51 pango python-installer ruby ttf-dejavu intltool
+rrdtool	git intltool libxml2 lua51 pango python-installer ruby ttf-dejavu
 lm_sensors	rrdtool
 python-sphinx-hawkmoth	git llvm python-build python-docutils python-hatchling python-installer python-sphinx
 mesa	cbindgen cmake directx-headers elfutils glslang libdisplay-info libdrm libglvnd libpng libva libx11 libxcb libxext libxml2 libxrandr libxshmfence libxxf86vm llvm lm_sensors python-mako python-ply python-pycparser python-sphinx python-sphinx-hawkmoth python-yaml rust rust-bindgen spirv-llvm-translator spirv-tools valgrind vulkan-icd-loader wayland wayland-protocols xcb-util-keysyms xorgproto
@@ -1356,22 +1437,21 @@ egl-gbm	eglexternalplatform libdrm mesa
 egl-wayland	eglexternalplatform git libdrm libglvnd wayland wayland-protocols
 egl-wayland2	eglexternalplatform git libdrm libglvnd mesa wayland wayland-protocols
 egl-x11	eglexternalplatform git libdrm libx11 libxcb mesa
-nvidia-utils	egl-gbm egl-wayland egl-wayland2 egl-x11 libglvnd
+nvidia-utils	dkms egl-gbm egl-wayland egl-wayland2 egl-x11 libglvnd
 cuda	cccl nvidia-utils
 openpmix	hwloc libevent
 nccl	cuda git
-hipify-clang	cmake cuda rocm-llvm
-rocm-smi-lib	cmake hsa-rocr rocm-core
-rccl	cmake git hip-runtime hipify-clang rocm-cmake rocm-core rocm-llvm rocm-smi-lib
 openucc	cuda hip-runtime nccl openucx rccl rdma-core rocm-llvm
 prrte	hwloc libevent openpmix
 openmpi	cuda gcc hip-runtime hwloc libevent libfabric nvidia-utils openpmix openucc openucx prrte valgrind
 boost	icu openmpi python-numpy
 cracklib	
 judy	
-mariadb	boost cmake cracklib curl git jemalloc judy krb5 liburing libxml2 pcre2
+perl-dbi	
+perl-dbd-mariadb	mariadb perl-dbi perl-devel-checklib
+mariadb	boost cmake cracklib curl git jemalloc judy krb5 liburing libxml2 pam pcre2 perl-dbd-mariadb perl-term-readkey
 libsasl	git krb5 mariadb openldap postgresql sqlite
-openldap	chrpath libsasl libsodium unixodbc
+openldap	chrpath libsasl libsodium unixodbc util-linux
 krb5	keyutils lmdb openldap
 libtirpc	krb5
 libnsl	libtirpc
@@ -1396,7 +1476,6 @@ python-setuptools-rust	git python-build python-installer python-semantic-version
 maturin	git python-build python-installer python-setuptools-rust rust
 python-ast-serialize	git maturin python-build python-installer rust
 python-librt	python-build python-installer
-python-orjson	maturin python-installer rust
 mypy	python-ast-serialize python-build python-installer python-librt python-mypy_extensions python-orjson python-pathspec python-typing_extensions
 python-charset-normalizer	git mypy python-build python-installer
 python-idna	git python-build python-installer
@@ -1430,9 +1509,9 @@ libppd	cups ghostscript libcupsfilters
 cmark-gfm	cmake
 jbig2dec	git libpng
 leptonica	giflib libjpeg-turbo libpng libtiff libwebp openjpeg2
-tesseract-data	
+tesseract-data	tesseract
 tesseract	asciidoc curl gcc icu leptonica libarchive pango tesseract-data
-mupdf	brotli cmark-gfm curl desktop-file-utils freeglut freetype2 git glu gumbo-parser harfbuzz jbig2dec leptonica libjpeg-turbo libx11 libxext llvm mesa openjpeg2 swig tesseract unzip zint zxing-cpp
+mupdf	brotli cmark-gfm curl desktop-file-utils freeglut freetype2 git glu gumbo-parser harfbuzz jbig2dec leptonica libglvnd libjpeg-turbo libx11 libxext llvm mesa openjpeg2 swig tesseract unzip zint zxing-cpp
 cups-filters	cups ghostscript libcupsfilters libppd mupdf
 cups	avahi colord cups-filters gnutls hicolor-icon-theme libpaper libusb pam
 ijs	docbook-utils ghostscript
@@ -1466,16 +1545,17 @@ ca-certificates	asciidoc nss p11-kit
 curl	brotli ca-certificates git gnutls krb5 libidn2 libnghttp2 libnghttp3 libngtcp2 libpsl libssh2 nettle patchelf
 rhash	
 cmake	cppdap curl emacs git hicolor-icon-theme jsoncpp libarchive libuv nlohmann-json python-sphinx qt6-base rhash
-spdlog	catch2 cmake fmt
 doxygen	cmake fmt ghostscript graphviz llvm qt6-base qt6-svg spdlog sqlite texlive-texmf
 libxml2	docbook-xsl doxygen git icu
 docbook-xml	libxml2
 docbook-xsl	docbook-xml libxml2 libxslt
 asciidoc	docbook-xsl libxslt python-build python-installer
 perl-error	
-perl-timedate	
 perl-mailtools	perl-timedate
-git	asciidoc curl pcre2 perl-error perl-mailtools rust xmlto zlib-ng
+icmake	git libunwind
+yodl	icmake
+zsh	pcre2 yodl
+git	asciidoc curl pcre2 perl-error perl-mailtools rust xmlto zlib-ng zsh
 a52dec	git
 buf	git go
 gn	git llvm
@@ -1501,8 +1581,6 @@ kconfigwidgets	doxygen extra-cmake-modules kcodecs kcolorscheme kconfig kcoreadd
 kcrash	doxygen extra-cmake-modules kcoreaddons libx11 qt6-base qt6-tools
 kdbusaddons	doxygen extra-cmake-modules qt6-base qt6-tools
 karchive	doxygen extra-cmake-modules qt6-base qt6-tools
-perl-mime-base32	
-perl-uri	perl-mime-base32
 kdoctools	docbook-xsl doxygen extra-cmake-modules karchive ki18n libxml2 libxslt perl-uri qt6-base qt6-tools
 catdoc	
 convertlit	libtommath
@@ -1543,8 +1621,8 @@ libtracefs	asciidoc libtraceevent xmlto
 ndctl	asciidoctor bash-completion cmake git iniparser json-c keyutils libtraceevent libtracefs util-linux xmlto
 parted	lvm2 util-linux
 volume_key	cryptsetup glib2 gpgme nspr nss swig util-linux
-libblockdev	autoconf-archive btrfs-progs cryptsetup exfatprogs git glib2 gobject-introspection gtk-doc json-glib keyutils libatasmart libbytesize libnvme libyaml lvm2 mdadm ndctl nss parted util-linux volume_key
-udisks2	autoconf-archive git glib2 gobject-introspection gtk-doc libblockdev libgudev lvm2 polkit util-linux
+libblockdev	autoconf-archive btrfs-progs cryptsetup exfatprogs git glib2 gobject-introspection gtk-doc json-glib keyutils libatasmart libbytesize libnvme libyaml lvm2 mdadm ndctl nss parted pygobject util-linux volume_key
+udisks2	autoconf-archive btrfs-progs git glib2 gobject-introspection gtk-doc libblockdev libgudev lvm2 polkit util-linux
 usbmuxd	git libimobiledevice libplist libusb
 upower	docbook-xsl git glib2 gobject-introspection gtk-doc libgudev libimobiledevice libplist polkit usbmuxd
 solid	doxygen extra-cmake-modules libimobiledevice libplist media-player-info qt6-base qt6-declarative qt6-tools udisks2 upower util-linux
@@ -1573,7 +1651,7 @@ plasma-activities	extra-cmake-modules kconfig kcoreaddons qt6-base qt6-declarati
 libplasma	extra-cmake-modules kcolorscheme kconfig kcoreaddons kdoctools kglobalaccel kguiaddons ki18n kiconthemes kio kirigami knotifications kpackage ksvg kwidgetsaddons kwindowsystem plasma-activities plasma-wayland-protocols qt6-5compat qt6-base qt6-declarative wayland wayland-protocols
 bluedevil	bluez-qt extra-cmake-modules kcmutils kconfig kcoreaddons kdbusaddons kdeclarative kdoctools ki18n kio kirigami kjobwidgets knotifications kservice ksvg kwidgetsaddons kwindowsystem libplasma qt6-base qt6-declarative
 bolt	asciidoc glib2 polkit
-packagekit	bash-completion git glib2 gobject-introspection pacman polkit sqlite vala intltool
+packagekit	bash-completion git glib2 gobject-introspection intltool pacman polkit sqlite vala
 packagekit-qt	cmake git packagekit qt6-base
 frameworkintegration	appstream extra-cmake-modules kcolorscheme kconfig ki18n kiconthemes knewstuff knotifications kwidgetsaddons packagekit-qt qt6-base qt6-tools
 kconfig5	extra-cmake-modules qt5-base qt5-declarative qt5-tools
@@ -1591,7 +1669,7 @@ kwindowsystem5	extra-cmake-modules qt5-tools qt5-x11extras
 libdbusmenu-qt	cmake qt5-base
 knotifications5	extra-cmake-modules kconfig5 kcoreaddons5 kwindowsystem5 libcanberra libdbusmenu-qt libxtst qt5-declarative qt5-speech qt5-tools
 frameworkintegration5	extra-cmake-modules kconfig5 kconfigwidgets5 kiconthemes5 knotifications5 kwidgetsaddons5 qt5-base
-breeze	breeze-icons extra-cmake-modules frameworkintegration frameworkintegration5 kcmutils kcolorscheme kconfig kconfigwidgets5 kcoreaddons kdecoration kguiaddons ki18n kiconthemes kiconthemes5 kirigami kwidgetsaddons kwindowsystem kwindowsystem5 qt6-base qt6-declarative qt6-svg
+breeze	breeze-icons extra-cmake-modules frameworkintegration frameworkintegration5 kcmutils kcolorscheme kconfig kconfig5 kconfigwidgets5 kcoreaddons kdecoration kguiaddons kguiaddons5 ki18n kiconthemes kiconthemes5 kirigami kwidgetsaddons kwindowsystem kwindowsystem5 qt5-base qt5-declarative qt6-base qt6-declarative qt6-svg
 plymouth	adwaita-fonts cairo docbook-xsl fontconfig freetype2 git glib2 gtk3 libdrm libevdev libpng libx11 libxkbcommon pango xkeyboard-config
 breeze-plymouth	extra-cmake-modules plymouth
 brightnessctl	
@@ -1610,7 +1688,6 @@ discount
 gnu-efi	
 python-pefile	python-build python-installer
 fwupd-efi	git gnu-efi python-pefile
-libmnl	
 noto-fonts-cjk	git
 passim	avahi cmake git glib2 gnutls gobject-introspection hicolor-icon-theme libsoup3
 fwupd	bash-completion curl dbus-python fwupd-efi gi-docgen git glib2 gnu-efi gnutls gobject-introspection hicolor-icon-theme libdrm libmbim libmnl libqmi libusb libxmlb modemmanager noto-fonts noto-fonts-cjk pandoc-cli passim polkit pygobject python-cairo python-dbusmock shared-mime-info sqlite tpm2-tss udisks2 umockdev vala valgrind
@@ -1629,7 +1706,7 @@ signon-ui	git glib2 libaccounts-qt libnotify libproxy qt6-base qt6-declarative q
 kaccounts-integration	extra-cmake-modules kcmutils kconfig kcoreaddons kdbusaddons kdoctools ki18n kio kirigami kwallet libaccounts-qt qcoro qt6-base signon-kwallet-extension signon-plugin-oauth2 signon-ui signond
 libdmtx	git
 prison	doxygen extra-cmake-modules libdmtx qrencode qt6-base qt6-declarative qt6-multimedia qt6-tools zxing-cpp
-purpose	extra-cmake-modules hicolor-icon-theme kaccounts-integration kcmutils kconfig kcoreaddons ki18n kio kirigami kitemmodels knotifications kservice libaccounts-qt prison qt6-base qt6-declarative qt6-tools intltool
+purpose	extra-cmake-modules hicolor-icon-theme intltool kaccounts-integration kcmutils kconfig kcoreaddons ki18n kio kirigami kitemmodels knotifications kservice libaccounts-qt prison qt6-base qt6-declarative qt6-tools
 discover	appstream archlinux-appstream-data attica discount extra-cmake-modules flatpak fwupd glib2 kcmutils kconfig kcoreaddons kcrash kdbusaddons ki18n kiconthemes kidletime kio kirigami kirigami-addons kjobwidgets knewstuff knotifications kservice kstatusnotifieritem kuserfeedback kwidgetsaddons kwindowsystem packagekit-qt purpose qcoro qt6-base qt6-declarative qt6-webview
 dmidecode	
 libnfnetlink	
@@ -1700,9 +1777,10 @@ libxfont2	freetype2 git libfontenc xorg-util-macros xorgproto xtrans
 libxres	libx11 libxext xorg-util-macros xorgproto
 xf86-input-libinput	libinput libx11 libxi xorg-server xorgproto
 xorg-setxkbmap	libx11 libxkbfile libxrandr xorg-util-macros
-xorg-server	git libdrm libepoxy libglvnd libpciaccess libtirpc libunwind libx11 libxau libxaw libxcvt libxdmcp libxfont2 libxi libxkbfile libxmu libxrender libxres libxshmfence libxtst libxv mesa nettle pixman xcb-util xcb-util-image xcb-util-keysyms xcb-util-renderutil xcb-util-wm xf86-input-libinput xkeyboard-config xorg-font-util xorg-setxkbmap xorg-util-macros xorg-xkbcomp xorgproto xtrans
+xorg-xauth	libx11 libxau libxext libxmu xorg-util-macros
+xorg-server	git libdrm libepoxy libglvnd libpciaccess libtirpc libunwind libx11 libxau libxaw libxcvt libxdmcp libxext libxfont2 libxi libxkbfile libxmu libxrender libxres libxshmfence libxtst libxv mesa nettle pixman xcb-util xcb-util-image xcb-util-keysyms xcb-util-renderutil xcb-util-wm xf86-input-libinput xkeyboard-config xorg-font-util xorg-setxkbmap xorg-util-macros xorg-xauth xorg-xkbcomp xorgproto xtrans
 xorg-xwayland	libdecor libdrm libei libepoxy libglvnd libtirpc libxau libxcvt libxfont2 libxkbfile libxshmfence mesa nettle pixman wayland wayland-protocols xorg-font-util xorg-server xorgproto xtrans
-hyprland	aquamarine cairo cmake glaze glib2 glslang hyprcursor hyprgraphics hyprland-guiutils hyprland-protocols hyprlang hyprutils hyprwayland-scanner hyprwire lcms2 libcanberra libdrm libei libglvnd libinput libx11 libxcb libxcomposite libxcursor libxfixes libxkbcommon libxrender lua mesa muparser nvidia-utils pango pixman re2 sdbus-cpp tomlplusplus util-linux wayland wayland-protocols xcb-proto xcb-util xcb-util-errors xcb-util-image xcb-util-keysyms xcb-util-renderutil xcb-util-wm xorg-xwayland xorgproto
+hyprland	aquamarine cairo cmake cpio glaze glib2 glslang hyprcursor hyprgraphics hyprland-guiutils hyprland-protocols hyprlang hyprutils hyprwayland-scanner hyprwire lcms2 libcanberra libdrm libei libglvnd libinput libx11 libxcb libxcomposite libxcursor libxfixes libxkbcommon libxrender lua mesa muparser nvidia-utils pango pixman re2 sdbus-cpp tomlplusplus util-linux wayland wayland-protocols xcb-proto xcb-util xcb-util-errors xcb-util-image xcb-util-keysyms xcb-util-renderutil xcb-util-wm xorg-xwayland xorgproto
 hyprlock	cairo cmake hyprgraphics hyprlang hyprutils hyprwayland-scanner libdrm libglvnd libxkbcommon mesa pam sdbus-cpp wayland wayland-protocols
 hyprsunset	cmake hyprland-protocols hyprlang hyprutils hyprwayland-scanner wayland wayland-protocols
 protobuf-c	protobuf
@@ -1764,7 +1842,7 @@ kio-fuse	extra-cmake-modules fuse3 kcoreaddons kio qt6-base
 kpipewire	extra-cmake-modules ffmpeg kcoreaddons ki18n libdrm libepoxy libva mesa pipewire qt6-base qt6-declarative
 libksysguard	extra-cmake-modules kauth kconfig kcoreaddons kdeclarative ki18n kirigami kitemmodels knewstuff kpackage kquickcharts kservice libdrm libnl libpcap lm_sensors qt6-5compat qt6-base qt6-declarative qt6-tools solid
 ksystemstats	extra-cmake-modules kcoreaddons kcrash ki18n kio libksysguard libnl lm_sensors networkmanager-qt qt6-base solid
-libqalculate	curl doxygen git icu libxml2 intltool
+libqalculate	curl doxygen git icu intltool libxml2
 ocean-sound-theme	extra-cmake-modules qt6-base
 kjobwidgets5	extra-cmake-modules kcoreaddons5 kwidgetsaddons5 qt5-tools qt5-x11extras
 sonnet5	aspell extra-cmake-modules hspell hunspell libvoikko qt5-base qt5-declarative qt5-tools
@@ -1777,7 +1855,7 @@ qqc2-breeze-style	extra-cmake-modules kcolorscheme kconfig kguiaddons kicontheme
 qt5-quickcontrols2	git qt5-declarative
 ttf-hack	
 xdg-desktop-portal-kde	extra-cmake-modules kcmutils kconfig kcoreaddons kcrash kdeclarative kglobalaccel ki18n kiconthemes kio kio-fuse kirigami kirigami-addons kitemviews knotifications kpipewire kservice kstatusnotifieritem kwayland kwindowsystem libxkbcommon plasma-wayland-protocols plasma-workspace qt6-base qt6-declarative wayland wayland-protocols xdg-desktop-portal
-plasma-integration	extra-cmake-modules kcolorscheme kconfig kconfig5 kcoreaddons kguiaddons ki18n ki18n5 kiconthemes kiconthemes5 kio kio5 kjobwidgets knotifications knotifications5 kservice kstatusnotifieritem kwayland5 kwidgetsaddons kwindowsystem kwindowsystem5 libxcb libxcursor noto-fonts plasma-wayland-protocols qqc2-breeze-style qqc2-desktop-style qt5-base qt5-declarative qt5-quickcontrols2 qt5-wayland qt5-x11extras qt6-base qt6-declarative ttf-hack wayland xdg-desktop-portal-kde
+plasma-integration	extra-cmake-modules kcolorscheme kconfig kconfig5 kconfigwidgets5 kcoreaddons kcoreaddons5 kguiaddons ki18n ki18n5 kiconthemes kiconthemes5 kio kio5 kjobwidgets kjobwidgets5 knotifications knotifications5 kservice kservice5 kstatusnotifieritem kwayland5 kwidgetsaddons kwidgetsaddons5 kwindowsystem kwindowsystem5 libxcb libxcursor noto-fonts plasma-wayland-protocols qqc2-breeze-style qqc2-desktop-style qt5-base qt5-declarative qt5-quickcontrols2 qt5-wayland qt5-x11extras qt6-base qt6-declarative ttf-hack wayland xdg-desktop-portal-kde
 qt6-virtualkeyboard	cmake git hunspell qt6-base qt6-declarative qt6-multimedia qt6-svg
 union	cxx-rust-cssparser extra-cmake-modules git kcolorscheme kconfig kcoreaddons kguiaddons kiconthemes kirigami qt6-base qt6-declarative qt6-shadertools
 xorg-xmessage	libx11 libxaw libxt xorg-util-macros
@@ -1786,7 +1864,7 @@ plasma-workspace	accountsservice appstream baloo extra-cmake-modules fontconfig 
 kdeplasma-addons	corrosion extra-cmake-modules icu kauth kcmutils kconfig kcoreaddons kdbusaddons kdeclarative kglobalaccel kguiaddons kholidays ki18n kiconthemes kio kirigami kirigami-addons kitemmodels kjobwidgets knewstuff knotifications kpackage krunner kservice ksvg kunitconversion kwidgetsaddons kwin kwindowsystem kxmlgui libplasma networkmanager-qt plasma-workspace qt6-5compat qt6-base qt6-declarative qt6-quick3d qt6-webengine sonnet
 kimageformats	extra-cmake-modules jxrlib karchive libavif libheif libjxl libraw openexr openjpeg2 qt6-base
 libva-utils	libva mesa
-mesa-demos	freeglut glslang glu libdecor libdrm libglvnd libx11 libxcb libxkbcommon mesa vulkan-headers vulkan-icd-loader wayland wayland-protocols
+mesa-demos	freeglut glslang glu libdecor libdrm libglvnd libx11 libxcb libxext libxkbcommon mesa vulkan-headers vulkan-icd-loader wayland wayland-protocols
 systemsettings	extra-cmake-modules kauth kcmutils kcolorscheme kconfig kconfigwidgets kcoreaddons kcrash kdbusaddons kdoctools ki18n kio kirigami kitemmodels kitemviews kjobwidgets krunner kservice kwidgetsaddons kwindowsystem kxmlgui plasma-activities qt6-base qt6-declarative
 volk	cmake git vulkan-headers
 vulkan-tools	cmake git glslang libx11 libxcb libxrandr spirv-tools volk vulkan-headers vulkan-icd-loader wayland wayland-protocols
@@ -1812,6 +1890,7 @@ socat
 kwallet-pam	extra-cmake-modules kwallet libgcrypt pam socat
 kwrited	extra-cmake-modules kcoreaddons kdbusaddons kdoctools knotifications kpty qt6-base
 libcec	cmake libxrandr swig
+libmanette	gcc gi-docgen git glib2 gobject-introspection hidapi libevdev libgudev vala
 libmng	lcms2 libjpeg-turbo
 nerd-fonts	
 xmlsec	gnutls libxml2 libxslt nspr nss
@@ -1821,9 +1900,9 @@ threadweaver	doxygen extra-cmake-modules qt6-base qt6-tools
 okular	discount djvulibre ebook-tools extra-cmake-modules freetype2 karchive kbookmarks kcolorscheme kcompletion kconfig kconfigwidgets kcoreaddons kcrash kdegraphics-mobipocket kdoctools ki18n kiconthemes kio kparts ktextwidgets kwallet kwidgetsaddons kwindowsystem kxmlgui libkexiv2 libspectre libtiff phonon poppler purpose qt6-base qt6-declarative qt6-speech qt6-svg threadweaver
 stoken	gtk3 libxml2 nettle
 vpnc	git libgcrypt which
-openconnect	gnutls krb5 libproxy libtasn1 libxml2 nettle oath-toolkit p11-kit pcsclite stoken tpm2-tss vpnc xdg-utils intltool
+openconnect	gnutls intltool krb5 libproxy libtasn1 libxml2 nettle oath-toolkit p11-kit pcsclite stoken tpm2-tss vpnc xdg-utils
 oxygen-icons	extra-cmake-modules qt6-base
-oxygen	extra-cmake-modules frameworkintegration frameworkintegration5 kcmutils kcolorscheme kcompletion kcompletion5 kconfig kconfigwidgets kconfigwidgets5 kcoreaddons kdecoration kguiaddons ki18n kiconthemes5 kservice5 kwidgetsaddons kwindowsystem kwindowsystem5 libplasma libxcb oxygen-icons qt6-base qt6-declarative
+oxygen	extra-cmake-modules frameworkintegration frameworkintegration5 kcmutils kcolorscheme kcompletion kcompletion5 kconfig kconfig5 kconfigwidgets kconfigwidgets5 kcoreaddons kdecoration kguiaddons kguiaddons5 ki18n ki18n5 kiconthemes5 kservice5 kwidgetsaddons kwidgetsaddons5 kwindowsystem kwindowsystem5 libplasma libxcb oxygen-icons qt5-base qt5-declarative qt5-x11extras qt6-base qt6-declarative
 papirus-icon-theme	gtk4
 plasma-nano	cmake extra-cmake-modules kdeclarative kirigami kitemmodels knewstuff kservice ksvg kwayland kwindowsystem libplasma plasma-workspace qt6-5compat qt6-base qt6-declarative
 plasma-nm	extra-cmake-modules glib2 kcmutils kcolorscheme kcompletion kconfig kcoreaddons kdbusaddons kdeclarative ki18n kio kirigami kirigami-addons kjobwidgets knotifications kquickcharts kservice kwidgetsaddons kwindowsystem libplasma modemmanager-qt networkmanager networkmanager-qt openconnect plasma-workspace prison qcoro qt6-base qt6-declarative qt6-webengine qtkeychain solid
@@ -1833,7 +1912,7 @@ plasma-bigscreen	bluez-qt extra-cmake-modules kcmutils kcolorscheme kconfig kcor
 plasma-browser-integration	extra-cmake-modules kconfig kcoreaddons kcrash kdbusaddons kfilemetadata ki18n kio kjobwidgets kservice kstatusnotifieritem plasma-activities plasma-workspace purpose qt6-base
 polkit-kde-agent	extra-cmake-modules kcoreaddons kcrash kdbusaddons kdoctools ki18n kirigami knotifications kwindowsystem polkit-qt qt6-base qt6-declarative
 xdg-user-dirs	docbook-xsl git
-plasma-desktop	attica baloo extra-cmake-modules ibus kaccounts-integration kbookmarks kcmutils kcodecs kcompletion kconfig kconfigwidgets kcoreaddons kcrash kdbusaddons kdeclarative kdoctools kglobalaccel kguiaddons ki18n kiconthemes kio kirigami kirigami-addons kitemmodels kjobwidgets kmenuedit knewstuff knotifications knotifyconfig kpackage kpipewire krunner kscreenlocker kservice ksvg kwidgetsaddons kwindowsystem kxmlgui libcanberra libksysguard libplasma libwacom libx11 libxcb libxkbcommon libxkbfile packagekit-qt plasma-activities plasma-activities-stats plasma-workspace plasma5support polkit-kde-agent powerdevil qt6-5compat qt6-base qt6-declarative scim sdl2-compat solid sonnet systemsettings wayland wayland-protocols xcb-util-keysyms xdg-user-dirs intltool
+plasma-desktop	attica baloo extra-cmake-modules ibus intltool kaccounts-integration kbookmarks kcmutils kcodecs kcompletion kconfig kconfigwidgets kcoreaddons kcrash kdbusaddons kdeclarative kdoctools kglobalaccel kguiaddons ki18n kiconthemes kio kirigami kirigami-addons kitemmodels kjobwidgets kmenuedit knewstuff knotifications knotifyconfig kpackage kpipewire krunner kscreenlocker kservice ksvg kwidgetsaddons kwindowsystem kxmlgui libcanberra libksysguard libplasma libwacom libx11 libxcb libxkbcommon libxkbfile packagekit-qt plasma-activities plasma-activities-stats plasma-workspace plasma5support polkit-kde-agent powerdevil qt6-5compat qt6-base qt6-declarative scim sdl2-compat solid sonnet systemsettings wayland wayland-protocols xcb-util-keysyms xdg-user-dirs
 smartmontools	libcap-ng
 plasma-disks	extra-cmake-modules kauth kcmutils kconfig kcoreaddons kdbusaddons kdeclarative ki18n kinfocenter kio kirigami knotifications kservice qt6-base qt6-declarative smartmontools solid
 plasma-firewall	extra-cmake-modules kauth kcmutils kconfig kcoreaddons ki18n kirigami qt6-base qt6-declarative
@@ -1855,41 +1934,10 @@ qt5ct	cmake qt5-base qt5-svg qt5-tools
 qt6-imageformats	cmake git jasper libmng libtiff libwebp qt6-base
 qt6ct	cmake git qt6-base qt6-svg qt6-tools
 quickshell	cli11 cmake cpptrace hicolor-icon-theme jemalloc libdrm libglvnd libxcb mesa pam pipewire polkit qt6-base qt6-declarative qt6-shadertools qt6-svg qt6-wayland spirv-tools vulkan-headers wayland wayland-protocols
-xorg-xauth	libx11 libxau libxext libxmu xorg-util-macros
 sddm	extra-cmake-modules git libxau libxcb noto-fonts pam python-docutils qt5-base qt5-declarative qt5-tools qt6-base qt6-declarative qt6-tools xorg-server xorg-xauth
 sddm-kcm	extra-cmake-modules karchive kauth kcmutils kconfig kcoreaddons kdoctools ki18n kio kirigami knewstuff kservice kwidgetsaddons qt6-base qt6-declarative sddm
 slurp	cairo libxkbcommon scdoc wayland wayland-protocols
 spectacle	extra-cmake-modules kconfig kconfigwidgets kcoreaddons kcrash kdbusaddons kdoctools kglobalaccel kguiaddons ki18n kio kirigami kjobwidgets knotifications kpipewire kquickimageeditor kservice kstatusnotifieritem kwidgetsaddons kwindowsystem kxmlgui layer-shell-qt libxcb plasma-wayland-protocols prison purpose qt6-base qt6-declarative qt6-imageformats qt6-multimedia tesseract wayland xcb-util xcb-util-cursor xcb-util-image
+webkitgtk-6.0	at-spi2-core bubblewrap cairo cmake enchant fontconfig freetype2 gcc gdk-pixbuf2 gi-docgen glib2 gobject-introspection gstreamer gtk4 harfbuzz hyphen icu lcms2 libavif libdrm libepoxy libgcrypt libglvnd libjpeg-turbo libjxl libmanette libpng libseccomp libsecret libsoup3 libtasn1 libwebp libx11 libxml2 libxslt llvm mesa noto-fonts openjpeg2 pango ruby sqlite systemd ttf-roboto unifdef wayland wayland-protocols woff2 xdg-dbus-proxy
 wf-recorder	ffmpeg pulseaudio wayland wayland-protocols
 xdg-desktop-portal-hyprland	cmake hyprland-protocols hyprlang hyprtoolkit hyprutils hyprwayland-scanner libinih pipewire qt6-base sdbus-cpp util-linux wayland wayland-protocols xdg-desktop-portal
-libmanette	gcc gi-docgen git glib2 gobject-introspection hidapi libevdev libgudev vala
-webkitgtk-6.0	at-spi2-core bubblewrap cairo cmake enchant fontconfig freetype2 gcc gdk-pixbuf2 gi-docgen glib2 gobject-introspection gstreamer gtk4 harfbuzz hyphen icu lcms2 libavif libdrm libepoxy libgcrypt libglvnd libjpeg-turbo libjxl libmanette libpng libseccomp libsecret libsoup3 libtasn1 libwebp libx11 libxml2 libxslt llvm mesa openjpeg2 pango ruby systemd ttf-roboto unifdef wayland wayland-protocols woff2 xdg-dbus-proxy
-perl-capture-tiny	
-perl-devel-checklib	perl-capture-tiny
-perl-class-inspector	
-perl-file-sharedir	perl-class-inspector
-perl-file-sharedir-install	
-perl-encode-locale	
-perl-http-date	perl-timedate
-perl-file-listing	perl-http-date
-perl-html-tagset	
-perl-clone	
-perl-io-html	
-perl-lwp-mediatypes	
-perl-http-message	perl-clone perl-encode-locale perl-http-date perl-io-html perl-lwp-mediatypes perl-uri
-perl-html-parser	perl-html-tagset perl-http-message perl-uri
-perl-http-cookiejar	perl-http-date
-perl-http-cookies	perl-http-date perl-http-message
-perl-extutils-config	
-perl-cpan-requirements-dynamic	perl-extutils-config
-perl-extutils-helpers	
-perl-extutils-installpaths	perl-extutils-config
-perl-module-build-tiny	perl-cpan-requirements-dynamic perl-extutils-config perl-extutils-helpers perl-extutils-installpaths
-perl-http-daemon	perl-http-date perl-http-message perl-lwp-mediatypes perl-module-build-tiny
-perl-http-negotiate	perl-http-message
-perl-net-http	
-perl-try-tiny	
-perl-www-robotrules	perl-uri
-perl-libwww	perl-encode-locale perl-file-listing perl-html-parser perl-http-cookiejar perl-http-cookies perl-http-daemon perl-http-date perl-http-negotiate perl-lwp-mediatypes perl-net-http perl-try-tiny perl-uri perl-www-robotrules
-perl-xml-parser	git perl-devel-checklib perl-file-sharedir perl-file-sharedir-install perl-libwww
-intltool	perl-xml-parser

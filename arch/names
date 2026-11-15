@@ -19,7 +19,6 @@ python-wheel wheel
 python-setuptools setuptools
 python-markupsafe markupsafe
 python-jinja jinja2
-perl-xml-parser perl
 linux-api-headers glibc
 sh bash
 awk gawk

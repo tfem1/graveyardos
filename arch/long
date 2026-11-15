@@ -2,3 +2,45 @@
 # (arch/plan-wave.py, arch/build-wave.sh); they get a build of their own that
 # resumes where the previous job stopped (ROADMAP.md, "qt6-webengine").
 qt6-webengine	Chromium inside: 6 to 9 hours on the runners' 4 cores
+
+# GPU compute stacks (CUDA, ROCm/HIP), left out of GraveyardOS 0.x: the
+# desktops need none of them (the NVIDIA image has the driver, not CUDA).
+# Their users are built without them (arch/drop, arch/fixes).
+cudnn	GPU compute stack, not built for now
+rocm-core	GPU compute stack, not built for now
+rocm-cmake	GPU compute stack, not built for now
+rocm-llvm	GPU compute stack, not built for now
+rocprofiler-register	GPU compute stack, not built for now
+hsa-rocr	GPU compute stack, not built for now
+rocminfo	GPU compute stack, not built for now
+hip-runtime	GPU compute stack, not built for now
+hipblas-common	GPU compute stack, not built for now
+amdsmi	GPU compute stack, not built for now
+python-tensile	GPU compute stack, not built for now
+rocm-toolchain	GPU compute stack, not built for now
+roctracer	GPU compute stack, not built for now
+rocblas	GPU compute stack, not built for now
+rocprim	GPU compute stack, not built for now
+rocsparse	GPU compute stack, not built for now
+rocsolver	GPU compute stack, not built for now
+hipblas	GPU compute stack, not built for now
+hipcub	GPU compute stack, not built for now
+rocfft	GPU compute stack, not built for now
+hipfft	GPU compute stack, not built for now
+rocrand	GPU compute stack, not built for now
+hiprand	GPU compute stack, not built for now
+hipsolver	GPU compute stack, not built for now
+hipsparse	GPU compute stack, not built for now
+composable-kernel	GPU compute stack, not built for now
+rocm-openmp	GPU compute stack, not built for now
+hipblaslt	GPU compute stack, not built for now
+miopen-hip	GPU compute stack, not built for now
+hipify-clang	GPU compute stack, not built for now
+rocm-smi-lib	GPU compute stack, not built for now
+rccl	GPU compute stack, not built for now
+rocalution	GPU compute stack, not built for now
+rocm-opencl-runtime	GPU compute stack, not built for now
+rocthrust	GPU compute stack, not built for now
+rocm-hip-sdk	GPU compute stack, not built for now
+cuda	GPU compute stack, not built for now
+nccl	GPU compute stack, not built for now

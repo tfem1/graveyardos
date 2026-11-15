@@ -7,11 +7,20 @@ dependencies too), minus what the GraveyardOS base already has.
 
 A target is a package name or @group (e.g. @plasma). Prints one package
 base per line in build order (dependencies first), then a summary.
+
+With --make, every package of a package base reached is taken in, not only
+the one a dependency names: arch/import.py builds them all (the musepack
+base makes libmpcdec and musepack-tools, which needs libcue), so a base
+needs the depends of all its packages and its makedepends, and what they
+reach joins the closure. Bases of the base system (--base) are not built
+and are not expanded. A dependency on a GraveyardOS recipe of arch/extra
+(minizip, which the base's zlib stands in for) is named too.
 """
-import argparse, json, os, re, sys, time, urllib.parse, urllib.request
+import argparse, json, os, re, sys, time, urllib.error, urllib.parse, urllib.request
 from concurrent.futures import ThreadPoolExecutor
 
 API = "https://archlinux.org/packages/search/json/?"
+HERE = os.path.dirname(os.path.abspath(__file__))
 
 def get(url, cache):
     key = os.path.join(cache, re.sub(r"[^A-Za-z0-9._-]", "_", url)[-200:])
@@ -23,6 +32,11 @@ def get(url, cache):
             with urllib.request.urlopen(req, timeout=60) as r:
                 text = r.read().decode()
             break
+        except urllib.error.HTTPError as e:
+            if e.code == 404:  # no such page: nothing to read (cached as such)
+                text = ""
+                break
+            time.sleep(2 ** attempt)
         except OSError:
             time.sleep(2 ** attempt)
     else:
@@ -51,6 +65,9 @@ def main():
         base = {n for l in open(a.base) for n in l.split("#")[0].split()}
 
     by_name, provides = {}, {}
+    # GraveyardOS's own recipes (arch/extra), by name
+    extra_dir = os.path.join(HERE, "extra")
+    extras = set(os.listdir(extra_dir)) if os.path.isdir(extra_dir) else set()
 
     def lookup(name):
         if name in by_name:
@@ -69,19 +86,36 @@ def main():
                 return out
             page += 1
 
+    def split(r):
+        """The names of all the packages of r's package base, from its page
+        on archlinux.org: the split package list when no package has the
+        base's name, else that package and its "Split Packages"."""
+        b = r["pkgbase"]
+        html = get(f"https://archlinux.org/packages/{r['repo']}/{r['arch']}/{b}/", a.cache)
+        if "Split Package Details" in html:
+            names = re.findall(r'title="View package details for ([^"]+)"', html)
+        else:
+            m = re.search(r"<th>Split Packages:</th>(.*?)</tr>", html, re.S)
+            names = re.findall(r'title="View package details for ([^"]+)"', m.group(1)) if m else []
+            own = lookup(b)
+            if own and own["pkgbase"] == b:
+                names.append(b)
+        return names
+
     todo = []
     for t in a.targets:
         todo += group(t[1:]) if t.startswith("@") else [t]
     if a.expand:
         print("\n".join(dict.fromkeys(todo)))
         return
-    seen, unresolved, order = set(), set(), []
+    seen, unresolved, order, expanded = set(), set(), [], set()
     while todo:
         batch = [n for n in dict.fromkeys(todo) if n not in seen and n not in base]
         todo = []
         seen.update(batch)
         with ThreadPoolExecutor(8) as ex:
             found = list(ex.map(lookup, batch))
+        grown = []
         for n, r in zip(batch, found):
             if not r:
                 unresolved.add(n)
@@ -89,6 +123,13 @@ def main():
             order.append(r)
             deps = r["depends"] + (r["makedepends"] if a.make else [])
             todo += [bare(x) for x in deps if bare(x) not in base]
+            # with --make: the base's other packages too (import.py builds them all)
+            if a.make and r["pkgbase"] not in base and r["pkgbase"] not in expanded:
+                expanded.add(r["pkgbase"])
+                grown.append(r)
+        with ThreadPoolExecutor(8) as ex:
+            for names in ex.map(split, grown):
+                todo += names
     bases = {}
     for r in order:
         bases.setdefault(r["pkgbase"], []).append(r["pkgname"])
@@ -96,21 +137,29 @@ def main():
         # base -> bases it needs (runtime and build), within the set
         base_of = {r["pkgname"]: r["pkgbase"] for r in order}
         for r in order:
-            for p in r.get("provides", []):
-                base_of.setdefault(bare(p), r["pkgbase"])
+            provided = [bare(p) for p in r.get("provides", [])]
+            # what stands in for a package of the base system (zlib-ng-compat
+            # for zlib): its names, libz.so too, stay the base's
+            if any(p in base for p in provided):
+                continue
+            for p in provided:
+                base_of.setdefault(p, r["pkgbase"])
         need = {b: set() for b in bases}
         for r in order:
             for d in r["depends"] + r["makedepends"]:
                 nb = base_of.get(bare(d))
                 if nb and nb != r["pkgbase"]:
                     need[r["pkgbase"]].add(nb)
+                if bare(d) in extras:  # built from arch/extra, not from its Arch base
+                    need[r["pkgbase"]].add(bare(d))
         done, out, active = set(), [], set()
         def visit(b):
             if b in done or b in active:  # a cycle: the book of the world breaks it by order
                 return
             active.add(b)
             for n in sorted(need[b]):
-                visit(n)
+                if n in need:  # not an arch/extra recipe
+                    visit(n)
             active.discard(b)
             done.add(b)
             out.append(b)
