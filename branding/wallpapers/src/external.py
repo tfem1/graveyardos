@@ -190,10 +190,59 @@ def swamp(work, gw, gh):
     return layered(work, "swamp", [[env + "mid-layer-01.png", env + "mid-layer-02.png"], env + "trees.png"], gw, gh)
 
 
+REPO = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+
+
+def eye_bitmap():
+    """The owner's Eye of Horus (branding/fastfetch/graveyard.txt, braille):
+    every braille dot one pixel, 2 x 4 per character."""
+    lines = [l for l in open(os.path.join(REPO, "branding", "fastfetch", "graveyard.txt"), encoding="utf-8").read().split("\n") if l]
+    w, h = max(len(l) for l in lines) * 2, len(lines) * 4
+    im = Image.new("L", (w, h), 0)
+    px = im.load()
+    dots = [(0, 0, 0), (1, 0, 1), (2, 0, 2), (3, 1, 0), (4, 1, 1), (5, 1, 2), (6, 0, 3), (7, 1, 3)]
+    for r, line in enumerate(lines):
+        for c, ch in enumerate(line):
+            b = ord(ch) - 0x2800
+            if 0 <= b < 256:
+                for bit, dx, dy in dots:
+                    if b >> bit & 1:
+                        px[c * 2 + dx, r * 4 + dy] = 255
+    return im
+
+
+def stamp(canvas, mask, x, y, ink=255, outline=0):
+    """A one-colour shape with a one-pixel outline, pixel exact."""
+    from PIL import ImageFilter
+    ring = mask.filter(ImageFilter.MaxFilter(3))
+    canvas.paste(outline, (x, y), ring)
+    canvas.paste(ink, (x, y), mask)
+
+
+def eye(work, gw, gh):
+    """GraveyardOS Cemetery with the Eye of Horus where the moon is, and the
+    name under it, in pixels."""
+    from PIL import ImageDraw, ImageFont
+    c = gothic(work, gw, gh)
+    e = eye_bitmap()
+    ex, ey = gw // 2 - e.width // 2, int(gh * 0.30) - e.height // 2 + (0 if gh >= 270 else 6)
+    stamp(c, e, ex, ey)
+    font = ImageFont.truetype(os.path.join(REPO, "branding", "sddm", "graveyard", "fonts", "Rubik-800.ttf"),
+                              22 if gh >= 270 else 18)
+    text = Image.new("L", (gw, 40), 0)
+    d = ImageDraw.Draw(text)
+    d.fontmode = "1"  # no smoothing: pixel letters
+    d.text((gw // 2, 2), "GraveyardOS", font=font, fill=255, anchor="mt")
+    stamp(c, text, 0, ey + e.height + 4)
+    return c
+
+
 WALLPAPERS = {
     # name: (scene, title, description, sources)
     "GraveyardOS-Cemetery": (gothic, "GraveyardOS cemetery", "A moonlit graveyard in pixel art", ["gothicvania"]),
     "GraveyardOS-Town": (town, "GraveyardOS town", "An old town and its church under a cloudy sky, in pixel art", ["town"]),
+    "GraveyardOS-Eye": (eye, "GraveyardOS eye", "The Eye of Horus over the cemetery, and the name, in pixel art",
+                        ["gothicvania"]),
     "Haunted-Swamp": (swamp, "Haunted swamp", "A haunted swamp forest, a face in its tree, in pixel art", ["swamp"]),
 }
 GRIDS = {(480, 270): [(1920, 1080), (3840, 2160)], (320, 200): [(2560, 1600)]}
