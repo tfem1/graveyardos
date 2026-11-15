@@ -131,6 +131,17 @@ pub fn parse_recipe(text: &str) -> Result<Recipe> {
     })
 }
 
+/// Unpack a zip archive (argv: archive, directory), keeping the Unix modes.
+const UNZIP: &str = r#"
+import os, sys, zipfile
+with zipfile.ZipFile(sys.argv[1]) as z:
+    for i in z.infolist():
+        p = z.extract(i, sys.argv[2])
+        mode = i.external_attr >> 16
+        if mode & 0o777 and not i.is_dir():
+            os.chmod(p, mode & 0o7777)
+"#;
+
 fn is_archive(name: &str) -> bool {
     [
         ".tar", ".tar.gz", ".tgz", ".tar.xz", ".txz", ".tar.zst", ".tar.bz2", ".tbz2",
@@ -483,7 +494,19 @@ pub fn build(dir: &Path, o: &BuildOpts, ui: &Ui) -> Result<PathBuf> {
                 bail!("{fname}: sha256 mismatch\n  expected {want}\n  got      {got}");
             }
         }
-        if is_archive(fname) && !r.noextract.iter().any(|n| n == fname) {
+        if fname.ends_with(".zip") && !r.noextract.iter().any(|n| n == fname) {
+            // GNU tar reads no zip; Python (in every GraveyardOS system) does,
+            // keeping the files' modes as makepkg's bsdtar does
+            let st = Command::new("python3")
+                .arg("-c")
+                .arg(UNZIP)
+                .arg(path)
+                .arg(&srcdir)
+                .status()?;
+            if !st.success() {
+                bail!("cannot extract {fname}");
+            }
+        } else if is_archive(fname) && !r.noextract.iter().any(|n| n == fname) {
             let st = Command::new("tar")
                 .arg("-xf")
                 .arg(path)

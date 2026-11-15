@@ -41,6 +41,18 @@ export LDFLAGS="-Wl,-O1 -Wl,--sort-common -Wl,--as-needed -Wl,-z,relro -Wl,-z,no
 export LTOFLAGS="-flto=auto"
 export RUSTFLAGS="-Cforce-frame-pointers=yes"
 export DEBUG_CFLAGS="-g" DEBUG_CXXFLAGS="-g"
+# python -m build checks the build dependencies' versions against what is
+# installed; Arch's packages are built against Arch's of the day, as these:
+# a newer flit-core must not stop python-mdurl (Arch's makepkg has the same
+# packages, built before the update)
+python() {
+  if [ "${1:-}" = -m ] && [ "${2:-}" = build ]; then shift 2; command python -m build --skip-dependency-check "$@"
+  else command python "$@"; fi
+}
+python3() {
+  if [ "${1:-}" = -m ] && [ "${2:-}" = build ]; then shift 2; command python3 -m build --skip-dependency-check "$@"
+  else command python3 "$@"; fi
+}
 # Arch's meson wrapper (/usr/bin/arch-meson of its meson package), which
 # PKGBUILDs call instead of meson
 arch-meson() {
@@ -236,7 +248,8 @@ def convert(pkgbase, cache, out, sources_dir, nmap, no_download=False):
         if re.match(r"^(svn|hg|bzr)(\+|://)", url):
             return f"skipped: VCS source {url}"
         if re.match(r"^git(\+|://)", url):
-            dirname = name or re.sub(r"\.git$", "", url_repo_name(srcs[i]))
+            # makepkg: the name up to the first ".git" (notofonts.github.io: notofonts)
+            dirname = name or re.sub(r"\.git.*$", "", url_repo_name(srcs[i]))
             if no_download:
                 fname, sha = f"{dirname}-git.tar.gz", "TODO"
             else:
