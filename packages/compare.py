@@ -28,6 +28,13 @@ EXCLUDE = (
     "etc/passwd-", "etc/group-", "etc/shadow-", "etc/gshadow-",
     "var/lib/systemd/catalog/database", "var/lib/sudo/lectured/",
     "usr/share/graveyard/initramfs/live/usr/lib/graveyard/installer/__pycache__/",
+    # systemd's state, written as the system runs
+    "var/lib/systemd/",
+    # chapter 6's site defaults for cross-compiling the temporary tools
+    "usr/share/config.site",
+    # Yone's hooks: how packages keep generated files current (the book
+    # generates them once, on the machine)
+    "usr/share/yone/",
 )
 
 
@@ -42,8 +49,8 @@ def known_difference(rel):
     # catalogs support (de_AT.UTF-8...): upstream's choice
     parts = rel.split("/")
     if len(parts) >= 4 and parts[:3] == ["usr", "share", "locale"] and "." in parts[3] \
-            and parts[3].split(".", 1)[1].lower().replace("-", "") == "utf8" and (len(parts) == 4 or parts[4] == "bc"):
-        return True
+            and (len(parts) == 4 or parts[4] == "bc"):
+        return True  # any charset: de_AT.utf8, ru_RU.KOI8-R, zh_CN.GB18030...
     return False
 
 

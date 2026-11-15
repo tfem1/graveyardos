@@ -2,3 +2,5 @@
 # building the package already has pip; the bundled wheel, installed here.
 python3 -m pip install --root="$PKGDIR" --ignore-installed --no-index --no-cache-dir \
   --no-warn-script-location --find-links Lib/ensurepip/_bundled pip
+# ensurepip installs pip3 and pip3.X only, not the bare name
+rm -f "$PKGDIR/usr/bin/pip"
