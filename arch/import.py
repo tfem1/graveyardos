@@ -136,6 +136,17 @@ def bare(dep):
     return re.split(r"[<>=]", dep, maxsplit=1)[0]
 
 
+def fixes(pkgbase):
+    """arch/fixes: shell lines for this base, run after its PKGBUILD is read
+    (flags for a newer compiler...)."""
+    out = []
+    for l in open(os.path.join(HERE, "fixes")):
+        f = l.rstrip("\n").split("\t", 1)
+        if len(f) == 2 and not l.startswith("#") and f[0] == pkgbase:
+            out.append(f[1])
+    return out
+
+
 def drops(pkgbase):
     """What arch/drop leaves out of this base."""
     out = set()
@@ -336,6 +347,7 @@ def convert(pkgbase, cache, out, sources_dir, nmap, no_download=False):
             "set +u",
             pkgbuild.replace("\r", ""),
             f"pkgname={name}",
+            *(["# --- GraveyardOS's fixes (arch/fixes)"] + fixes(pkgbase) if fixes(pkgbase) else []),
             "# --- what makepkg runs",
             "# prepare() once: a build resumed (YONE_RESUME) finds it done",
             'cd "$srcdir"; if [ ! -e .prepared ]; then if declare -F prepare >/dev/null; then prepare; fi; cd "$srcdir"; touch .prepared; fi',

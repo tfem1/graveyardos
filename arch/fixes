@@ -1,0 +1,4 @@
+# Shell lines run after a package base's PKGBUILD is read (arch/import.py),
+# for what Arch's build of the day does not meet here.
+# base<TAB>line
+unifdef	CFLAGS+=" -std=gnu17"  # its own "constexpr" variable: a keyword in C23, gcc's default
