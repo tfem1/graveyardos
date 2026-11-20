@@ -305,6 +305,18 @@ def mirrors():
     return out
 
 
+def resums(pkgbase):
+    """arch/resum: this base's files that upstream serves changed since the
+    PKGBUILD (forge archives and patches made again), by name: the SHA-256
+    of the file as served now, taken only once its content was reviewed."""
+    out = {}
+    for l in open(os.path.join(HERE, "resum")):
+        f = l.split("#")[0].split()
+        if len(f) == 3 and f[0] == pkgbase:
+            out[f[1]] = f[2]
+    return out
+
+
 def checksum(path, algo):
     h = {"sha256": hashlib.sha256, "sha512": hashlib.sha512, "b2": lambda: hashlib.blake2b(digest_size=64)}[algo]()
     with open(path, "rb") as f:
@@ -320,7 +332,9 @@ def wrong_sum(path, sums, i):
             with open(path, "rb") as f:
                 head = f.read(512).lstrip().lower()
             page = ", a web page" if head.startswith((b"<!doctype html", b"<html")) else ""
-            return f"{algo} does not match the PKGBUILD ({os.path.getsize(path)} bytes{page})"
+            # (its SHA-256: what arch/resum would pin, once the file is checked)
+            return (f"{algo} does not match the PKGBUILD ({os.path.getsize(path)} bytes{page}, "
+                    f"sha256 {checksum(path, 'sha256')})")
     return None
 
 
@@ -443,12 +457,28 @@ def convert(pkgbase, cache, out, sources_dir, nmap, no_download=False):
             sha = known if known and known != "SKIP" else "TODO"
         else:
             path = os.path.join(sources_dir, fname)
-            try:
-                if os.path.exists(path) and wrong_sum(path, sums, i):
-                    os.remove(path)  # another base's file of that name
-                err = wrong_sum(download(url, path), sums, i)
-            except subprocess.CalledProcessError as e:
-                err = ((e.stderr or "").strip().splitlines() or [str(e)])[-1]
+            pinned = resums(pkgbase).get(fname)
+
+            def bad(p):
+                """Why p is not this source: neither the PKGBUILD's file nor
+                the reviewed one of arch/resum."""
+                why = wrong_sum(p, sums, i)
+                return None if why and pinned == checksum(p, "sha256") else why
+            # the URL, then where the same file is (arch/mirrors: a host gone
+            # or down); every file checked as the URL's is
+            errs = []
+            for u in [url] + [alt + url[len(p):] for p, alt in mirrors() if url.startswith(p)]:
+                try:
+                    if os.path.exists(path) and bad(path):
+                        os.remove(path)  # another base's file of that name, or a URL's before
+                    why = bad(download(u, path))
+                except subprocess.CalledProcessError as e:
+                    why = ((e.stderr or "").strip().splitlines() or [str(e)])[-1]
+                if not why:
+                    errs = []
+                    break
+                errs.append(why if u == url else f"{u}: {why}")
+            err = "; ".join(errs)
             if err:
                 # what Arch built with: its source package (the sums still checked)
                 got = from_srcpkg(info, sources_dir, fname, path + ".arch")
