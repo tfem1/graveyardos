@@ -74,3 +74,4 @@ wayland	mdbook	the documentation (wayland-docs)
 # sysprof needs glib2 (and gtk4...): glib2 comes first, built without it; arch/fixes turns it off
 glib2	sysprof	sysprof's tracing marks (its capture library)
 glib2	libsysprof-capture	sysprof's tracing marks (its capture library)
+pulseaudio	libasyncns	asynchronous name lookups of the network modules (libasyncns: its Git host, git.0pointer.net, is gone; meson auto feature)
