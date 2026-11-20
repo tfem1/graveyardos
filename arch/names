@@ -7,6 +7,7 @@ libstdc++ gcc
 libgomp gcc
 libatomic gcc
 libquadmath gcc
+libgfortran gcc-fortran
 systemd-libs systemd
 util-linux-libs util-linux
 libudev systemd

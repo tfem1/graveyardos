@@ -1,0 +1,75 @@
+# GCC's Fortran compiler, gfortran, and its runtime, libgfortran: lapack,
+# openblas, fftw, hdf5, numpy, scipy... build with it. Arch makes them in its
+# gcc package base (gcc-fortran, libgfortran), which the GraveyardOS base
+# stands in for with LFS's GCC, built for C and C++ only. The same GCC as the
+# base's (lfs/book/ch08/071-ch-system-gcc.sh), configured the same with
+# Fortran added; only the Fortran parts are packaged, none of the base's
+# gcc files (the gmp, mpfr, mpc and zstd it builds with are the base's).
+name = gcc-fortran
+version = 16.2.0
+release = 1
+desc = Fortran front-end for GCC (gfortran) and its runtime library
+url = https://gcc.gnu.org
+license = GPL-3.0-or-later WITH GCC-exception-3.1
+depends = gcc gmp mpfr mpc zlib zstd
+provides = libgfortran
+source = https://ftpmirror.gnu.org/gcc/gcc-16.2.0/gcc-16.2.0.tar.xz
+sha256 = e6738e29597f733270731aa90600f37ffdc045079dfc27ec7e8192cc81085c3e
+
+@build
+cd gcc-16.2.0
+sed -e '/m64=/s/lib64/lib/' -i gcc/config/i386/t-linux64
+mkdir -p build
+cd build
+# the book's configure line, with fortran
+[ -f Makefile ] || ../configure --prefix=/usr  \
+  LD=ld                                         \
+  --enable-languages=c,c++,fortran              \
+  --enable-default-pie                          \
+  --enable-default-ssp                          \
+  --enable-host-pie                             \
+  --enable-targets=all                          \
+  --disable-multilib                            \
+  --disable-bootstrap                           \
+  --disable-fixincludes                         \
+  --with-system-zlib
+# the compilers and the Fortran runtime (libquadmath and libbacktrace come
+# with it), and libgomp for its Fortran modules (omp_lib); not libstdc++,
+# the sanitizers... which the base has
+make all-gcc all-target-libgfortran all-target-libgomp
+
+@package
+cd gcc-16.2.0/build
+d=$SRCDIR/dest
+rm -rf "$d"
+make -j1 DESTDIR="$d" install-gcc install-target-libgfortran install-target-libgomp
+t=$(./gcc/xgcc -dumpmachine)        # x86_64-pc-linux-gnu
+v=$(./gcc/xgcc -dumpfullversion)    # 16.2.0: the base's directories
+lib=usr/lib/gcc/$t/$v exe=usr/libexec/gcc/$t/$v
+# the driver (with Arch's names for it) and the compiler proper
+install -Dm755 "$d/usr/bin/gfortran" "$PKGDIR/usr/bin/gfortran"
+ln -sf gfortran "$PKGDIR/usr/bin/$t-gfortran"
+ln -sf gfortran "$PKGDIR/usr/bin/f95"
+install -Dm755 "$d/$exe/f951" "$PKGDIR/$exe/f951"
+# modules (ieee_*, omp_lib), the C interoperability header, the coarray
+# libraries. Not OpenACC's (openacc.mod, openacc_lib.h): their procedures
+# are in a libgomp built with Fortran, and the base's libgomp.so, built
+# without, does not have them; "use openacc" fails to compile rather than
+# to link. OpenMP's need nothing more of libgomp.
+install -d "$PKGDIR/$lib/include"
+cp -a "$d/$lib/finclude" "$PKGDIR/$lib/"
+rm -f "$PKGDIR/$lib/finclude"/openacc*
+cp -a "$d/$lib/include/ISO_Fortran_binding.h" "$PKGDIR/$lib/include/"
+cp -a "$d/$lib"/libcaf_*.a "$PKGDIR/$lib/"
+# the runtime library (Arch's libgfortran) and the spec gfortran links with
+install -d "$PKGDIR/usr/lib"
+cp -a "$d"/usr/lib/libgfortran.so* "$d/usr/lib/libgfortran.spec" "$PKGDIR/usr/lib/"
+install -Dm644 "$d/usr/share/man/man1/gfortran.1" "$PKGDIR/usr/share/man/man1/gfortran.1"
+if [ -f "$d/usr/share/info/gfortran.info" ]; then
+  install -Dm644 "$d/usr/share/info/gfortran.info" "$PKGDIR/usr/share/info/gfortran.info"
+fi
+install -Dm644 ../COPYING.RUNTIME "$PKGDIR/usr/share/licenses/gcc-fortran/RUNTIME.LIBRARY.EXCEPTION"
+# stripped, as LFS strips the base's
+strip --strip-all "$PKGDIR/usr/bin/gfortran" "$PKGDIR/$exe/f951"
+strip --strip-unneeded "$PKGDIR"/usr/lib/libgfortran.so.*.*
+strip --strip-debug "$PKGDIR/$lib"/libcaf_*.a

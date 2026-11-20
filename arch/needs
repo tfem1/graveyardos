@@ -193,11 +193,11 @@ libedit
 python-mdurl	python-build python-installer
 python-markdown-it-py	python-build python-installer python-mdurl
 python-mdit_py_plugins	python-build python-installer python-markdown-it-py
-lapack	cmake doxygen gcc git
+lapack	cmake doxygen gcc gcc-fortran git
 patchelf	git
 python-pyproject-metadata	python-build python-installer
 meson-python	git patchelf python-build python-installer python-pyproject-metadata
-python-numpy	cmake cython gcc git lapack meson-python python-build python-installer
+python-numpy	cmake cython gcc gcc-fortran git lapack meson-python python-build python-installer
 cython	git python-build python-installer python-numpy python-pygments
 python-yaml	cython libyaml python-build python-installer
 python-myst-parser	python-build python-docutils python-installer python-markdown-it-py python-mdit_py_plugins python-pygments python-sphinx python-yaml
@@ -265,7 +265,7 @@ jbigkit	git
 libdeflate	cmake git
 hicolor-icon-theme	git
 djvulibre	git hicolor-icon-theme libjpeg-turbo libtiff
-fftw	cmake gcc openmpi
+fftw	cmake gcc gcc-fortran openmpi
 add-determinism	rust
 libunwind	texlive-texmf
 gperftools	asciidoctor git libunwind
@@ -513,8 +513,8 @@ libcbor	cmake cmocka
 libfido2	cmake hidapi libcbor
 mkinitcpio-busybox	
 mkinitcpio	asciidoctor git libarchive mkinitcpio-busybox
-suitesparse	cmake gcc git lapack
-eigen	cmake fftw freeglut gcc git suitesparse
+suitesparse	cmake gcc gcc-fortran git lapack
+eigen	cmake fftw freeglut gcc gcc-fortran git suitesparse
 python-iniconfig	git python-build python-installer python-setuptools-scm
 python-pytest	git python-build python-iniconfig python-installer python-pluggy python-pygments python-setuptools-scm
 python-hatch-vcs	git python-build python-hatchling python-installer python-setuptools-scm
@@ -707,7 +707,7 @@ python-gast	python-build python-installer
 python-beniget	git python-build python-gast python-installer
 xsimd	cmake git gtest
 python-pythran	boost git python-beniget python-build python-gast python-installer python-numpy python-ply xsimd
-python-scipy	boost cython gcc git lapack meson-python pybind11 python-build python-installer python-numpy python-platformdirs python-pooch python-pythran
+python-scipy	boost cython gcc gcc-fortran git lapack meson-python pybind11 python-build python-installer python-numpy python-platformdirs python-pooch python-pythran
 python-networkx	git python-build python-installer python-matplotlib python-numpy python-pandas python-scipy
 python-schema	python-build python-installer
 python-toposort	python-build python-installer
@@ -824,7 +824,7 @@ libfyaml	cmake git libyaml
 cfitsio	cmake curl git
 libcgif	
 libaec	cmake
-hdf5	cmake gcc git java-openjdk libaec openmpi time
+hdf5	cmake gcc gcc-fortran git java-openjdk libaec openmpi time
 libmatio	git hdf5
 libraw	gcc git lcms2 libjpeg-turbo
 openjph	cmake doxygen git libtiff
@@ -905,10 +905,10 @@ qt6-svg	cmake git qt6-base
 qt6-declarative	cmake git qt6-base qt6-languageserver qt6-shadertools qt6-svg vulkan-headers
 qt6-5compat	cmake git icu qt6-base qt6-declarative qt6-shadertools
 verdict	cmake git
-zfp	cmake cython gcc python-numpy
+zfp	cmake cython gcc gcc-fortran python-numpy
 zlib-ng	cmake git
 blosc2	cmake git zfp zlib-ng
-conduit-llnl	cmake gcc openmpi python-build python-installer python-numpy
+conduit-llnl	cmake gcc gcc-fortran openmpi python-build python-installer python-numpy
 libfabric	numactl
 libsodium	git
 catch2	cmake git
@@ -941,18 +941,18 @@ python-msgpack	cython python-build python-installer
 python-tensile	cmake git python-build python-installer python-joblib python-msgpack python-pyaml
 rocm-toolchain	git
 roctracer	cmake hip-runtime hsa-rocr python-cppheaderparser python-ply rocm-core rocm-llvm
-rocblas	amdsmi cmake gcc git gtest hip-runtime lapack llvm msgpack-cxx perl-file-which python-joblib python-msgpack python-pyaml python-tensile rocm-cmake rocm-core rocm-llvm rocm-toolchain roctracer
+rocblas	amdsmi cmake gcc gcc-fortran git gtest hip-runtime lapack llvm msgpack-cxx perl-file-which python-joblib python-msgpack python-pyaml python-tensile rocm-cmake rocm-core rocm-llvm rocm-toolchain roctracer
 rocprim	cmake hip-runtime rocm-cmake rocm-core rocm-llvm rocm-toolchain
-rocsparse	cmake gcc hip-runtime rocblas rocm-cmake rocm-core rocm-llvm rocm-toolchain rocprim roctracer
+rocsparse	cmake gcc gcc-fortran hip-runtime rocblas rocm-cmake rocm-core rocm-llvm rocm-toolchain rocprim roctracer
 rocsolver	cmake fmt hip-runtime rocblas rocm-cmake rocm-core rocm-llvm rocm-toolchain rocprim rocsparse
-hipblas	cmake gcc git hip-runtime hipblas-common rocblas rocm-cmake rocm-core rocsolver
+hipblas	cmake gcc gcc-fortran git hip-runtime hipblas-common rocblas rocm-cmake rocm-core rocsolver
 hipcub	cmake hip-runtime rocm-cmake rocm-core rocm-llvm rocm-toolchain rocprim
 rocfft	cmake hip-runtime rocm-cmake rocm-core rocm-llvm rocm-toolchain sqlite
 hipfft	cmake hip-runtime rocfft rocm-cmake rocm-core rocm-llvm
 rocrand	cmake hip-runtime rocm-cmake rocm-core rocm-llvm rocm-toolchain
-hiprand	cmake gcc hip-runtime rocm-cmake rocm-core rocrand
-hipsolver	cmake gcc hip-runtime lapack rocblas rocm-cmake rocm-core rocm-llvm rocsolver rocsparse suitesparse
-hipsparse	cmake gcc git gtest hip-runtime rocm-cmake rocm-core rocsparse
+hiprand	cmake gcc gcc-fortran hip-runtime rocm-cmake rocm-core rocrand
+hipsolver	cmake gcc gcc-fortran hip-runtime lapack rocblas rocm-cmake rocm-core rocm-llvm rocsolver rocsparse suitesparse
+hipsparse	cmake gcc gcc-fortran git gtest hip-runtime rocm-cmake rocm-core rocsparse
 composable-kernel	cmake git hip-runtime llvm rocm-cmake rocm-core rocm-llvm rocm-toolchain
 functional-plus	cmake
 python-orjson	maturin python-installer rust
@@ -961,7 +961,7 @@ python-ujson	python-build python-installer python-setuptools-scm
 rocm-openmp	cmake git hsa-rocr libxml2 rocm-cmake rocm-core rocm-llvm
 spdlog	catch2 cmake fmt
 yaml-cpp	cmake git
-hipblaslt	amdsmi cmake fmt gcc git gtest hip-runtime hipblas-common lapack msgpack-cxx python-joblib python-msgpack python-orjson python-pyaml python-simplejson python-ujson python-yaml rocm-cmake rocm-core rocm-llvm rocm-openmp rocm-toolchain roctracer spdlog yaml-cpp
+hipblaslt	amdsmi cmake fmt gcc gcc-fortran git gtest hip-runtime hipblas-common lapack msgpack-cxx python-joblib python-msgpack python-orjson python-pyaml python-simplejson python-ujson python-yaml rocm-cmake rocm-core rocm-llvm rocm-openmp rocm-toolchain roctracer spdlog yaml-cpp
 lbzip2	
 miopen-hip	cmake composable-kernel eigen functional-plus git hip-runtime hipblas hipblaslt lbzip2 nlohmann-json rocblas rocm-cmake rocm-core rocm-llvm rocm-toolchain rocrand roctracer sqlite
 hipify-clang	cmake cuda rocm-llvm
@@ -974,16 +974,16 @@ rocm-opencl-runtime	git hsa-rocr mesa numactl ocl-icd opencl-headers rocm-cmake 
 rocthrust	cmake hip-runtime rocm-cmake rocm-core rocm-llvm rocm-toolchain rocprim
 rocm-hip-sdk	hip-runtime hipblas hipcub hipfft hiprand hipsolver hipsparse hsa-rocr miopen-hip rccl rocalution rocblas rocfft rocm-cmake rocm-core rocm-llvm rocm-opencl-runtime rocminfo rocprim rocrand rocsolver rocsparse rocthrust
 openucx	cuda gcc rdma-core rocm-hip-sdk
-paraview-catalyst	cmake conduit-llnl gcc gtest openmpi python-numpy
+paraview-catalyst	cmake conduit-llnl gcc gcc-fortran gtest openmpi python-numpy
 python-mpi4py	cython openmpi python-build python-installer
 gsl	lapack
 sz	cmake gcc gsl gtest hdf5
 libpgm	git
 zeromq	asciidoc cmake git gnutls libpgm libsodium xmlto
-adios2	blosc2 cmake conduit-llnl cuda curl gcc gtest hdf5 libfabric libpng libsodium mgard nanobind nlohmann-json openmpi openucx paraview-catalyst pugixml python-mpi4py python-numpy sqlite sz yaml-cpp zeromq zfp
+adios2	blosc2 cmake conduit-llnl cuda curl gcc gcc-fortran gtest hdf5 libfabric libpng libsodium mgard nanobind nlohmann-json openmpi openucx paraview-catalyst pugixml python-mpi4py python-numpy sqlite sz yaml-cpp zeromq zfp
 alembic	cmake hdf5 imath
 anari-sdk	cmake git
-cgns	cmake gcc glu hdf5 libglvnd libx11 libxmu tk
+cgns	cmake gcc gcc-fortran glu hdf5 libglvnd libx11 libxmu tk
 cli11	cmake
 snappy	cmake git gtest llvm
 apache-orc	abseil-cpp cmake git protobuf snappy
@@ -1443,7 +1443,7 @@ openpmix	hwloc libevent
 nccl	cuda git
 openucc	cuda hip-runtime nccl openucx rccl rdma-core rocm-llvm
 prrte	hwloc libevent openpmix
-openmpi	cuda gcc hip-runtime hwloc libevent libfabric nvidia-utils openpmix openucc openucx prrte valgrind
+openmpi	cuda gcc gcc-fortran hip-runtime hwloc libevent libfabric nvidia-utils openpmix openucc openucx prrte valgrind
 boost	icu openmpi python-numpy
 cracklib	
 judy	
@@ -1527,7 +1527,7 @@ gsfonts
 gts	glib2 netpbm
 libgdiplus	cairo fontconfig giflib glib2 harfbuzz libexif libjpeg-turbo libpng libtiff libx11 pango
 mono	ca-certificates cmake git libgdiplus
-r	cairo curl gcc glib2 icu java-openjdk lapack libdeflate libjpeg-turbo libpng libtiff libtirpc libx11 libxmu libxt pango pcre2 texlive-texmf tk unzip which zip
+r	cairo curl gcc gcc-fortran glib2 icu java-openjdk lapack libdeflate libjpeg-turbo libpng libtiff libtirpc libx11 libxmu libxt pango pcre2 texlive-texmf tk unzip which zip
 graphviz	gd ghostscript gsfonts gts guile librsvg lua mono pango qt6-base r swig tk
 vala	autoconf-archive git glib2 graphviz gtk-doc help2man libxslt noto-fonts
 dconf	bash-completion git glib2 gtk-doc vala
