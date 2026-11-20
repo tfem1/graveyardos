@@ -69,6 +69,9 @@ jobs:
       - name: Initramfs section again
         run: sudo -E GRAVEYARD_REDO="graveyard-base-files graveyard-initramfs" bash lfs/build.sh run ch09 ch10
 
+      - name: A place for the packages
+        run: sudo mkdir -p /mnt/arch-work && sudo chown "$(id -u):$(id -g)" /mnt/arch-work
+
       - uses: actions/download-artifact@v4
         with:
           name: arch-repo
@@ -109,6 +112,7 @@ jobs:
           fi
 
       - name: Build the ISO
+        id: iso
         run: |
           sudo rm -rf /mnt/arch-work
           sudo apt-get install -y -qq squashfs-tools xorriso mtools dosfstools qemu-system-x86 ovmf > /dev/null
@@ -144,7 +148,7 @@ jobs:
       # The same ISO from a stick prepared with the current Ventoy release,
       # booted to the desktop with both firmwares (iso/ventoy-stick.sh)
       - name: Boot it to the desktop from a Ventoy stick (BIOS and UEFI)
-        if: always()
+        if: always() && steps.iso.outcome == 'success'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
