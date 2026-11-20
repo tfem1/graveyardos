@@ -233,11 +233,19 @@ build_extras() {
 
 n=0 okn=0 waiting=0
 build_extras
+# A base's arch/fixes lines, fingerprinted: a pin (a failure without part of
+# its cycle) holds only while they stay the same (plan-wave.py)
+fixes_print() { awk -F'\t' -v b="$1" '$1 == b' "$HERE/fixes" | md5sum | cut -c1-8; }
+
 # A shard line may name, after the base, the dependencies of its cycle it is
-# built without (plan-wave.py breaks each dependency cycle at one base)
+# built without (plan-wave.py breaks each dependency cycle at one base). A
+# base marked "+" is built again: it was built without part of its cycle,
+# which is there now (a release suffix makes its packages newer)
 while read -r base relax; do
   [ -n "$base" ] || continue
-  if grep -qx "$base" "$work/done"; then continue; fi
+  again=
+  case $base in +*) base=${base#+}; again=1 ;; esac
+  if [ -z "$again" ] && grep -qx "$base" "$work/done"; then continue; fi
   # a build of its own (arch-long), unless this is it
   if [ -z "${ARCH_LONG:-}" ] && grep -qx "$base" <(grep -v '^#' "$HERE/long" | cut -f1); then continue; fi
   # what the GraveyardOS base already is (glibc, gcc...): never rebuilt
@@ -269,18 +277,26 @@ while read -r base relax; do
   fi
   echo "$out" > "$lf"
   mapfile -t names < <(echo "$out" | sed -n 's/^[^ ]* *ok: //p' | tr ' ' '\n' | grep .)
+  if [ -n "$again" ]; then
+    for name in "${names[@]}"; do sed -i 's/^release = \(.*\)$/release = \1.1/' "$work/recipes/$name/YONEBUILD"; done
+  fi
   ok=1
   for name in "${names[@]}"; do
     build_dir "$work/recipes/$name" "$lf" || { ok=0; break; }
   done
   if [ "$ok" = 1 ]; then
-    echo "$base" >> "$work/done"; okn=$((okn + 1)); printf 'ok   %5ds\n' $((SECONDS - t0))
+    grep -qx "$base" "$work/done" || echo "$base" >> "$work/done"
+    okn=$((okn + 1)); printf 'ok   %5ds\n' $((SECONDS - t0))
     printf '%s\t%s\n' "$base" "${names[*]}" >> "$work/made"   # its packages' names (repair-done.py)
+    # built without part of its cycle: plan-wave.py builds it again once that
+    # part is built ("-": complete)
+    miss=; for d in $relax; do grep -qx "$d" "$work/done" || miss="$miss $d"; done
+    printf '%s\t%s\n' "$base" "${miss# }" | sed 's/\t$/\t-/' >> "$work/partial"
     build_extras
   else
     # "relaxed": it lacked part of its cycle, so plan-wave.py tries it again
     # once that part is built
-    rx=; for d in $relax; do grep -qx "$d" "$work/done" || rx=relaxed; done
+    rx=; for d in $relax; do grep -qx "$d" "$work/done" || rx="relaxed:$(fixes_print "$base")"; done
     printf '%s\t%s%s\n' "$base" "$(grep -v '^\s*$' "$lf" | tail -n 1 | cut -c1-200 | tr '\t' ' ')" "${rx:+	$rx}" >> "$work/failed"
     printf 'FAIL %5ds\n' $((SECONDS - t0))
   fi

@@ -34,3 +34,43 @@ opencv	python-opencv-cuda	the CUDA build of OpenCV
 pyside6	qt6-webengine	the QtWebEngine bindings (PySide builds the modules Qt has)
 pyside6	qt6-webview	the QtWebView bindings
 hspell	qt6-webengine	hunspell-he's dictionaries for Qt WebEngine (.bdic)
+# Documentation tools built early (a minimal build), so that what generates
+# documentation with them can wait for them: doxygen, graphviz and gi-docgen
+# (with python-pygments) were in the big cycle through qt6, llvm, texlive...
+doxygen	doxygen-docs	its manual (HTML and PDF: LaTeX, ghostscript and graphviz to make)
+doxygen	texlive-texmf	nothing more: it was there for doxygen-docs (texlive-fontsrecommended's base)
+doxygen	texlive-fontsrecommended	nothing more: it was there for doxygen-docs
+doxygen	texlive-fontutils	nothing more: it was there for doxygen-docs
+doxygen	texlive-latexextra	nothing more: it was there for doxygen-docs
+doxygen	texlive-plaingeneric	nothing more: it was there for doxygen-docs
+doxygen	ghostscript	nothing more: it was there for doxygen-docs
+doxygen	graphviz	nothing more: it was there for doxygen-docs (dot is still used at run time when installed)
+doxygen	qt6-base	doxywizard, the GUI front end
+doxygen	qt6-svg	doxywizard, the GUI front end
+doxygen	llvm	libclang parsing (CLANG_ASSISTED_PARSING)
+doxygen	clang	libclang parsing (llvm's base)
+doxygen	llvm-libs	libclang parsing (llvm's base)
+doxygen	fmt	nothing: doxygen's bundled fmt is used (fmt waits for doxygen, mkdocs and npm)
+doxygen	spdlog	nothing: doxygen's bundled spdlog is used (it needs fmt)
+graphviz	pango	the cairo/pango renderers (PNG, PDF and the like; SVG, PostScript and the text formats stay)
+graphviz	gd	the gd renderers (PNG, GIF, JPEG) and the gdtclft Tcl package
+graphviz	librsvg	SVG images inside graphs (rsvg loader)
+graphviz	ghostscript	PostScript images inside graphs (gs loader)
+graphviz	gts	the sfdp overlap removal by GTS triangulation (sfdp itself stays)
+graphviz	qt6-base	gvedit, the GUI editor
+graphviz	swig	the gv language bindings (Python, Perl, Lua, Tcl gv...; tcldot and tclpathplan stay)
+graphviz	mono	the C# bindings
+graphviz	guile	the Guile bindings
+graphviz	lua	the Lua bindings
+graphviz	r	the R bindings
+graphviz	tk	nothing: graphviz 16 has no Tk extension any more
+python-pygments	python-sphinx	its HTML documentation (/usr/share/doc/python-pygments)
+# wayland without its documentation (wayland-docs): built early, everything waits for it
+wayland	doxygen	the documentation (wayland-docs)
+wayland	graphviz	the documentation (wayland-docs)
+wayland	xmlto	the documentation (wayland-docs)
+wayland	docbook-xsl	the documentation (wayland-docs)
+wayland	mdbook	the documentation (wayland-docs)
+# sysprof needs glib2 (and gtk4...): glib2 comes first, built without it; arch/fixes turns it off
+glib2	sysprof	sysprof's tracing marks (its capture library)
+glib2	libsysprof-capture	sysprof's tracing marks (its capture library)

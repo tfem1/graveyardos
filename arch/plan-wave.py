@@ -125,12 +125,24 @@ def main():
     # (Eades-Lin-Smyth, on the other dependencies): as Arch builds a cycle on
     # its previous packages. "relax" is what a base is built without.
     done = set(lines(os.path.join(work, "done"))) | base
+    # A base done (built, or replaced by a bootstrap: cmake, git) waits for
+    # nothing more: what it needs closes no cycle
+    needs = {b: ([] if b in done else ds) for b, ds in needs.items()}
+    # a pin holds while the base's arch/fixes lines stay as they were when it
+    # failed (build-wave.sh's fixes_print): a new fix lifts it
+    import hashlib
+    fixlines = {}
+    for l in open(os.path.join(HERE, "fixes")):
+        fixlines.setdefault(l.split("\t", 1)[0], []).append(l if l.endswith("\n") else l + "\n")
+    def fprint(b):
+        return hashlib.md5("".join(fixlines.get(b, [])).encode()).hexdigest()[:8]
     failed = {}
     if os.path.exists(os.path.join(work, "failed")):
         for l in open(os.path.join(work, "failed")):
             f = l.rstrip("\n").split("\t")
             if f[0]:
-                failed[f[0]] = f[2:3] == ["relaxed"]
+                m = f[2] if len(f) > 2 else ""
+                failed[f[0]] = m == "relaxed:" + fprint(f[0]) or (m == "relaxed" and not fixlines.get(f[0]))
     # A base that failed when built without part of its cycle cannot do
     # without it: it is pinned (it waits for all it needs, and the cycle is
     # broken at another base), and planned again
@@ -177,7 +189,16 @@ def main():
     import graphlib
     topo = [b for b in graphlib.TopologicalSorter(
         {b: [d for d in eff[b] if d in orderset] for b in order}).static_order() if b in orderset]
-    pending = [b for b in topo if b not in done and b not in failed]
+    # built without part of their cycle, which is there now: built again
+    again = set()
+    if os.path.exists(os.path.join(work, "partial")):
+        for l in open(os.path.join(work, "partial")):
+            f = l.rstrip("\n").split("\t")
+            if len(f) == 2 and f[0] in done and f[1] != "-" and all(d in done for d in f[1].split()):
+                again.add(f[0])
+            elif len(f) == 2:
+                again.discard(f[0])
+    pending = [b for b in topo if (b not in done or b in again) and b not in failed]
     ready = [b for b in pending if all(d in done for d in eff[b])]
     shard_of, lists = {}, [[] for _ in range(max(1, shards))]
     for b in pending:
@@ -189,7 +210,7 @@ def main():
     os.makedirs(out, exist_ok=True)
     for i, l in enumerate(lists):
         with open(os.path.join(out, f"shard-{i}"), "w") as f:
-            f.write("".join(b + ("\t" + " ".join(relax[b]) if b in relax else "") + "\n" for b in l))
+            f.write("".join(("+" if b in again else "") + b + ("\t" + " ".join(relax[b]) if b in relax else "") + "\n" for b in l))
     n = len(lists) if ready else 0
 
     # What holds the waiting bases back: their dependencies that cannot be
@@ -216,6 +237,7 @@ def main():
     print(f"cycles: {len(relax)} bases built without part of their cycle; pinned after failing so: "
           f"{len(pinned)}" + (f" ({' '.join(sorted(pinned))})" if pinned else ""), file=sys.stderr)
     print(json.dumps({"shard": list(range(n))}))
+    print(f"built again now that their cycle is: {len(again)}" + (f" ({' '.join(sorted(again))})" if again else ""), file=sys.stderr)
     print(f"done {len(done & orderset)}, failed {len(failed)}, ready now {len(ready)}, "
           f"planned {len(pending)} in {n} shards, of {len(order)}", file=sys.stderr)
 

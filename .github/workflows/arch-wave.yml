@@ -141,6 +141,7 @@ jobs:
           sudo cat /mnt/arch-work/done 2> /dev/null | grep -vxF -f "$RUNNER_TEMP/done.before" > "$RUNNER_TEMP/out/done" || true
           sudo cp /mnt/arch-work/failed "$RUNNER_TEMP/out/failed" 2> /dev/null || touch "$RUNNER_TEMP/out/failed"
           sudo cp /mnt/arch-work/made "$RUNNER_TEMP/out/made" 2> /dev/null || touch "$RUNNER_TEMP/out/made"
+          sudo cp /mnt/arch-work/partial "$RUNNER_TEMP/out/partial" 2> /dev/null || touch "$RUNNER_TEMP/out/partial"
           sudo cp -r /mnt/arch-work/logs/. "$RUNNER_TEMP/out/logs/" 2> /dev/null || true
           sudo chown -R "$(id -u)" "$RUNNER_TEMP/out"
           echo "new packages: $(ls "$RUNNER_TEMP/out/repo" | grep -c '\.yon$'), new done: $(grep -c . "$RUNNER_TEMP/out/done")"
@@ -188,6 +189,7 @@ jobs:
             cp -n "$d"/repo/* state/repo/ 2> /dev/null || true
             cat "$d/done" >> state/done 2> /dev/null || true
             cat "$d/made" >> state/made 2> /dev/null || true
+            cat "$d/partial" >> state/partial 2> /dev/null || true
             cat "$d/failed" >> failed.wave 2> /dev/null || true
             mkdir -p state/logs && cp -r "$d"/logs/. state/logs/ 2> /dev/null || true
           done
@@ -198,6 +200,7 @@ jobs:
             cat "long-$id/done" >> state/done 2> /dev/null || true
           done
           awk '!seen[$0]++' state/done > state/done.new && mv state/done.new state/done
+          [ ! -f state/partial ] || { tac state/partial | awk -F'\t' '!seen[$1]++' | tac > state/partial.new && mv state/partial.new state/partial; }
           [ ! -f state/made ] || { tac state/made | awk -F'\t' '!seen[$1]++' | tac > state/made.new && mv state/made.new state/made; }
           # a base built by one shard is no failure even if another tried it first
           grep -vF -f <(sed 's/$/\t/' state/done) failed.wave | tac | awk -F'\t' '!seen[$1]++' | tac > state/failed || true   # a base's latest failure
