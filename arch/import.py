@@ -258,7 +258,8 @@ def arch_srcpkg(info, sources_dir):
         _srcpkgs[key] = None
         d = os.path.join(sources_dir, "arch-src")
         os.makedirs(d, exist_ok=True)
-        for repo in ("extra", "core", "multilib"):
+        # sources/packages/ now; sources/<repository>/ before
+        for repo in ("packages", "extra", "core", "multilib"):
             for n in names:
                 try:
                     _srcpkgs[key] = download(SRCPKG.format(repo, n), os.path.join(d, n + ".src.tar.gz"))
