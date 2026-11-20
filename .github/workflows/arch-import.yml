@@ -1,0 +1,26 @@
+# arch/import.py on a runner, for some package bases: why a recipe cannot be
+# made (a source that moved, a checksum that changed...).
+name: arch-import
+
+on:
+  workflow_dispatch:
+    inputs:
+      bases:
+        description: "package bases (space separated)"
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  import:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Import
+        run: |
+          for b in ${{ inputs.bases }}; do
+            echo "== $b"
+            python3 arch/import.py --out "$RUNNER_TEMP/recipes" --cache "$RUNNER_TEMP/repos" --sources "$RUNNER_TEMP/src" "$b" 2>&1 | tail -n 5 || true
+            grep -h '^source = ' "$RUNNER_TEMP"/repos/"$b"/.SRCINFO 2> /dev/null | head -n 5 || true
+          done

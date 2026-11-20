@@ -450,8 +450,12 @@ def convert(pkgbase, cache, out, sources_dir, nmap, no_download=False):
                 err = ((e.stderr or "").strip().splitlines() or [str(e)])[-1]
             if err:
                 # what Arch built with: its source package (the sums still checked)
-                if not (from_srcpkg(info, sources_dir, fname, path + ".arch") and not wrong_sum(path + ".arch", sums, i)):
-                    raise SystemExit(f"{pkgbase}: {fname}: {err} (nor in Arch's source package)")
+                got = from_srcpkg(info, sources_dir, fname, path + ".arch")
+                why = (wrong_sum(path + ".arch", sums, i) if got else
+                       "not in it" if arch_srcpkg(info, sources_dir) else
+                       f"no {info['pkgver']}-{info['pkgrel']} on sources.archlinux.org")
+                if why:
+                    raise SystemExit(f"{pkgbase}: {fname}: {err} (nor in Arch's source package: {why})")
                 os.replace(path + ".arch", path)
             sha = checksum(path, "sha256")
         lines_src.append((f"{fname}::{url}" if name else url, sha))
