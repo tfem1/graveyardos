@@ -81,6 +81,8 @@ jobs:
             grep -n -B3 -A3 -E "${{ inputs.grep }}" logs/*.log | cut -c1-220 | head -n 150 || true
           fi
           for p in ${{ inputs.logs }}; do
+            echo "== $p: done=$(grep -cx "$p" work/done) failed=$(grep -c "^$p	" work/failed) packages: $(ls work/repo 2> /dev/null | grep "^$p-[0-9]" | grep -v sig | tr '\n' ' ')"
+            grep "^$p	" work/made work/partial 2> /dev/null || true
             echo "== log of $p"
             tail -n 40 "logs/$p.log" 2> /dev/null | cut -c1-220 || echo "(no log)"
           done

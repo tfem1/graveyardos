@@ -280,6 +280,25 @@ while read -r base relax; do
   if [ -n "$again" ]; then
     for name in "${names[@]}"; do sed -i 's/^release = \(.*\)$/release = \1.1/' "$work/recipes/$name/YONEBUILD"; done
   fi
+  # built before part of its cycle: what it needs to run and is not built yet
+  # leaves its depends (it could not be installed, nor what needs it); the
+  # complete package is made once that part is built ("partial", "+base")
+  early=; for d in $relax; do grep -qx "$d" "$work/done" || early="$early $d"; done
+  if [ -n "$early" ]; then
+    have=$(cat "$sys"/var/lib/yone/sync/*.index "$sys"/var/lib/yone/local/*/info 2> /dev/null \
+      | sed -n 's/^\(name\|provides\) = //p' | tr ' ' '\n' | sed 's/[<>=].*//' | grep . | sort -u)
+    for name in "${names[@]}"; do
+      y=$work/recipes/$name/YONEBUILD
+      line=$(sed -n 's/^depends = //p' "$y"); [ -n "$line" ] || continue
+      keep=; cut=
+      for d in $line; do
+        if grep -qxF "$d" <<< "$have" || printf '%s\n' "${names[@]}" | grep -qxF "$d"; then keep="$keep $d"; else cut="$cut $d"; fi
+      done
+      [ -n "$cut" ] || continue
+      echo "   $name: for now without$cut" >> "$lf"
+      if [ -n "$keep" ]; then sed -i "s/^depends = .*/depends =$keep/" "$y"; else sed -i '/^depends = /d' "$y"; fi
+    done
+  fi
   ok=1
   for name in "${names[@]}"; do
     build_dir "$work/recipes/$name" "$lf" || { ok=0; break; }
