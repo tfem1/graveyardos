@@ -15,7 +15,7 @@ on:
         description: "a pattern to look for in every log (with 3 lines around)"
         default: ""
       shard:
-        description: "arch-wave: read this shard's artifact instead (its new packages, failures and logs)"
+        description: "arch-wave: read this shard's artifact instead (its new packages, failures and logs); all: every shard's"
         default: ""
 
 permissions:
@@ -41,7 +41,22 @@ jobs:
           run-id: ${{ inputs.run }}
           github-token: ${{ github.token }}
       - uses: actions/download-artifact@v4
-        if: inputs.shard != ''
+        if: inputs.shard == 'all'
+        with:
+          pattern: shard-*
+          path: shards
+          run-id: ${{ inputs.run }}
+          github-token: ${{ github.token }}
+      - name: Every shard together
+        if: inputs.shard == 'all'
+        run: |
+          mkdir -p work/logs
+          for d in shards/*/; do
+            cat "$d/failed" >> work/failed 2> /dev/null || true
+            cp "$d"/logs/*.log work/logs/ 2> /dev/null || true
+          done
+      - uses: actions/download-artifact@v4
+        if: inputs.shard != '' && inputs.shard != 'all'
         with:
           name: shard-${{ inputs.shard }}
           path: work
