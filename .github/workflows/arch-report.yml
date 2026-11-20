@@ -76,6 +76,7 @@ jobs:
             | cut -c1-110 | sort | uniq -c | sort -rn | head -n 60
           echo "== every failure"
           cut -c1-220 work/failed
+          echo "== done: $(tr '\n' ' ' < work/done)"
           if [ -n "${{ inputs.grep }}" ]; then
             echo "== logs matching ${{ inputs.grep }}"
             grep -n -B3 -A3 -E "${{ inputs.grep }}" logs/*.log | cut -c1-220 | head -n 150 || true

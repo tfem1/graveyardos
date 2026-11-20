@@ -6,8 +6,8 @@ be installed yet, and left the base in done, so it was never built again
 
     python3 arch/repair-done.py WORK
 
-A base is in the repository when a package is named after it or starts with
-"<base>-" (split packages: hyphen-en). Bases a bootstrap replaces, the base
+A base is in the repository when every package it made (the work's made
+file) is, or, unknown, the package named after it. Bases a bootstrap replaces, the base
 system's names and GraveyardOS's extras are left alone.
 """
 import glob
@@ -94,7 +94,14 @@ def main():
     for b in done:
         if b not in order or b in keep:
             continue
-        if b in names or any(n.startswith(b + "-") for n in names) or made.get(b, set()) & names:
+        # every package it made, when known; else the one named after it (a
+        # prefix is not enough: brotli-testdata stayed when brotli was taken
+        # out); a base whose packages are named otherwise is built once more,
+        # which records them
+        if b in made:
+            if made[b] <= names:
+                continue
+        elif b in names:
             continue
         gone.append(b)
     if gone:
