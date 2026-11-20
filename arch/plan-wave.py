@@ -126,7 +126,7 @@ def main():
     # its previous packages. "relax" is what a base is built without.
     done = set(lines(os.path.join(work, "done"))) | base
     failed = {}
-    if "--retry-failed" not in sys.argv and os.path.exists(os.path.join(work, "failed")):
+    if os.path.exists(os.path.join(work, "failed")):
         for l in open(os.path.join(work, "failed")):
             f = l.rstrip("\n").split("\t")
             if f[0]:
@@ -137,6 +137,9 @@ def main():
     pinned = {b for b, relaxed in failed.items() if relaxed}
     for b in pinned:
         del failed[b]
+    # tried again (fixes pushed): every failure is planned, the pins hold
+    if "--retry-failed" in sys.argv:
+        failed = {}
 
     hard = {b: [d for d in ds if not SOFT.match(d)] for b, ds in needs.items()}
     relax = {}
