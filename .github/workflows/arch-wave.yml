@@ -180,6 +180,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           python3 arch/repair-done.py state
+          cp state/failed state/failed.before 2> /dev/null || touch state/failed.before
           # earlier failures stay failures (not tried again each wave), unless retried
           ${{ needs.plan.outputs.retry == 'true' && ': > failed.wave' || 'cp state/failed failed.wave' }}
           for d in shards/shard-*; do
@@ -226,6 +227,11 @@ jobs:
           new=0
           for d in shards/shard-*; do new=$((new + $(grep -c . "$d/done" 2> /dev/null || echo 0))); done
           echo "built in this wave: $new"
+          # bases newly pinned (failed without part of their cycle): the next
+          # plan breaks their cycles elsewhere, so the chain goes on
+          pins=$(cat shards/shard-*/failed 2> /dev/null | grep -P '\trelaxed$' | cut -f1 | sort -u | grep -vxF -f <(grep -P '\trelaxed$' state/failed.before 2> /dev/null | cut -f1) | grep -c . || true)
+          echo "newly pinned: $pins"
+          [ "$pins" = 0 ] || new=$((new + 1))
           # fixes pushed since this wave started: the next one tries its failures again
           latest=$(gh api "repos/$GITHUB_REPOSITORY/commits/$GITHUB_REF_NAME" -q .sha || echo "$GITHUB_SHA")
           if [ "$new" -gt 0 ] || [ "$latest" != "$GITHUB_SHA" ]; then

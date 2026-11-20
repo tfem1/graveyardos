@@ -214,7 +214,7 @@ def main():
     top = sorted(count.items(), key=lambda kv: -kv[1])[:25]
     print("held back by: " + ", ".join(f"{d} ({c})" for d, c in top), file=sys.stderr)
     print(f"cycles: {len(relax)} bases built without part of their cycle; pinned after failing so: "
-          f"{len(pinned)}" + (f" ({' '.join(sorted(pinned)[:15])})" if pinned else ""), file=sys.stderr)
+          f"{len(pinned)}" + (f" ({' '.join(sorted(pinned))})" if pinned else ""), file=sys.stderr)
     print(json.dumps({"shard": list(range(n))}))
     print(f"done {len(done & orderset)}, failed {len(failed)}, ready now {len(ready)}, "
           f"planned {len(pending)} in {n} shards, of {len(order)}", file=sys.stderr)
