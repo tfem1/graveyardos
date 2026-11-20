@@ -54,7 +54,13 @@ rm -rf "$sys/packages"; mkdir -p "$sys/packages/repo" "$sys/etc/yone/keys"
 install -m 600 "$work/archkey.key" "$sys/packages/key.key"
 cp "$work/archkey.pub.pem" "$sys/etc/yone/keys/arch-dev.pub.pem"
 mount --bind "$work/repo" "$sys/packages/repo"
-trap 'umount "$sys/packages/repo" 2> /dev/null || true; LFS=$sys bash "$REPO/lfs/build.sh" umount > /dev/null 2>&1 || true' EXIT
+# The network for what PKGBUILDs fetch in prepare(), as on Arch's build
+# machines: cargo fetch (Rust crates), go mod download... The host's name
+# server and certificate authorities (the base has none of its own).
+cp -L /etc/resolv.conf "$sys/etc/resolv.conf"
+mkdir -p "$sys/etc/ssl/graveyard-host-certs"
+mount --bind -o ro /etc/ssl/certs "$sys/etc/ssl/graveyard-host-certs"
+trap 'umount "$sys/packages/repo" "$sys/etc/ssl/graveyard-host-certs" 2> /dev/null || true; LFS=$sys bash "$REPO/lfs/build.sh" umount > /dev/null 2>&1 || true' EXIT
 cat > "$sys/etc/yone/yone.conf" << 'EOF'
 [options]
 siglevel = required
@@ -135,6 +141,9 @@ build_dir() { # recipe dir (host path), log
   local before
   before=$(ls "$work/repo")
   timeout --kill-after=1m "${ARCH_PACKAGE_TIMEOUT:-150m}" setsid --wait chroot "$sys" /usr/bin/env -i \
+    SSL_CERT_FILE=/etc/ssl/graveyard-host-certs/ca-certificates.crt \
+    CARGO_HTTP_CAINFO=/etc/ssl/graveyard-host-certs/ca-certificates.crt \
+    GIT_SSL_CAINFO=/etc/ssl/graveyard-host-certs/ca-certificates.crt \
     HOME=/root TERM=xterm LC_ALL=C.UTF-8 PATH=/usr/bin:/usr/sbin:/usr/local/bin MAKEFLAGS="-j$(nproc)" \
     ${ARCH_LONG:+YONE_RESUME=1} \
     /usr/local/bin/yone build "/packages/recipes/$name" --out /packages/repo --sign /packages/key.key \
