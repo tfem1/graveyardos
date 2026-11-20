@@ -18,3 +18,7 @@ autoconf-archive	0001_fix_AX_CXX_COMPILE_STDCXX.patch	101d898728047056ff8e69d58a
 # GitLab's archive of tag r0-52-25 (arch/mirrors), pagure's in the PKGBUILD;
 # the same tree, the tag the same commit (9b9e7e89) on GitLab and on GitHub
 libnewt	newt-r0-52-25.tar.gz	6984c9bd754be2fbcf896a0a8bd5b659cd231935a3cce7b8554bfc25ceac91e7
+# Its forge's archive made again: git archive --format=tar.gz of tag librttopo-1.1.0
+# from the official mirror gitlab.com/rttopo/rttopo gives these bytes exactly
+# (with gzip -n, the PKGBUILD's): the same tree
+librttopo	librttopo-1.1.0.tar.gz	60b49acb493c1ab545116fb0b0d223ee115166874902ad8165eb39e9fd98eaa9
