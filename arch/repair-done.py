@@ -82,11 +82,19 @@ def main():
     # name-version-release-arch.yon
     names = {re.sub(r"-[^-]+-[^-]+-[^-]+\.yon$", "", os.path.basename(f))
              for f in glob.glob(os.path.join(work, "repo", "*.yon"))}
+    # the packages each base made (build-wave.sh): java-common's, nerd-fonts'...
+    # are not named after it
+    made = {}
+    if os.path.exists(os.path.join(work, "made")):
+        for l in open(os.path.join(work, "made")):
+            f = l.rstrip("\n").split("\t")
+            if len(f) == 2:
+                made[f[0]] = set(f[1].split())
     gone = []
     for b in done:
         if b not in order or b in keep:
             continue
-        if b in names or any(n.startswith(b + "-") for n in names):
+        if b in names or any(n.startswith(b + "-") for n in names) or made.get(b, set()) & names:
             continue
         gone.append(b)
     if gone:

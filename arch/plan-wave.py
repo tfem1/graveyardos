@@ -13,6 +13,7 @@ builds make ready (build-wave.sh skips what still waits). Prints the matrix
 as JSON for GitHub Actions ({"shard": [0, 1, ...]}), a summary on stderr.
 """
 import json
+import re
 import os
 import sys
 
@@ -26,10 +27,85 @@ def lines(path):
         return []
 
 
+def sccs(nodes, needs):
+    """The strongly connected components of the needs graph among nodes
+    (Tarjan's algorithm, iterative)."""
+    nodes = list(nodes)
+    inside = set(nodes)
+    index, low, on, stack, out, counter = {}, {}, set(), [], [], [0]
+    for root in nodes:
+        if root in index:
+            continue
+        work = [(root, iter([d for d in needs.get(root, []) if d in inside]))]
+        index[root] = low[root] = counter[0]; counter[0] += 1
+        stack.append(root); on.add(root)
+        while work:
+            v, it = work[-1]
+            for w in it:
+                if w not in index:
+                    index[w] = low[w] = counter[0]; counter[0] += 1
+                    stack.append(w); on.add(w)
+                    work.append((w, iter([d for d in needs.get(w, []) if d in inside])))
+                    break
+                if w in on:
+                    low[v] = min(low[v], index[w])
+            else:
+                work.pop()
+                if work:
+                    low[work[-1][0]] = min(low[work[-1][0]], low[v])
+                if low[v] == index[v]:
+                    comp = []
+                    while True:
+                        w = stack.pop(); on.discard(w); comp.append(w)
+                        if w == v:
+                            break
+                    out.append(comp)
+    return out
+
+
+# Dependencies that close most cycles and that a build can do without for a
+# first round: documentation and test tools. A cycle is broken at them first.
+SOFT = re.compile(r"^(python-sphinx.*|sphinx.*|doxygen|graphviz|gi-docgen|gtk-doc|asciidoc|asciidoctor|xmlto|docbook-.*|"
+                  r"help2man|texlive-.*|texinfo|python-docutils|pandoc.*|ruby-ronn|python-myst-parser|python-breathe|"
+                  r"python-pytest.*|check|cmocka|gtest|catch2|doctest|valgrind|python-hypothesis|python-mock|"
+                  r"python-sphinx_rtd_theme|python-furo|python-recommonmark|mkdocs.*|python-mkdocs.*|ghostscript|"
+                  r"dblatex|w3m|lynx|man-db|groff|yelp-tools|itstool|python-babel|python-pygments)$")
+
+
+def els_order(comp, needs):
+    """Eades-Lin-Smyth: an order of a cycle's bases with few back edges
+    (a base after the bases it needs, as far as the cycle allows)."""
+    cs = set(comp)
+    deps = {b: {d for d in needs.get(b, []) if d in cs and d != b} for b in comp}
+    users = {b: set() for b in comp}
+    for b in comp:
+        for d in deps[b]:
+            users[d].add(b)
+    left = set(comp)
+    front, back = [], []
+    key = {b: i for i, b in enumerate(comp)}
+    while left:
+        moved = True
+        while moved:
+            moved = False
+            for b in sorted(left, key=key.get):
+                if not (deps[b] & left):          # needs nothing left: early
+                    front.append(b); left.discard(b); moved = True
+            for b in sorted(left, key=key.get):
+                if not (users[b] & left):         # nothing left needs it: late
+                    back.insert(0, b); left.discard(b); moved = True
+        if left:
+            b = max(sorted(left, key=key.get), key=lambda x: len(users[x] & left) - len(deps[x] & left))
+            front.append(b); left.discard(b)
+    return front + back
+
+
 def main():
     work, shards, out = sys.argv[1], int(sys.argv[2]), sys.argv[3]
     long = set(lines(os.path.join(HERE, "long")))
     order = [b for b in lines(os.path.join(HERE, "order")) if b not in long]
+    orderset = set(order)
+    extras = set(os.listdir(os.path.join(HERE, "extra")))
     base = {n for l in open(os.path.join(HERE, "base-names")) for n in l.split("#")[0].split()}
     needs = {}
     for l in open(os.path.join(HERE, "needs")):
@@ -40,37 +116,72 @@ def main():
         f = l.rstrip("\n").split("\t")
         if len(f) >= 2 and not l.startswith("#") and f[0] in needs:
             needs[f[0]] = [d for d in needs[f[0]] if d != f[1]]
-    # A dependency later in the order than the base is a back edge of a
-    # dependency cycle, which the order broke there: the base does not wait
-    # for it (built with what there is, as Arch builds a cycle on its
-    # previous packages)
-    idx = {b: i for i, b in enumerate(order)}
-    for b in needs:
-        if b in idx:
-            needs[b] = [d for d in needs[b] if not (d in idx and idx[d] > idx[b])]
+
+    # Dependency cycles, broken once: in each cycle (strongly connected
+    # component), a base does not wait for the cycle's documentation and test
+    # tools, nor for the bases after it in an order with few back edges
+    # (Eades-Lin-Smyth, on the other dependencies): as Arch builds a cycle on
+    # its previous packages. "relax" is what a base is built without.
+    hard = {b: [d for d in ds if not SOFT.match(d)] for b, ds in needs.items()}
+    relax = {}
+    for comp in sccs(order, needs):
+        if len(comp) < 2:
+            continue
+        cs = set(comp)
+        pos = {b: i for i, b in enumerate(els_order(sorted(comp, key=order.index), hard))}
+        for b in comp:
+            r = [d for d in needs.get(b, []) if d in cs and (SOFT.match(d) or pos[d] > pos[b])]
+            if r:
+                relax[b] = r
+    eff = {b: [d for d in needs.get(b, []) if d not in relax.get(b, ())] for b in order}
+
     done = set(lines(os.path.join(work, "done"))) | base
-    failed = set() if "--retry-failed" in sys.argv else set(lines(os.path.join(work, "failed")))
-    ready = [b for b in order if b not in done and b not in failed
-             and all(d in done for d in needs.get(b, []))]
-    blocked = [b for b in order if b not in done and b not in failed and b not in ready]
-    n = max(1, min(shards, len(ready)))
+    failed = {}
+    if "--retry-failed" not in sys.argv and os.path.exists(os.path.join(work, "failed")):
+        for l in open(os.path.join(work, "failed")):
+            f = l.rstrip("\n").split("\t")
+            if f[0]:
+                failed[f[0]] = f[2:3] == ["relaxed"]
+    # a base that failed while built without part of its cycle is tried again
+    # once that part is built
+    for b, relaxed in list(failed.items()):
+        if relaxed and all(d in done for d in relax.get(b, [])):
+            del failed[b]
+
+    # Shards: in an order where each base comes after what it waits for, a
+    # base joins the shard that builds its unbuilt dependencies when they are
+    # all in one, so a shard climbs a chain within one wave; otherwise the
+    # least loaded shard
+    import graphlib
+    topo = [b for b in graphlib.TopologicalSorter(
+        {b: [d for d in eff[b] if d in orderset] for b in order}).static_order() if b in orderset]
+    pending = [b for b in topo if b not in done and b not in failed]
+    ready = [b for b in pending if all(d in done for d in eff[b])]
+    shard_of, lists = {}, [[] for _ in range(max(1, shards))]
+    for b in pending:
+        homes = {shard_of[d] for d in eff[b] if d in shard_of}
+        k = homes.pop() if len(homes) == 1 else min(range(len(lists)), key=lambda i: len(lists[i]))
+        shard_of[b] = k
+        lists[k].append(b)
+    lists = [l for l in lists if l]
     os.makedirs(out, exist_ok=True)
-    for i in range(n):
+    for i, l in enumerate(lists):
         with open(os.path.join(out, f"shard-{i}"), "w") as f:
-            f.write("".join(b + "\n" for b in ready[i::n] + blocked[i::n]))
+            f.write("".join(b + ("\t" + " ".join(relax[b]) if b in relax else "") + "\n" for b in l))
+    n = len(lists) if ready else 0
+
     # What holds the waiting bases back: their dependencies that cannot be
     # built now (failed, set aside in arch/long, or named nowhere), by how
     # many waiting bases need them, directly or through others
-    # arch/extra recipes are built at the start of every shard (build-wave.sh)
-    orderset = set(order) | set(os.listdir(os.path.join(HERE, "extra")))
-    stuck = {b for b in failed} | long | {d for b in blocked for d in needs.get(b, [])
-                                          if d not in done and d not in orderset}
+    blocked = [b for b in pending if b not in ready]
+    stuck = set(failed) | long | {d for b in blocked for d in eff[b]
+                                  if d not in done and d not in orderset and d not in extras}
     count = {}
     for b in blocked:
         seen, todo = set(), [b]
         while todo:
             x = todo.pop()
-            for d in needs.get(x, []):
+            for d in eff.get(x, []):
                 if d in done or d in seen:
                     continue
                 seen.add(d)
@@ -80,9 +191,10 @@ def main():
             count[d] = count.get(d, 0) + 1
     top = sorted(count.items(), key=lambda kv: -kv[1])[:25]
     print("held back by: " + ", ".join(f"{d} ({c})" for d, c in top), file=sys.stderr)
-    print(json.dumps({"shard": list(range(n)) if ready else []}))
-    print(f"done {len(done & set(order))}, failed {len(failed)}, ready {len(ready)} in {n if ready else 0} shards, "
-          f"waiting for dependencies {len(blocked)}, of {len(order)}", file=sys.stderr)
+    print(f"cycles: {sum(1 for b in relax)} bases built without part of their cycle", file=sys.stderr)
+    print(json.dumps({"shard": list(range(n))}))
+    print(f"done {len(done & orderset)}, failed {len(failed)}, ready now {len(ready)}, "
+          f"planned {len(pending)} in {n} shards, of {len(order)}", file=sys.stderr)
 
 
 if __name__ == "__main__":

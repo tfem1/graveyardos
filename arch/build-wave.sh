@@ -187,14 +187,11 @@ for r in "$HERE"/bootstrap/git "$HERE"/bootstrap/python-pyproject-hooks "$HERE"/
 done
 
 # what a base needs built first, less what arch/drop leaves out of it
-# (and less its back edges: dependencies later in arch/order, cycles the order broke)
 needs() {
   awk -F'\t' -v b="$1" '
-    FILENAME ~ /order$/ { if ($0 !~ /^#/ && $1 != "") idx[$1] = FNR; next }
     FILENAME ~ /drop$/ { if ($0 !~ /^#/ && $1 == b) gone[$2] = 1; next }
-    $1 == b { n = split($2, d, " "); for (i = 1; i <= n; i++)
-      if (!(d[i] in gone) && !((d[i] in idx) && (b in idx) && idx[d[i]] > idx[b])) print d[i] }
-  ' "$HERE/order" "$HERE/drop" "$HERE/needs"
+    $1 == b { n = split($2, d, " "); for (i = 1; i <= n; i++) if (!(d[i] in gone)) print d[i] }
+  ' "$HERE/drop" "$HERE/needs"
 }
 
 # GraveyardOS's own recipes (arch/extra), built as soon as what their
@@ -224,7 +221,9 @@ build_extras() {
 
 n=0 okn=0 waiting=0
 build_extras
-while read -r base; do
+# A shard line may name, after the base, the dependencies of its cycle it is
+# built without (plan-wave.py breaks each dependency cycle at one base)
+while read -r base relax; do
   [ -n "$base" ] || continue
   if grep -qx "$base" "$work/done"; then continue; fi
   # a build of its own (arch-long), unless this is it
@@ -238,8 +237,10 @@ while read -r base; do
   # not a failure: a later pass, or another shard's, builds them)
   missing_need=
   for d in $(needs "$base"); do
+    case " $relax " in *" $d "*) continue ;; esac
     grep -qx "$d" "$work/done" || { missing_need=$d; break; }
   done
+  [ -z "$relax" ] || [ -n "$missing_need" ] || echo "   $base: built before $relax (a dependency cycle)"
   if [ -n "$missing_need" ]; then waiting=$((waiting + 1)); continue; fi
   # twelve tries and nothing built: something general is wrong, not a package
   if [ "$n" -ge 12 ] && [ "$okn" -eq 0 ]; then
@@ -262,9 +263,13 @@ while read -r base; do
   done
   if [ "$ok" = 1 ]; then
     echo "$base" >> "$work/done"; okn=$((okn + 1)); printf 'ok   %5ds\n' $((SECONDS - t0))
+    printf '%s\t%s\n' "$base" "${names[*]}" >> "$work/made"   # its packages' names (repair-done.py)
     build_extras
   else
-    printf '%s\t%s\n' "$base" "$(grep -v '^\s*$' "$lf" | tail -n 1 | cut -c1-200)" >> "$work/failed"
+    # "relaxed": it lacked part of its cycle, so plan-wave.py tries it again
+    # once that part is built
+    rx=; for d in $relax; do grep -qx "$d" "$work/done" || rx=relaxed; done
+    printf '%s\t%s%s\n' "$base" "$(grep -v '^\s*$' "$lf" | tail -n 1 | cut -c1-200 | tr '\t' ' ')" "${rx:+	$rx}" >> "$work/failed"
     printf 'FAIL %5ds\n' $((SECONDS - t0))
   fi
 done < "${ARCH_ONLY:-$HERE/order}"
