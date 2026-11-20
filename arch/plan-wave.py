@@ -155,6 +155,20 @@ def main():
             if r:
                 relax[b] = r
     eff = {b: [d for d in needs.get(b, []) if d not in relax.get(b, ())] for b in order}
+    # Last resort: a cycle left (its bases all pinned) is broken all the same,
+    # at its bases' later dependencies in the order with few back edges
+    while True:
+        rest = [c for c in sccs(order, eff) if len(c) > 1]
+        if not rest:
+            break
+        for comp in rest:
+            cs = set(comp)
+            pos = {b: i for i, b in enumerate(els_order(sorted(comp, key=order.index), eff))}
+            for b in comp:
+                late = [d for d in eff[b] if d in cs and pos[d] > pos[b]]
+                if late:
+                    relax[b] = relax.get(b, []) + late
+                    eff[b] = [d for d in eff[b] if d not in late]
 
     # Shards: in an order where each base comes after what it waits for, a
     # base joins the shard that builds its unbuilt dependencies when they are
