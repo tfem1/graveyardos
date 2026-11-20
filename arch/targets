@@ -6,7 +6,7 @@ hyprland hyprlock hypridle hyprsunset xdg-desktop-portal-hyprland quickshell kit
 grim slurp wf-recorder libnotify libpulse ffmpeg brightnessctl playerctl cava gamemode
 qt5ct qt6ct adw-gtk-theme papirus-icon-theme inter-font ttf-jetbrains-mono-nerd adwaita-cursors xdg-desktop-portal-gtk
 # KDE edition: Plasma on Wayland, the standard desktop
-@plasma dolphin ark kate spectacle gwenview okular
+@plasma dolphin ark kate spectacle gwenview okular konsole
 # both
 sddm fastfetch pipewire pipewire-pulse wireplumber networkmanager bluez bluez-utils power-profiles-daemon flatpak git curl
 # both: the installer's window, WebKitGTK until qt6-webengine is built (arch/long)

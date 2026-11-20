@@ -141,6 +141,22 @@ jobs:
           GRAVEYARD_DESKTOP=${{ inputs.edition }} GRAVEYARD_BOOT_CASES="uefi-disc bios-usb" \
             bash iso/boot-test.sh "$(ls "$RUNNER_TEMP"/iso/GraveyardOS-*.iso)" "$RUNNER_TEMP/boot"
 
+      # The same ISO from a stick prepared with the current Ventoy release,
+      # booted to the desktop with both firmwares (iso/ventoy-stick.sh)
+      - name: Boot it to the desktop from a Ventoy stick (BIOS and UEFI)
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          sudo apt-get install -y -qq exfatprogs > /dev/null
+          iso=$(ls "$RUNNER_TEMP"/iso/GraveyardOS-*.iso)
+          sudo GH_TOKEN="$GH_TOKEN" bash iso/ventoy-stick.sh "$iso" "$RUNNER_TEMP/ventoy.img"
+          sudo chown "$(id -u):$(id -g)" "$RUNNER_TEMP/ventoy.img"
+          echo "Ventoy $(cat "$RUNNER_TEMP/ventoy.img.ventoy-version")" >> "$GITHUB_STEP_SUMMARY"
+          GRAVEYARD_DESKTOP=${{ inputs.edition }} GRAVEYARD_VENTOY_IMG="$RUNNER_TEMP/ventoy.img" \
+            GRAVEYARD_BOOT_CASES="uefi-ventoy bios-ventoy" bash iso/boot-test.sh "$iso" "$RUNNER_TEMP/boot"
+          rm -f "$RUNNER_TEMP/ventoy.img"
+
       - uses: actions/upload-artifact@v4
         if: always()
         with:
