@@ -211,7 +211,9 @@ build_extras() {
   for r in "$HERE"/extra/*/; do
     [ -f "$r/YONEBUILD" ] || continue
     n=$(basename "$r")
-    grep -qx "$n" "$work/done" && continue
+    # built again when its version or release changes
+    mark="extra:$n@$(sed -n 's/^version = //p' "$r/YONEBUILD")-$(sed -n 's/^release = //p' "$r/YONEBUILD")"
+    grep -qx "$mark" "$work/done" && continue
     case $extras_tried in *" $n "*) continue ;; esac
     after=$(sed -n 's/^# after: //p' "$r/YONEBUILD")
     ready=1
@@ -220,7 +222,8 @@ build_extras() {
     extras_tried="$extras_tried$n "
     printf '   %-30s ' "$n (extra)"
     if build_dir "$r" "$work/logs/$n.log"; then
-      echo "$n" >> "$work/done"; okn=$((okn + 1)); echo ok
+      grep -qx "$n" "$work/done" || echo "$n" >> "$work/done"
+      echo "$mark" >> "$work/done"; okn=$((okn + 1)); echo ok
     else
       printf '%s\t%s\n' "$n" "$(grep -v '^\s*$' "$work/logs/$n.log" | tail -n 1 | cut -c1-200)" >> "$work/failed"
       echo FAIL

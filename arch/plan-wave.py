@@ -72,7 +72,7 @@ SOFT = re.compile(r"^(python-sphinx.*|sphinx.*|doxygen|graphviz|gi-docgen|gtk-do
                   r"dblatex|w3m|lynx|man-db|groff|yelp-tools|itstool|python-babel|python-pygments)$")
 
 
-def els_order(comp, needs):
+def els_order(comp, needs, pinned=frozenset()):
     """Eades-Lin-Smyth: an order of a cycle's bases with few back edges
     (a base after the bases it needs, as far as the cycle allows)."""
     cs = set(comp)
@@ -95,7 +95,9 @@ def els_order(comp, needs):
                 if not (users[b] & left):         # nothing left needs it: late
                     back.insert(0, b); left.discard(b); moved = True
         if left:
-            b = max(sorted(left, key=key.get), key=lambda x: len(users[x] & left) - len(deps[x] & left))
+            # a break point; a base that failed as one (pinned) is not chosen again
+            pool = (left - pinned) or left
+            b = max(sorted(pool, key=key.get), key=lambda x: len(users[x] & left) - len(deps[x] & left))
             front.append(b); left.discard(b)
     return front + back
 
@@ -122,19 +124,6 @@ def main():
     # tools, nor for the bases after it in an order with few back edges
     # (Eades-Lin-Smyth, on the other dependencies): as Arch builds a cycle on
     # its previous packages. "relax" is what a base is built without.
-    hard = {b: [d for d in ds if not SOFT.match(d)] for b, ds in needs.items()}
-    relax = {}
-    for comp in sccs(order, needs):
-        if len(comp) < 2:
-            continue
-        cs = set(comp)
-        pos = {b: i for i, b in enumerate(els_order(sorted(comp, key=order.index), hard))}
-        for b in comp:
-            r = [d for d in needs.get(b, []) if d in cs and (SOFT.match(d) or pos[d] > pos[b])]
-            if r:
-                relax[b] = r
-    eff = {b: [d for d in needs.get(b, []) if d not in relax.get(b, ())] for b in order}
-
     done = set(lines(os.path.join(work, "done"))) | base
     failed = {}
     if "--retry-failed" not in sys.argv and os.path.exists(os.path.join(work, "failed")):
@@ -142,11 +131,27 @@ def main():
             f = l.rstrip("\n").split("\t")
             if f[0]:
                 failed[f[0]] = f[2:3] == ["relaxed"]
-    # a base that failed while built without part of its cycle is tried again
-    # once that part is built
-    for b, relaxed in list(failed.items()):
-        if relaxed and all(d in done for d in relax.get(b, [])):
-            del failed[b]
+    # A base that failed when built without part of its cycle cannot do
+    # without it: it is pinned (it waits for all it needs, and the cycle is
+    # broken at another base), and planned again
+    pinned = {b for b, relaxed in failed.items() if relaxed}
+    for b in pinned:
+        del failed[b]
+
+    hard = {b: [d for d in ds if not SOFT.match(d)] for b, ds in needs.items()}
+    relax = {}
+    for comp in sccs(order, needs):
+        if len(comp) < 2:
+            continue
+        cs = set(comp)
+        pos = {b: i for i, b in enumerate(els_order(sorted(comp, key=order.index), hard, pinned))}
+        for b in comp:
+            if b in pinned:
+                continue
+            r = [d for d in needs.get(b, []) if d in cs and (SOFT.match(d) or pos[d] > pos[b])]
+            if r:
+                relax[b] = r
+    eff = {b: [d for d in needs.get(b, []) if d not in relax.get(b, ())] for b in order}
 
     # Shards: in an order where each base comes after what it waits for, a
     # base joins the shard that builds its unbuilt dependencies when they are
@@ -191,7 +196,8 @@ def main():
             count[d] = count.get(d, 0) + 1
     top = sorted(count.items(), key=lambda kv: -kv[1])[:25]
     print("held back by: " + ", ".join(f"{d} ({c})" for d, c in top), file=sys.stderr)
-    print(f"cycles: {sum(1 for b in relax)} bases built without part of their cycle", file=sys.stderr)
+    print(f"cycles: {len(relax)} bases built without part of their cycle; pinned after failing so: "
+          f"{len(pinned)}" + (f" ({' '.join(sorted(pinned)[:15])})" if pinned else ""), file=sys.stderr)
     print(json.dumps({"shard": list(range(n))}))
     print(f"done {len(done & orderset)}, failed {len(failed)}, ready now {len(ready)}, "
           f"planned {len(pending)} in {n} shards, of {len(order)}", file=sys.stderr)
