@@ -127,6 +127,7 @@ def main():
     done = set(lines(os.path.join(work, "done"))) | base
     # A base done (built, or replaced by a bootstrap: cmake, git) waits for
     # nothing more: what it needs closes no cycle
+    full_needs = needs
     needs = {b: ([] if b in done else ds) for b, ds in needs.items()}
     # a pin holds while the base's arch/fixes lines stay as they were when it
     # failed (build-wave.sh's fixes_print): a new fix lifts it
@@ -204,6 +205,12 @@ def main():
         f = l.rstrip("\n").split("\t")
         if len(f) >= 2 and not l.startswith("#") and f[0] in done and f"rebuilt:{f[0]}@{f[1]}" not in done:
             again.add(f[0])
+    # what a base built again lacks still (arch/rebuild: dconf for glib2) is
+    # named as its cycle's, so build-wave.sh builds it without, as the first time
+    for b in again:
+        late = [d for d in full_needs.get(b, []) if d not in done]
+        if late:
+            relax[b] = sorted(set(relax.get(b, [])) | set(late))
     pending = [b for b in topo if (b not in done or b in again) and b not in failed]
     ready = [b for b in pending if all(d in done for d in eff[b])]
     shard_of, lists = {}, [[] for _ in range(max(1, shards))]

@@ -259,6 +259,11 @@ while read -r base relax; do
   for d in $(needs "$base"); do
     case " $relax " in *" $d "*) continue ;; esac
     grep -qx "$d" "$work/done" || { missing_need=$d; break; }
+    # nor before an arch/rebuild of what it needs (glib2's introspection data)
+    for t in $(grep -v '^#' "$HERE/rebuild" | awk -F'\t' -v b="$d" '$1 == b {print $2}'); do
+      grep -qx "rebuilt:$d@$t" "$work/done" || missing_need="$d (built again)"
+    done
+    [ -z "$missing_need" ] || break
   done
   [ -z "$relax" ] || [ -n "$missing_need" ] || echo "   $base: built before $relax (a dependency cycle)"
   if [ -n "$missing_need" ]; then waiting=$((waiting + 1)); continue; fi

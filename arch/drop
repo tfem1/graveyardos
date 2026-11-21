@@ -290,3 +290,11 @@ libsasl	mariadb-libs	nothing: only the sql plugin uses it, which package() remov
 libsasl	mariadb	nothing: the same (mariadb-libs' base)
 libsasl	postgresql-libs	nothing: only the sql plugin uses it, which package() removes (cyrus-sasl's)
 libsasl	postgresql	nothing: the same (postgresql-libs' base)
+fontconfig	docbook-utils	its HTML manual (docbook2html); the manual pages need the same tools (meson auto)
+fontconfig	docbook-sgml	its HTML manual (docbook-utils')
+fontconfig	perl-sgmls	its HTML manual (docbook-utils')
+curl	gnutls	libcurl-gnutls, the libcurl linked with GnuTLS (curl and libcurl-compat use OpenSSL)
+curl	libcurl-gnutls	libcurl linked with GnuTLS: gnutls needs tpm2-tss, which needs curl
+libngtcp2	gnutls	the GnuTLS crypto helper (libngtcp2_crypto_gnutls), libcurl-gnutls' only; the OpenSSL one is built
+gnutls	tpm2-tss	TPM 2.0 keys (tpm2-tss needs curl, which needs gnutls through libngtcp2)
+iptables	iptables-legacy	the legacy (x_tables) iptables: it holds the same files as iptables (nft), which Yone installs first, so its install conflicts
