@@ -1452,7 +1452,8 @@ perl-dbd-mariadb	mariadb perl-dbi perl-devel-checklib
 mariadb	boost cmake cracklib curl git jemalloc judy krb5 liburing libxml2 pam pcre2 perl-dbd-mariadb perl-term-readkey
 libsasl	git krb5 mariadb openldap postgresql sqlite
 openldap	chrpath libsasl libsodium unixodbc util-linux
-krb5	keyutils lmdb openldap
+libverto	libevent
+krb5	keyutils libverto lmdb openldap
 libtirpc	krb5
 libnsl	libtirpc
 libuv	git libnsl python-sphinx python-sphinx-copybutton
@@ -1587,7 +1588,8 @@ convertlit	libtommath
 ebook-tools	cmake convertlit libxml2 libzip
 exiv2	brotli cmake curl git gtest libinih
 kdegraphics-mobipocket	extra-cmake-modules qt6-base
-squashfuse	git
+fuse2	fuse3
+squashfuse	fuse2 git
 xdg-utils-cxx	cmake git
 libappimage	boost cairo cmake desktop-file-utils git glib2 libarchive librsvg squashfuse wget xdg-utils-cxx
 kfilemetadata	catdoc doxygen ebook-tools exiv2 extra-cmake-modules ffmpeg karchive kcodecs kconfig kcoreaddons kdegraphics-mobipocket ki18n libappimage poppler qt6-base qt6-tools taglib

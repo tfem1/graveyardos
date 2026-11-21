@@ -1452,6 +1452,7 @@ perl-dbd-mariadb
 mariadb
 libsasl
 openldap
+libverto
 krb5
 libtirpc
 libnsl
@@ -1587,6 +1588,7 @@ convertlit
 ebook-tools
 exiv2
 kdegraphics-mobipocket
+fuse2
 squashfuse
 xdg-utils-cxx
 libappimage

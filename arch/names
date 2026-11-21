@@ -163,3 +163,37 @@ vim-minimal vim
 vim-plugin-runtime vim
 vlock kbd
 xxd vim
+# Virtual names (Arch's provides, which recipes do not carry): the package
+# that provides them in Arch, by default its first or the desktop's choice
+atk at-spi2-core
+cargo rust
+emoji-font  # noto-fonts-emoji is not built yet: Plasma's emoji without a colour font
+fuse fuse2
+haskell-ghc ghc
+intel-tbb onetbb
+tbb onetbb
+jack jack2
+java-environment jdk-openjdk
+java-runtime jre-openjdk
+java-runtime-headless jre-openjdk-headless
+kdsoap-qt6 kdsoap
+libegl libglvnd
+libgl libglvnd
+libgles libglvnd
+libverto-module-base libverto
+onevpl libvpl
+opencl-icd-loader ocl-icd
+opengl-driver mesa
+org.freedesktop.secrets kwallet
+phonon-qt6-backend  # no Phonon back end yet (phonon-vlc needs VLC): KDE's sounds go through Qt Multimedia and Canberra
+qt6-multimedia-backend qt6-multimedia-ffmpeg
+ruby-cgi ruby
+ruby-net-protocol ruby
+ruby-psych ruby
+ruby-reline ruby
+ruby-resolv ruby
+ruby-ruby2_keywords ruby
+ruby-rubygems rubygems
+sdl2 sdl2-compat
+tessdata tesseract-data-eng
+ttf-font noto-fonts
