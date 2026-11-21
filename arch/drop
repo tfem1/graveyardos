@@ -169,3 +169,118 @@ fftw	fftw-openmpi	the MPI libraries (OpenMPI)
 lv2	python-pylint	nothing: pylint only runs in the strict-mode tests
 colord	sane	the SANE sensor plugin and helper (colord-sane)
 colord	colord-sane	the SANE sensor plugin and helper (SANE)
+# rust: only the x86_64-unknown-linux-gnu host toolchain (and rust-src, rustc-dev); arch/fixes trims the targets
+rust	rust-musl	the musl target (x86_64-unknown-linux-musl)
+rust	rust-wasm	the WebAssembly targets (wasm32-unknown-unknown, wasm32v1-none, wasm32-wasip1, -wasip1-threads, -wasip2)
+rust	lib32-rust-libs	the i686 target
+rust	rust-aarch64-gnu	the AArch64 GNU cross target
+rust	rust-aarch64-musl	the AArch64 musl cross target
+rust	musl	nothing more: it was there for the musl target (and brings the AArch64 and RISC-V cross compilers)
+rust	wasi-libc	nothing more: it was there for the WASI targets
+rust	wasm-component-ld	nothing more: it was there for the wasm32-wasip2 target
+rust	aarch64-linux-gnu-gcc	nothing more: it was there for the AArch64 cross targets
+rust	aarch64-linux-gnu-glibc	nothing more: it was there for the AArch64 GNU cross target
+rust	libgit2	nothing: cargo is built with libgit2-sys's bundled libgit2 1.9 (and its bundled llhttp)
+libgit2	llhttp	nothing: libgit2's bundled llhttp is used (USE_HTTP_PARSER=builtin); llhttp's own build runs npm
+# llvm: without the WASI runtimes (Firefox's wasm sandbox); they and rust need llvm
+llvm	wasi-compiler-rt	the compiler runtime for WASI (wasm32-wasip1)
+llvm	wasi-libc++	libc++ for WASI
+llvm	wasi-libc++abi	libc++abi for WASI
+llvm	wasi-libc	nothing more: it was there for the WASI runtimes
+llvm	wasm-component-ld	nothing more: it was there for the WASI runtimes
+fmt	fmt-docs	its HTML documentation (mkdocs)
+fmt	mkdocs	nothing more: it was there for fmt-docs
+fmt	mkdocs-material	nothing more: it was there for fmt-docs
+fmt	mkdocstrings	nothing more: it was there for fmt-docs
+fmt	python-pymdown-extensions	nothing more: it was there for fmt-docs
+fmt	python-regex	nothing more: it was there for fmt-docs
+fmt	npm	nothing more: it was there for fmt-docs
+fmt	doxygen	nothing more: it was there for fmt-docs
+orc	orc-docs	its API reference (hotdoc)
+orc	hotdoc	nothing more: it was there for orc-docs (meson auto feature)
+pam	fop	the PDF manuals (the HTML and text ones and the manual pages stay)
+xmlstarlet	fop	the PDF user guide (the HTML one and the manual page stay)
+xmlstarlet	ghostscript	the PostScript user guide (made from the PDF one)
+gnupg	fig2dev	nothing: two figures of the manual's PDF/HTML form (built, not installed; placeholders, arch/fixes)
+gnupg	imagemagick	nothing: the same (gnupg-module-overview.svg to PNG and PDF)
+gnupg	librsvg	nothing: the same (ImageMagick's SVG reader)
+ragel	fig2dev	the HTML and PDF Ragel guide (--disable-manual; the manual page stays)
+ragel	asciidoc	the HTML and PDF Ragel guide
+ragel	dblatex	the HTML and PDF Ragel guide
+ragel	texlive-bin	the HTML and PDF Ragel guide
+ragel	python-pygments	the HTML and PDF Ragel guide
+openssh	linux-headers	nothing: the seccomp sandbox's linux/*.h come from linux-api-headers
+openssh	linux	nothing: the same (linux-headers' base)
+lm_sensors	rrdtool	sensord, the logging daemon (sensors, libsensors and sensors-detect stay)
+iio-sensor-proxy	libssc	Qualcomm Snapdragon Sensor Core sensors (phones)
+audit	apparmor	nothing: --with-apparmor only names the AppArmor event types, it does not link libapparmor
+qt6-base	renderdoc	QGraphicsFrameCapture with RenderDoc (frame capture for debugging; header check)
+qt6-base	xmlstarlet	nothing: it compresses the built-in MIME database, which is off (FEATURE_mimetype_database=OFF)
+kio-extras	samba	the smb:// worker (Windows shares)
+kio-extras	smbclient	the smb:// worker (samba's)
+kio-extras	kdsoap-ws-discovery-client	nothing more: only the smb:// worker uses it (WS-Discovery of shares)
+kio-extras	kdsoap	nothing more: only the smb:// worker uses it (kdsoap-qt6, named kdsoap here)
+kio-extras	ripgrep-all	Dolphin's content search through rga (it falls back to rg if installed, else its own search)
+libsoup3	samba	NTLM single sign-on through Samba's ntlm_auth (NTLM with a typed password stays)
+libsoup3	python-quart	nothing: the HTTP/2 test server (tests are not run)
+qt6-speech	speech-dispatcher	the Speech Dispatcher text-to-speech backend (the Flite one stays)
+appstream	libvips	appstream-compose, the metadata generator for repositories (-Dcompose=false)
+appstream	libblake3	appstream-compose (b3sum's)
+appstream	b3sum	appstream-compose (libblake3's base)
+extra-cmake-modules	python-requests	nothing: only its Android fastlane script uses it at run time
+# KDE Frameworks' Python bindings (BUILD_PYTHON_BINDINGS, arch/fixes turns it off)
+kcoreaddons	pyside6	the Python bindings (PySide6)
+kcoreaddons	shiboken6-generator	the Python bindings (pyside6's)
+kguiaddons	pyside6	the Python bindings (PySide6)
+kguiaddons	shiboken6-generator	the Python bindings (pyside6's)
+kjobwidgets	pyside6	the Python bindings (PySide6)
+kjobwidgets	shiboken6-generator	the Python bindings (pyside6's)
+knotifications	pyside6	the Python bindings (PySide6)
+knotifications	shiboken6-generator	the Python bindings (pyside6's)
+kstatusnotifieritem	pyside6	the Python bindings (PySide6)
+kstatusnotifieritem	shiboken6-generator	the Python bindings (pyside6's)
+kunitconversion	pyside6	the Python bindings (PySide6)
+kunitconversion	shiboken6-generator	the Python bindings (pyside6's)
+kwidgetsaddons	pyside6	the Python bindings (PySide6)
+kwidgetsaddons	shiboken6-generator	the Python bindings (pyside6's)
+kxmlgui	pyside6	the Python bindings (PySide6)
+kxmlgui	shiboken6-generator	the Python bindings (pyside6's)
+# qt6-base 6.12 has no GStreamer, ALSA or PulseAudio code (Qt 5's multimedia), and no TDS SQL driver
+qt6-base	gst-plugins-base-libs	nothing: no part of qtbase 6.12 uses GStreamer (qt6-multimedia has its own)
+qt6-base	gstreamer	nothing: the same (gst-plugins-base-libs' base)
+qt6-base	libpulse	nothing: no part of qtbase 6.12 uses PulseAudio
+qt6-base	pulseaudio	nothing: the same (libpulse's base)
+qt6-base	alsa-lib	nothing: no part of qtbase 6.12 uses ALSA
+pygobject	python-gobject-docs	its HTML developer documentation (Sphinx)
+pygobject	python-sphinx	nothing more: it was there for python-gobject-docs
+pygobject	python-pydata-sphinx-theme	nothing more: it was there for python-gobject-docs
+pygobject	python-sphinx-copybutton	nothing more: it was there for python-gobject-docs
+python-charset-normalizer	mypy	nothing: 3.5.1 has no mypyc build (CHARSET_NORMALIZER_USE_MYPYC is ignored; its optional extension is Cython's)
+# xdg-desktop-portal without its test suite (arch/fixes: -D tests=disabled) and HTML documentation
+xdg-desktop-portal	umockdev	nothing: the test suite
+xdg-desktop-portal	python-pytest	nothing: the test suite
+xdg-desktop-portal	python-dbusmock	nothing: the test suite
+xdg-desktop-portal	python-dbus	nothing: the test suite
+xdg-desktop-portal	dbus-python	nothing: the test suite (python-dbus's base)
+xdg-desktop-portal	python-gobject	nothing: the test suite
+xdg-desktop-portal	pygobject	nothing: the test suite (python-gobject's base)
+xdg-desktop-portal	gst-plugins-good	nothing: the test suite (its wavparse)
+xdg-desktop-portal	libportal	nothing: the test suite
+xdg-desktop-portal	gamemode	nothing: the test suite (the GameMode portal talks to it over D-Bus)
+xdg-desktop-portal	rtkit	nothing: the test suite (the Realtime portal talks to it over D-Bus)
+xdg-desktop-portal	python-sphinx	the HTML documentation (meson auto feature)
+xdg-desktop-portal	python-sphinx-copybutton	the HTML documentation
+xdg-desktop-portal	python-sphinx-furo	the HTML documentation
+xdg-desktop-portal	python-sphinxext-opengraph	the HTML documentation
+# documentation-only and optional makedepends inside the qt6-base cycle (arch/plan-wave.py relaxes it)
+nasm	fontconfig	its HTML and PDF manual (make doc; the manual pages ship prebuilt)
+nasm	ttf-roboto	its HTML and PDF manual
+nasm	ttf-roboto-mono	its HTML and PDF manual
+nasm	ghostscript	its HTML and PDF manual
+nasm	perl-font-ttf	its HTML and PDF manual
+nasm	perl-sort-versions	its HTML and PDF manual
+nasm	asciidoc	nothing: the manual pages ship prebuilt (make all does not remake them)
+nasm	xmlto	nothing: the same
+libpcap	bluez-libs	Bluetooth sniffing (capturing HCI traffic, as Wireshark does)
+libpcap	bluez	Bluetooth sniffing (bluez-libs' base)
+bluez	cups	nothing: the CUPS backend (bluez-cups) does not link libcups; configure asks cups only for its directory, /usr/lib/cups/backend, also the default (bluez-cups then lacks its cups dependency)
