@@ -181,7 +181,7 @@ if ! grep -qx "graveyard-base-provides@$bp_sum" "$work/done"; then
 fi
 
 # Tools Arch builds with themselves, from arch/bootstrap first.
-for r in "$HERE"/bootstrap/git "$HERE"/bootstrap/python-pyproject-hooks "$HERE"/bootstrap/python-installer "$HERE"/bootstrap/python-build "$HERE"/bootstrap/cmake "$HERE"/bootstrap/rust "$HERE"/bootstrap/go "$HERE"/bootstrap/gengetopt; do
+for r in "$HERE"/bootstrap/git "$HERE"/bootstrap/python-pyproject-hooks "$HERE"/bootstrap/python-installer "$HERE"/bootstrap/python-build "$HERE"/bootstrap/cmake "$HERE"/bootstrap/rust "$HERE"/bootstrap/go "$HERE"/bootstrap/gengetopt "$HERE"/bootstrap/vala; do
   b=$(basename "$r")
   grep -qx "$b" "$work/done" && continue
   grep -qx "bootstrap:$b" "$work/done" && continue

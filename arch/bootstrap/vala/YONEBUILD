@@ -1,0 +1,23 @@
+# Arch's vala is built from Git, whose tree has the compiler only in Vala:
+# its configure stops without a valac (Arch's makedepends name vala). This
+# is the GNOME release before Arch's (its C files generated), installed as
+# "vala" at a lower version so that the one built from source replaces it
+# as an upgrade. No "# replaces:" line; no valadoc (graphviz, built minimal).
+name = vala
+version = 0.56.18
+release = 0
+desc = Compiler for the GObject type system (bootstrap)
+url = https://wiki.gnome.org/Projects/Vala
+license = LGPL-2.1-or-later
+depends = glib2
+source = https://download.gnome.org/sources/vala/0.56/vala-0.56.18.tar.xz
+sha256 = TODO
+
+@build
+cd vala-0.56.18
+./configure --prefix=/usr --disable-valadoc
+make
+
+@package
+cd vala-0.56.18
+make DESTDIR="$PKGDIR" install

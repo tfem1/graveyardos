@@ -98,3 +98,5 @@ curl	eval "$(declare -f build | sed '/build-curl-gnutls;$/,/libcurl-gnutls\.so\.
 libngtcp2	eval "$(declare -f build | sed 's/--with-gnutls/--without-gnutls/')"  # no GnuTLS crypto helper (arch/drop); the OpenSSL one is found by configure
 gnutls	eval "$(declare -f build | sed 's/--with-tpm2/--without-tpm2/')"  # no TPM 2.0 (tpm2-tss: arch/drop), which closed the curl, gnutls, tpm2-tss cycle
 libsasl	eval "$(declare -f build | sed 's/--enable-sql/--disable-sql/; s| --with-mysql=/usr||; s| --with-pgsql=/usr/lib||')"  # no sql plugin (MariaDB, PostgreSQL: arch/drop), which package() removes anyway: configure links it to libmysqlclient and libpq when told
+ffmpeg	eval "$(declare -f build | sed 's/ --enable-vapoursynth / /')"  # no VapourSynth input (arch/drop): configure stops on an --enable-* whose library is missing
+pulseaudio	eval "$(declare -f package_pulseaudio | sed '/_pick lirc /d')"  # no module-lirc to split off (pulseaudio-lirc, lirc: arch/drop; meson auto feature)

@@ -430,6 +430,13 @@ def convert(pkgbase, cache, out, sources_dir, nmap, no_download=False):
     lines_src, local, gitdirs = [], [], []
     for i, s in enumerate(srcs):
         name, _, url = s.rpartition("::") if "::" in s else ("", "", s)
+        # a Mercurial or Subversion repository that a Git mirror holds
+        # (arch/mirrors: nss, hg.mozilla.org's, is on GitHub with its tags)
+        for p, alt in mirrors():
+            if re.match(r"^(svn|hg|bzr)\+", url) and url.startswith(p) and alt.startswith("git+"):
+                url = alt + url[len(p):]
+                s = f"{name}::{url}" if name else url
+                srcs[i] = s
         if re.match(r"^(svn|hg|bzr)(\+|://)", url):
             return f"skipped: VCS source {url}"
         if re.match(r"^git(\+|://)", url):

@@ -17,3 +17,7 @@ gives it one, and the go built from source replaces it.
 gengetopt is the same for gengetopt: Arch's is built from Git, which has
 not the option parser gengetopt generates for itself (makedepends
 gengetopt); the GNU release before Arch's version has it generated.
+
+vala is the same for Vala: Arch's is built from Git, whose compiler is
+written in Vala; the GNOME release before Arch's version has its C files
+generated.

@@ -298,3 +298,6 @@ curl	libcurl-gnutls	libcurl linked with GnuTLS: gnutls needs tpm2-tss, which nee
 libngtcp2	gnutls	the GnuTLS crypto helper (libngtcp2_crypto_gnutls), libcurl-gnutls' only; the OpenSSL one is built
 gnutls	tpm2-tss	TPM 2.0 keys (tpm2-tss needs curl, which needs gnutls through libngtcp2)
 iptables	iptables-legacy	the legacy (x_tables) iptables: it holds the same files as iptables (nft), which Yone installs first, so its install conflicts
+ffmpeg	vapoursynth	reading VapourSynth scripts (.vpy) as input (vapoursynth's Python build fetches glslang from GitHub)
+pulseaudio	lirc	infrared remote control (module-lirc, pulseaudio-lirc)
+pulseaudio	pulseaudio-lirc	infrared remote control (lirc needs libftdi, whose Python binding does not build)
