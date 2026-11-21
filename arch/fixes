@@ -100,3 +100,4 @@ gnutls	eval "$(declare -f build | sed 's/--with-tpm2/--without-tpm2/')"  # no TP
 libsasl	eval "$(declare -f build | sed 's/--enable-sql/--disable-sql/; s| --with-mysql=/usr||; s| --with-pgsql=/usr/lib||')"  # no sql plugin (MariaDB, PostgreSQL: arch/drop), which package() removes anyway: configure links it to libmysqlclient and libpq when told
 ffmpeg	eval "$(declare -f build | sed 's/ --enable-vapoursynth / /')"  # no VapourSynth input (arch/drop): configure stops on an --enable-* whose library is missing
 pulseaudio	eval "$(declare -f package_pulseaudio | sed '/_pick lirc /d')"  # no module-lirc to split off (pulseaudio-lirc, lirc: arch/drop; meson auto feature)
+gstreamer	eval "$(declare -f package_gst-plugins-bad | sed 's# usr/lib/gstreamer-1.0/libgstrtmp\.so##')"  # no librtmp plugin to install (rtmpdump: arch/drop; gst-plugins-bad:rtmp is an auto feature)

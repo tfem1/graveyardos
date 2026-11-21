@@ -9,3 +9,5 @@ libpipeline make patch tar texinfo vim markupsafe jinja2 systemd dbus man-db pro
 dosfstools
 # names Arch gives to parts of those: libtool's libltdl, util-linux's libraries
 libltdl util-linux-libs
+# the other Arch names of arch/base-names (systemd-libs's libsystemd, libudev, sh...): a package that depends on them installs too
+awk gcc-libs libgcc libmpc libstdc++ libsystemd libudev linux-api-headers procps-ng python-flit-core python-jinja python-markupsafe python-packaging python-setuptools python-wheel sh systemd-libs tzdata

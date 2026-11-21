@@ -15,3 +15,6 @@ https://cgit.git.savannah.gnu.org/cgit/autoconf-archive.git/patch/?id=241f7ae5f8
 hg+https://hg.mozilla.org/projects/nss	git+https://github.com/nss-dev/nss
 # without www. too (docbook5-xml's)
 https://docbook.org/	https://archive.docbook.org/
+# Savannah's Git times out from the runners: gnulib (wget's source and
+# submodule) is mirrored on GitHub
+https://git.savannah.gnu.org/git/gnulib.git	https://github.com/coreutils/gnulib.git

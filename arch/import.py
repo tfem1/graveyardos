@@ -407,7 +407,10 @@ def git_snapshot(src, dirname, sources_dir, info=None):
     # PKGBUILD's "git submodule update" in the build system (no network)
     # then finds them in place
     if os.path.exists(os.path.join(co, ".gitmodules")):
-        run(["git", "-C", co, "submodule", "update", "--init", "--recursive", "-q"])
+        # through arch/mirrors' Git mirrors (gnulib's), as the repository itself
+        alt = [a for p, m in mirrors() if not m.startswith("git+") and p.endswith(".git")
+               for a in ("-c", f"url.{m}.insteadOf={p}")]
+        run(["git", "-C", co, *alt, "submodule", "update", "--init", "--recursive", "-q"])
     run(["tar", "-C", work, "--sort=name", "--owner=0", "--group=0", "--numeric-owner",
          "-czf", out + ".part", dirname])
     os.replace(out + ".part", out)

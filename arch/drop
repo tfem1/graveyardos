@@ -301,3 +301,4 @@ iptables	iptables-legacy	the legacy (x_tables) iptables: it holds the same files
 ffmpeg	vapoursynth	reading VapourSynth scripts (.vpy) as input (vapoursynth's Python build fetches glslang from GitHub)
 pulseaudio	lirc	infrared remote control (module-lirc, pulseaudio-lirc)
 pulseaudio	pulseaudio-lirc	infrared remote control (lirc needs libftdi, whose Python binding does not build)
+gstreamer	rtmpdump	the RTMP source and sink of librtmp (rtmpsrc; the native rtmp2 plugin stays): rtmpdump's Git tag is not on git.ffmpeg.org

@@ -197,3 +197,4 @@ ruby-rubygems rubygems
 sdl2 sdl2-compat
 tessdata tesseract-data-eng
 ttf-font noto-fonts
+perl-xml-parser perl
