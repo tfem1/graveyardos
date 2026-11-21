@@ -198,6 +198,12 @@ def main():
                 again.add(f[0])
             elif len(f) == 2:
                 again.discard(f[0])
+    # arch/rebuild: a base built before a fix that changes what it makes
+    # (base<TAB>number<TAB>why), built again once per number
+    for l in open(os.path.join(HERE, "rebuild")):
+        f = l.rstrip("\n").split("\t")
+        if len(f) >= 2 and not l.startswith("#") and f[0] in done and f"rebuilt:{f[0]}@{f[1]}" not in done:
+            again.add(f[0])
     pending = [b for b in topo if (b not in done or b in again) and b not in failed]
     ready = [b for b in pending if all(d in done for d in eff[b])]
     shard_of, lists = {}, [[] for _ in range(max(1, shards))]

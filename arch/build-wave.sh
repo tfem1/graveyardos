@@ -277,8 +277,15 @@ while read -r base relax; do
   fi
   echo "$out" > "$lf"
   mapfile -t names < <(echo "$out" | sed -n 's/^[^ ]* *ok: //p' | tr ' ' '\n' | grep .)
+  # arch/rebuild: built again once per number, which suffixes its release
+  # (newer than the earlier build, and than a ".1" rebuild of its cycle)
+  rebuilt=$(grep -v '^#' "$HERE/rebuild" | awk -F'\t' -v b="$base" '$1 == b {print $2}' | while read -r t; do
+    grep -qx "rebuilt:$base@$t" "$work/done" || echo "$t"; done | tail -n 1)
   if [ -n "$again" ]; then
-    for name in "${names[@]}"; do sed -i 's/^release = \(.*\)$/release = \1.1/' "$work/recipes/$name/YONEBUILD"; done
+    # otherwise (its cycle complete) one more than its last rebuild's number
+    last=$(sed -n "s/^rebuilt:$(printf '%s' "$base" | sed 's/[][\\.*^$/]/\\&/g')@//p" "$work/done" | sort -n | tail -n 1)
+    suffix=${rebuilt:-$(( ${last:-0} + 1 ))}
+    for name in "${names[@]}"; do sed -i "s/^release = \(.*\)\$/release = \1.$suffix/" "$work/recipes/$name/YONEBUILD"; done
   fi
   # built before part of its cycle: what it needs to run and is not built yet
   # leaves its depends (it could not be installed, nor what needs it); the
@@ -307,6 +314,7 @@ while read -r base relax; do
     grep -qx "$base" "$work/done" || echo "$base" >> "$work/done"
     okn=$((okn + 1)); printf 'ok   %5ds\n' $((SECONDS - t0))
     printf '%s\t%s\n' "$base" "${names[*]}" >> "$work/made"   # its packages' names (repair-done.py)
+    [ -z "$again" ] || [ -z "$rebuilt" ] || echo "rebuilt:$base@$rebuilt" >> "$work/done"
     # built without part of its cycle: plan-wave.py builds it again once that
     # part is built ("-": complete)
     miss=; for d in $relax; do grep -qx "$d" "$work/done" || miss="$miss $d"; done

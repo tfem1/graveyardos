@@ -1,0 +1,8 @@
+# Package bases built again after a fix that changes what they make, though
+# they count as built (arch/plan-wave.py plans them, arch/build-wave.sh
+# suffixes their release with the number). base<TAB>number<TAB>why; a new
+# number (2, 3...) builds the base once more.
+docbook-xml	2	its Yone hook registers it in /etc/xml/catalog (arch/fixes)
+docbook-xsl	2	its Yone hook registers it in /etc/xml/catalog (arch/fixes)
+libxml2	2	its Python bindings, HTTP and xmllint history (arch/fixes: meson .enabled() options)
+glib2	2	its GObject introspection data (GLib-2.0.gir...) now that gobject-introspection is built: every GIR depends on it
