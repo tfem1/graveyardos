@@ -61,3 +61,6 @@ hdf5	eval "$(declare -f build | sed 's/-DHDF5_BUILD_JAVA=ON/-DHDF5_BUILD_JAVA=OF
 boost	eval "$(declare -f build | sed '/using mpi ;/d')"; eval "$(declare -f package_boost-libs | sed '/site_packages/d')"  # no OpenMPI (arch/drop): b2 skips Boost.MPI (and graph_parallel's MPI part), so no boost/mpi.so Python module to install
 fftw	eval "$(declare -f build | sed 's/ --enable-mpi / /; s/ MPILIBS="\$(mpicc --showme:link)"//')"; eval "$(declare -f package_fftw | sed 's/_pick \$pkgbase-openmpi/:/')"  # no OpenMPI (arch/drop): no MPI libraries to split off (fftw-openmpi is not made)
 colord	eval "$(declare -f build | sed 's/-D sane=true/-D sane=false/')"; eval "$(declare -f package_colord | sed '/_pick sane/d')"  # no SANE (arch/drop): no sane sensor plugin nor colord-sane helper to split off (colord-sane is not made)
+rapidjson	export CMAKE_POLICY_VERSION_MINIMUM=3.5  # its CMakeLists.txt asks for CMake 2.8, below what CMake 4 still accepts
+clisp	export FORCE_UNSAFE_CONFIGURE=1  # its gnulib configure refuses root, as Yone's build chroot runs
+libdc1394	echo 'AC_DEFUN([AM_PATH_SDL], [m4_default([$3], [:])])' >> "$srcdir/libdc1394/acinclude.m4"  # SDL 1.2's sdl.m4 is not built: autoreconf only needs the macro defined; the dc1394_multiview example is left out
