@@ -132,3 +132,40 @@ qca	qt5-base	nothing more: it was there for qca-qt5
 ibus	qt5-base	nothing: ibus 1.5.34's configure looks for no Qt (a makedepends left from older ibus)
 gpsd	qt5-base	the Qt binding (libQgpsmm)
 zbar	qt5-x11extras	the Qt widget (libzbarqt, zbar-qt)
+# Heavy optional parts of multimedia bases (OpenCV, Java, WPE WebKit, OpenCL, PyQt5, MPI), left out for a desktop sooner; arch/fixes turns them off where the build asks for them
+ffmpeg	frei0r-plugins	the frei0r video effect filters (frei0r, frei0r_src)
+ffmpeg	ocl-icd	the OpenCL filters and hardware mapping (--enable-opencl)
+ffmpeg	opencl-headers	nothing more: it was there for OpenCL (ocl-icd)
+gstreamer	opencv	the opencv plugin and library (gst-plugin-opencv)
+gstreamer	gst-plugin-opencv	the opencv plugin and library (OpenCV)
+gstreamer	wpewebkit	the wpe2 web page source plugin (gst-plugin-wpe2)
+gstreamer	gst-plugin-wpe2	the wpe2 web page source plugin (WPE WebKit)
+zxing-cpp	opencv	the ZXingOpenCV example program (built, never installed)
+imagemagick	ocl-icd	OpenCL acceleration
+imagemagick	opencl-headers	nothing more: it was there for OpenCL (ocl-icd)
+libbluray	apache-ant	the BD-J jar (Blu-ray Java menus; ant's package base is ant)
+libbluray	ant	the BD-J jar (Blu-ray Java menus)
+libbluray	java-environment	the BD-J jar (Blu-ray Java menus; java-openjdk's)
+libbluray	java-openjdk	the BD-J jar (Blu-ray Java menus)
+libical	jdk-openjdk	the Java bindings
+libical	java-openjdk	the Java bindings (jdk-openjdk's base)
+libjxl	java-environment	the JNI wrapper (libjxl_jni.so, jpegxl.jar; java-openjdk's)
+libjxl	java-openjdk	the JNI wrapper (libjxl_jni.so, jpegxl.jar)
+libjxl	add-determinism	nothing more: it was there to make jpegxl.jar reproducible
+rubberband	java-environment	the JNI library (librubberband-jni.so and its jar; java-openjdk's)
+rubberband	java-openjdk	the JNI library (librubberband-jni.so and its jar)
+hdf5	java-environment	the Java library (java-openjdk's)
+hdf5	java-openjdk	the Java library
+hdf5	openmpi	the parallel (MPI) build, hdf5-openmpi
+hdf5	hdf5-openmpi	the parallel (MPI) build (OpenMPI)
+pulseaudio	python-pyqt5	the graphical equalizer (qpaeq) and its sink module: pulseaudio-equalizer
+pulseaudio	pyqt5	the graphical equalizer (python-pyqt5's base)
+pulseaudio	pulseaudio-equalizer	the graphical equalizer (qpaeq needs PyQt5) and module-equalizer-sink
+libffado	python-pyqt5	ffado-mixer, the mixer GUI
+libffado	pyqt5	ffado-mixer, the mixer GUI (python-pyqt5's base)
+boost	openmpi	Boost.MPI (libboost_mpi, its Python module) and graph_parallel's MPI part
+fftw	openmpi	the MPI libraries (fftw-openmpi)
+fftw	fftw-openmpi	the MPI libraries (OpenMPI)
+lv2	python-pylint	nothing: pylint only runs in the strict-mode tests
+colord	sane	the SANE sensor plugin and helper (colord-sane)
+colord	colord-sane	the SANE sensor plugin and helper (SANE)

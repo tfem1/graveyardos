@@ -49,3 +49,15 @@ polkit-qt	eval "$(declare -f build | sed '/build5/d')"  # only the Qt6 build (po
 qca	eval "$(declare -f build | sed '/build-qt5/d')"  # only the Qt6 build (qca-qt5: arch/drop)
 gpsd	eval "$(declare -f build | sed 's/qt_versioned=5/qt=no/')"  # no Qt5 (arch/drop): without libQgpsmm, whatever the chroot has
 zbar	eval "$(declare -f build | sed 's/-D java=disabled/& -D qt=false/')"  # no Qt5 (arch/drop): without the Qt widget, whatever the chroot has
+# Heavy optional parts of multimedia bases left out (arch/drop)
+ffmpeg	eval "$(declare -f build | sed 's/ --enable-frei0r / /; s/ --enable-opencl / /')"  # no frei0r-plugins nor OpenCL (ocl-icd, arch/drop): configure stops on an --enable-* whose library is missing
+gstreamer	eval "$(declare -f build | sed 's/-D gst-plugins-bad:wpe=disabled/& -D gst-plugins-bad:wpe2=disabled -D gst-plugins-bad:opencv=disabled/')"  # no wpewebkit nor opencv (arch/drop): their auto features off for sure, so no wpe2/opencv plugin is left in root/ for gstreamer-docs' emptiness check (gst-plugin-wpe2, gst-plugin-opencv are not made)
+zxing-cpp	eval "$(declare -f build | sed 's/-DZXING_UNIT_TESTS=ON/-DZXING_UNIT_TESTS=OFF/')"  # the unit tests fetch googletest from GitHub at configure time when gtest is not installed (a check dependency, not given; no network here), and check() is not run
+imagemagick	eval "$(declare -f build | sed 's/--enable-opencl/--disable-opencl/')"  # no OpenCL (ocl-icd, arch/drop); configure would only warn, this keeps it off whatever the chroot has
+libical	eval "$(declare -f build | sed 's|-DCMAKE_INSTALL_PREFIX=/usr|& -DLIBICAL_JAVA_BINDINGS=false|')"  # no Java (arch/drop): LIBICAL_JAVA_BINDINGS defaults to true and stops cmake without a Java compiler
+libjxl	eval "$(declare -f build | sed 's/-Wno-author/-DJPEGXL_ENABLE_JNI:BOOL=false &/')"; eval "$(declare -f package_libjxl | sed '/usr\/share\/java/d')"  # no Java (arch/drop): no JNI wrapper, so no jpegxl.jar for package_libjxl to rename and add-det
+rubberband	eval "$(declare -f build | sed 's| -Dextra_include_dirs="[^"]*"| -Djni=disabled|')"  # no Java (arch/drop): the JDK include directories it adds do not exist (meson refuses them), and the JNI library is not built
+hdf5	eval "$(declare -f build | sed 's/-DHDF5_BUILD_JAVA=ON/-DHDF5_BUILD_JAVA=OFF/; /build-mpi/d')"  # no Java nor OpenMPI (arch/drop): no Java library, and no second, MPI build (hdf5-openmpi is not made)
+boost	eval "$(declare -f build | sed '/using mpi ;/d')"; eval "$(declare -f package_boost-libs | sed '/site_packages/d')"  # no OpenMPI (arch/drop): b2 skips Boost.MPI (and graph_parallel's MPI part), so no boost/mpi.so Python module to install
+fftw	eval "$(declare -f build | sed 's/ --enable-mpi / /; s/ MPILIBS="\$(mpicc --showme:link)"//')"; eval "$(declare -f package_fftw | sed 's/_pick \$pkgbase-openmpi/:/')"  # no OpenMPI (arch/drop): no MPI libraries to split off (fftw-openmpi is not made)
+colord	eval "$(declare -f build | sed 's/-D sane=true/-D sane=false/')"; eval "$(declare -f package_colord | sed '/_pick sane/d')"  # no SANE (arch/drop): no sane sensor plugin nor colord-sane helper to split off (colord-sane is not made)
