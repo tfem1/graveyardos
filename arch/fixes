@@ -38,3 +38,14 @@ lapack	command -v doxygen >/dev/null || { eval "$(declare -f build | sed 's/-DBU
 jsoncpp	command -v doxygen >/dev/null || { eval "$(declare -f build | sed '/Building docs/d; /doxybuild\.py/d')"; eval "$(declare -f package_jsoncpp-doc | sed '/dist\/doxygen/d')"; }  # built before doxygen (their cycle): no API reference (jsoncpp-doc)
 libsasl	[ -e /usr/include/ldap.h ] || eval "$(declare -f build | sed 's/--enable-ldapdb/--disable-ldapdb/; s/--with-ldap /--without-ldap /')"  # built before openldap (their cycle with krb5): the ldapdb plugin, which package() removes (cyrus-sasl's), needs it; without krb5, mariadb and postgresql configure leaves out only the plugins package() removes
 krb5	eval "$(declare -f build | sed 's/--with-ldap/--without-ldap/')"  # no LDAP back end (arch/drop): krb5 comes first in the krb5, openldap, libsasl cycle
+# Qt 5 and KDE Frameworks 5 are not built (arch/drop)
+breeze	eval "$(declare -f build | sed '/build5/d')"  # only the Qt6 build (-DBUILD_QT5=OFF): no Qt5 style (breeze5: arch/drop), no KDE Frameworks 5
+plasma-integration	eval "$(declare -f build | sed '/build5/d')"  # only the Qt6 build (-DBUILD_QT5=OFF): no Qt5 platform theme (plasma5-integration: arch/drop), no KDE Frameworks 5
+sddm	eval "$(declare -f build | sed '/build5/d')"; eval "$(declare -f package | sed '/build5/d')"  # only the Qt6 build (-DBUILD_WITH_QT6=ON): no Qt5 sddm-greeter nor its QML components (arch/drop); themes with QtVersion=6, and the built-in one, use sddm-greeter-qt6
+poppler	eval "$(declare -f build | sed 's/-DENABLE_GTK_DOC=ON/& -DENABLE_QT5=OFF/')"  # no Qt5 bindings (poppler-qt5: arch/drop); ENABLE_QT5 is on by default and stops cmake without Qt5
+gstreamer	eval "$(declare -f build | sed 's/-D gpl=enabled/& -D qt5=disabled/')"  # no qmlgl plugin (gst-plugin-qmlgl: arch/drop), whatever the chroot has: a libgstqmlgl.so left in root fails gstreamer-docs' leftover check; gst-plugins-good's qt5 yields to this top-level option
+libportal	eval "$(declare -f build | sed 's/arch-meson libportal build/& -D backend-qt5=disabled/')"; eval "$(declare -f package_libportal | sed 's/gtk3 gtk4 qt5 qt6/gtk3 gtk4 qt6/')"  # no Qt5 backend (libportal-qt5: arch/drop), and package_libportal has no qt5 files to split off (its mv would fail)
+polkit-qt	eval "$(declare -f build | sed '/build5/d')"  # only the Qt6 build (polkit-qt5: arch/drop)
+qca	eval "$(declare -f build | sed '/build-qt5/d')"  # only the Qt6 build (qca-qt5: arch/drop)
+gpsd	eval "$(declare -f build | sed 's/qt_versioned=5/qt=no/')"  # no Qt5 (arch/drop): without libQgpsmm, whatever the chroot has
+zbar	eval "$(declare -f build | sed 's/-D java=disabled/& -D qt=false/')"  # no Qt5 (arch/drop): without the Qt widget, whatever the chroot has

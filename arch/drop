@@ -82,3 +82,53 @@ qt6-base	mariadb-libs	the MariaDB/MySQL SQL driver (Qt's sql_mysql feature is fo
 qt6-base	mariadb	the MariaDB/MySQL SQL driver (mariadb-libs's base)
 qt6-base	postgresql	the PostgreSQL SQL driver (sql_psql, found, not required)
 qt6-base	freetds	the MS SQL driver (sql_tds, found, not required)
+# Qt 5 and KDE Frameworks 5 are not built: the Qt 6 build of what Arch builds for both (arch/fixes)
+breeze	breeze5	the Qt5 Breeze widget style (breeze5)
+breeze	frameworkintegration5	nothing more: it was there for breeze5
+breeze	kconfig5	nothing more: it was there for breeze5
+breeze	kconfigwidgets5	nothing more: it was there for breeze5
+breeze	kguiaddons5	nothing more: it was there for breeze5
+breeze	kiconthemes5	nothing more: it was there for breeze5
+breeze	kwindowsystem5	nothing more: it was there for breeze5
+breeze	qt5-base	nothing more: it was there for breeze5
+breeze	qt5-declarative	nothing more: it was there for breeze5
+plasma-integration	plasma5-integration	the Qt5 platform theme (plasma5-integration)
+plasma-integration	kconfig5	nothing more: it was there for plasma5-integration
+plasma-integration	kconfigwidgets5	nothing more: it was there for plasma5-integration
+plasma-integration	kcoreaddons5	nothing more: it was there for plasma5-integration
+plasma-integration	ki18n5	nothing more: it was there for plasma5-integration
+plasma-integration	kiconthemes5	nothing more: it was there for plasma5-integration
+plasma-integration	kio5	nothing more: it was there for plasma5-integration
+plasma-integration	kjobwidgets5	nothing more: it was there for plasma5-integration
+plasma-integration	knotifications5	nothing more: it was there for plasma5-integration
+plasma-integration	kservice5	nothing more: it was there for plasma5-integration
+plasma-integration	kwayland5	nothing more: it was there for plasma5-integration
+plasma-integration	kwidgetsaddons5	nothing more: it was there for plasma5-integration
+plasma-integration	kwindowsystem5	nothing more: it was there for plasma5-integration
+plasma-integration	qt5-base	nothing more: it was there for plasma5-integration
+plasma-integration	qt5-declarative	nothing more: it was there for plasma5-integration
+plasma-integration	qt5-quickcontrols2	nothing more: it was there for plasma5-integration
+plasma-integration	qt5-wayland	nothing more: it was there for plasma5-integration
+plasma-integration	qt5-x11extras	nothing more: it was there for plasma5-integration
+sddm	qt5-base	the Qt5 greeter (sddm-greeter) and its QML components, for themes without QtVersion=6 (sddm-greeter-qt6 stays)
+sddm	qt5-declarative	the Qt5 greeter (sddm-greeter) and its QML components
+sddm	qt5-tools	the Qt5 greeter's translations (lrelease)
+poppler	poppler-qt5	the Qt5 bindings (poppler-qt5)
+poppler	qt5-base	nothing more: it was there for poppler-qt5
+gstreamer	gst-plugin-qmlgl	the Qt5 QML video sink and source (qmlglsink, gst-plugin-qmlgl; the Qt6 qml6 plugin stays)
+gstreamer	qt5-base	nothing more: it was there for gst-plugin-qmlgl
+gstreamer	qt5-declarative	nothing more: it was there for gst-plugin-qmlgl
+gstreamer	qt5-tools	nothing more: it was there for gst-plugin-qmlgl
+gstreamer	qt5-wayland	nothing more: it was there for gst-plugin-qmlgl
+gstreamer	qt5-x11extras	nothing more: it was there for gst-plugin-qmlgl
+libportal	libportal-qt5	the Qt5 backend (libportal-qt5)
+libportal	qt5-base	nothing more: it was there for libportal-qt5
+libportal	qt5-tools	nothing more: it was there for libportal-qt5
+libportal	qt5-x11extras	nothing more: it was there for libportal-qt5
+polkit-qt	polkit-qt5	the Qt5 library (polkit-qt5)
+polkit-qt	qt5-base	nothing more: it was there for polkit-qt5
+qca	qca-qt5	the Qt5 library (qca-qt5)
+qca	qt5-base	nothing more: it was there for qca-qt5
+ibus	qt5-base	nothing: ibus 1.5.34's configure looks for no Qt (a makedepends left from older ibus)
+gpsd	qt5-base	the Qt binding (libQgpsmm)
+zbar	qt5-x11extras	the Qt widget (libzbarqt, zbar-qt)
