@@ -18,3 +18,9 @@ https://docbook.org/	https://archive.docbook.org/
 # Savannah's Git times out from the runners: gnulib (wget's source and
 # submodule) is mirrored on GitHub
 https://git.savannah.gnu.org/git/gnulib.git	https://github.com/coreutils/gnulib.git
+# ftp.gnu.org times out from the runners: kernel.org's GNU mirror (the same
+# files, checked against the PKGBUILD's sums)
+https://ftp.gnu.org/gnu/	https://mirrors.kernel.org/gnu/
+# download.drobilla.net times out: Debian's copy of the release (its
+# orig.tar.xz is upstream's file; the PKGBUILD's sums check it)
+https://download.drobilla.net/zix-0.8.2.tar.xz	https://deb.debian.org/debian/pool/main/z/zix/zix_0.8.2.orig.tar.xz
