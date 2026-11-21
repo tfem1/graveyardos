@@ -101,3 +101,5 @@ libsasl	eval "$(declare -f build | sed 's/--enable-sql/--disable-sql/; s| --with
 ffmpeg	eval "$(declare -f build | sed 's/ --enable-vapoursynth / /')"  # no VapourSynth input (arch/drop): configure stops on an --enable-* whose library is missing
 pulseaudio	eval "$(declare -f package_pulseaudio | sed '/_pick lirc /d')"  # no module-lirc to split off (pulseaudio-lirc, lirc: arch/drop; meson auto feature)
 gstreamer	eval "$(declare -f package_gst-plugins-bad | sed 's# usr/lib/gstreamer-1.0/libgstrtmp\.so##')"  # no librtmp plugin to install (rtmpdump: arch/drop; gst-plugins-bad:rtmp is an auto feature)
+tpm2-tss	eval "$(declare -f build | sed 's/ --enable-integration / /; s/ --enable-unit / /')"  # no test suites: the integration tests need a TPM simulator (swtpm, a check dependency) at configure time, and check() is not run
+openldap	export LIBRARY_PATH="$srcdir/$pkgbase-$pkgver/libraries/libldap/.libs:$srcdir/$pkgbase-$pkgver/libraries/liblber/.libs${LIBRARY_PATH:+:$LIBRARY_PATH}"  # libtool relinks the slapd overlays with -lldap at make install: from the tree, as no libldap is installed in the chroot
