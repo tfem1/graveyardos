@@ -227,8 +227,8 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          new=0
-          for d in shards/shard-*; do new=$((new + $(grep -c . "$d/done" 2> /dev/null || echo 0))); done
+          # (grep -c prints 0 and fails on an empty file: no "|| echo 0" here)
+          new=$(cat shards/shard-*/done 2> /dev/null | grep -c . || true)
           echo "built in this wave: $new"
           # bases newly pinned (failed without part of their cycle): the next
           # plan breaks their cycles elsewhere, so the chain goes on
